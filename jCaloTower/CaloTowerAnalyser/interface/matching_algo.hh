@@ -93,7 +93,28 @@ bool in_array(std::vector<int> array, int value) {
 
 }
 
-std::vector<int> analyse_pairs(std::vector<pair_info> & pairs, int reco_size, double DR2max) {
+std::vector<int> analyse_pairs_global(std::vector<pair_info> & pairs, int reco_size, double DR2max) {
+
+  //std::vector<std::string> reco_matched_index(reco_size, "other");
+  std::vector<int> reco_matched_index(reco_size, -1);
+
+  std::vector<int> gen_matched;
+  std::vector<int> reco_matched;
+
+  for(unsigned int i=0; i< pairs.size(); i++) {
+    if(!in_array(reco_matched, pairs[i].ID2()) && pairs[i].DR2() < DR2max) {
+      gen_matched.push_back(pairs[i].ID1());
+      reco_matched.push_back(pairs[i].ID2());
+      //reco_matched_index[pairs[i].ID2()] = get_flavour(pairs[i].ID1());
+      reco_matched_index[pairs[i].ID2()] = pairs[i].ID1();
+    }
+  }
+
+  return reco_matched_index;
+
+}
+
+std::vector<int> analyse_pairs_local(std::vector<pair_info> & pairs, int reco_size, double DR2max) {
 
   //std::vector<std::string> reco_matched_index(reco_size, "other");
   std::vector<int> reco_matched_index(reco_size, -1);
