@@ -863,7 +863,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
    std::vector<jJet> L1_4300_jJet = getL1Jets(myarray, 4, 3, 0, 0);
    std::vector<jJet> L1_4350_jJet = getL1Jets(myarray, 4, 3, 5, 0);
    std::vector<jJet> L1_4400_jJet = getL1Jets(myarray, 4, 4, 0, 0);
-   std::vector<jJet> L1_rect_jJet = getL1Jets(myarray, 4, 4,4,4, 0, 0);
+   std::vector<jJet> L1_rect_jJet = getL1Jets(myarray, 8, 2,8,2, 0, 0);
    std::vector<jJet> L1_4300donut_jJet;
    std::vector<jJet> L1_4350donut_jJet;
 
@@ -877,6 +877,8 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
    jJetMap["L1_4400"] = L1_4400_jJet;
    jJetMap["L1_4350"] = L1_4350_jJet;
+   jJetMap["L1_4300"] = L1_4300_jJet;
+   jJetMap["L1_rect"] = L1_rect_jJet;
 
    ak4Map["ak4tt"] = ak4ttjets; 
    ak4Map["ak4gen"] = ak4genjetsp; 
