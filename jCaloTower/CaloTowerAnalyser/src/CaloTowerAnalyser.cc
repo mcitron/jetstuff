@@ -932,7 +932,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
    if(this->mPrintMe)
    {
-      std::cout << "Event Printed" << std::endl;
+      //std::cout << "Event Printed" << std::endl;
       //printOneEvent(triggertowers, L1_4400_jJet,ak4ttjets, genJetCol, ak4genjetsp);
         printOneEvent(triggertowers, jJetMap,ak4Map,genMap);
    }
