@@ -345,8 +345,10 @@ void CaloTowerAnalyser::printOneEvent(const edm::Handle<l1slhc::L1CaloTowerColle
       ttowE->Fill((*j).iEta(), (*j).iPhi(), (*j).E());
       ttowH->Fill((*j).iEta(), (*j).iPhi(), (*j).H());
    }
+
    for (std::map<TString,std::vector<jJet>>::const_iterator j = L1jets.begin();j != L1jets.end();j++)
    {
+      std::cout << (*j).first << std::endl;
       TH2I* hjJet = dir.make<TH2I>((*j).first,";eta;phi", 57,-28.5,28.5, 72, 0.5, 72.5);
 	 for(std::vector<jJet>::const_iterator jet=(*j).second.begin(); jet!=(*j).second.end(); jet++) {
 	    hjJet->Fill(jet->iEta(), jet->iPhi(), jet->pt());
@@ -874,6 +876,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
    std::map <TString,const reco::GenJetCollection * > genMap;
 
    jJetMap["L1_4400"] = L1_4400_jJet;
+   jJetMap["L1_4350"] = L1_4350_jJet;
 
    ak4Map["ak4tt"] = ak4ttjets; 
    ak4Map["ak4gen"] = ak4genjetsp; 
@@ -882,7 +885,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
    if(this->mPrintMe)
    {
-      std::cout << "Event Printed" << std::endl;
+      //std::cout << "Event Printed" << std::endl;
       //printOneEvent(triggertowers, L1_4400_jJet,ak4ttjets, genJetCol, ak4genjetsp);
         printOneEvent(triggertowers, jJetMap,ak4Map,genMap);
    }
