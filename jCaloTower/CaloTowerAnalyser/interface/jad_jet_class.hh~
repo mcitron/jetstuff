@@ -20,6 +20,7 @@ public:
   double pt() const;
   std::vector<int> ringSums() const;
   std::vector<int> ringAreas() const;
+  std::vector<int> getOuterRings() const;
   int DeltaR2(const jJet & jet2) const;
   int PUE();
   double eatDonut(); //the energy after PUsubtraction
@@ -44,7 +45,6 @@ double jJet::pt() const { return mpt; }
 std::vector<int> jJet::ringSums() const { return mringsums; }
 std::vector<int> jJet::ringAreas() const { return mringareas; }
 int jJet::PUE() { return (mouterstrips[1] + mouterstrips[2]); } //i.e. sum up the middle two energies
-}
 
 double jJet::eatDonut() {
   double lastringsum = this->ringSums().at(this->ringSums().size() - 1);
