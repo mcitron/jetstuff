@@ -5,11 +5,11 @@
 // 
 /**\class CaloTowerAnalyser CaloTowerAnalyser.cc jCaloTower/CaloTowerAnalyser/src/CaloTowerAnalyser.cc
 
- Description: [one line class summary]
+Description: [one line class summary]
 
- Implementation:
-     [Notes on implementation]
-*/
+Implementation:
+[Notes on implementation]
+ */
 //
 // Original Author:  Jad Marrouche
 //         Created:  Fri Jun 21 08:28:06 BST 2013
@@ -71,121 +71,122 @@
 //
 
 class CaloTowerAnalyser : public edm::EDAnalyzer {
-public:
-  explicit CaloTowerAnalyser(const edm::ParameterSet&);
-  ~CaloTowerAnalyser();
-  
-  static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
+   public:
+      explicit CaloTowerAnalyser(const edm::ParameterSet&);
+      ~CaloTowerAnalyser();
 
-  void getJets(std::vector < fastjet::PseudoJet > &constits,std::vector < fastjet::PseudoJet > &jets);
-  std::vector<jJet> getL1Jets(const std::vector< std::vector<int> > & input, int phisize, int etasize, int vetophisize, int vetoetasize, int seedthresh1, int seedthresh2);
-  std::vector<jJet> getL1Jets(const std::vector< std::vector<int> > & input, int jetsize, int vetowindowsize, int seedthresh1, int seedthresh2); 
-  void compareJetCollections(const std::vector<jJet> & col1, const std::vector<jJet> & col2, std::string folderName);
-void printOneEvent(const edm::Handle<l1slhc::L1CaloTowerCollection> triggertowers, const std::map <TString,std::vector<jJet> > & L1jets, const std::map<TString,std::vector<fastjet::PseudoJet>> & ak4jets,std::map<TString,const reco::GenJetCollection *> ak4genjets);
-  std::vector<int> closestJetDistance(const std::vector<jJet> & jJets);
-  void SetNPV(int NPV);
-  int GetNPV();
+      static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
-private:
-  bool mPrintMe=false;
-  virtual void beginJob() ;
-  virtual void analyze(const edm::Event&, const edm::EventSetup&);
-  virtual void endJob() ;
+      void getJets(std::vector < fastjet::PseudoJet > &constits,std::vector < fastjet::PseudoJet > &jets);
+      std::vector<jJet> getL1Jets(const std::vector< std::vector<int> > & input, int phisize, int etasize, int vetophisize, int vetoetasize, int seedthresh1, int seedthresh2);
+      std::vector<jJet> getL1Jets(const std::vector< std::vector<int> > & input, int jetsize, int vetowindowsize, int seedthresh1, int seedthresh2); 
+      std::vector<jJet> emuL1Jets(const std::vector< std::vector<int> > & input, int etasize, int phisize,int seedthresh1, int seedthresh2);
+      void compareJetCollections(const std::vector<jJet> & col1, const std::vector<jJet> & col2, std::string folderName);
+      void printOneEvent(const edm::Handle<l1slhc::L1CaloTowerCollection> triggertowers, const std::map <TString,std::vector<jJet> > & L1jets, const std::map<TString,std::vector<fastjet::PseudoJet>> & ak4jets,std::map<TString,const reco::GenJetCollection *> ak4genjets);
+      std::vector<int> closestJetDistance(const std::vector<jJet> & jJets);
+      void SetNPV(int NPV);
+      int GetNPV();
 
-  //void Make2DMap(const edm::Handle<l1slhc::L1CaloTowerCollection> triggertowers, const edm::Handle<CaloTowerCollection> calotowers, const int eventNumber);
+   private:
+      bool mPrintMe=false;
+      virtual void beginJob() ;
+      virtual void analyze(const edm::Event&, const edm::EventSetup&);
+      virtual void endJob() ;
 
-  //virtual void beginRun(edm::Run const&, edm::EventSetup const&);
-  //virtual void endRun(edm::Run const&, edm::EventSetup const&);
-  //virtual void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
-  //virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
+      //void Make2DMap(const edm::Handle<l1slhc::L1CaloTowerCollection> triggertowers, const edm::Handle<CaloTowerCollection> calotowers, const int eventNumber);
 
-  // ----------member data ---------------------------
-  int mEventNumber;
-  int mNPV;
-  std::vector<pair_info> pairs;
-  TH1D * num_tops_per_event;
-  TH1D * median_energy_per_event;
+      //virtual void beginRun(edm::Run const&, edm::EventSetup const&);
+      //virtual void endRun(edm::Run const&, edm::EventSetup const&);
+      //virtual void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
+      //virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
 
-  TH1D * genjet_pt;
-  TH2D * ntowers_vs_npv;
+      // ----------member data ---------------------------
+      int mEventNumber;
+      int mNPV;
+      std::vector<pair_info> pairs;
+      TH1D * num_tops_per_event;
+      TH1D * median_energy_per_event;
 
-  TH2D * r4_vs_npv_eta1_pt3050;
-  TH2D * r4_vs_npv_eta2_pt3050;
-  TH2D * r4_vs_npv_eta3_pt3050;
-  TH2D * r4_vs_npv_eta1_pt80100;
-  TH2D * r4_vs_npv_eta2_pt80100;
-  TH2D * r4_vs_npv_eta3_pt80100;
+      TH1D * genjet_pt;
+      TH2D * ntowers_vs_npv;
 
-  TH2D * deltaGenL1_pT3050_eta1_v1;
-  TH2D * deltaGenL1_v2;
-  TH2D * deltaGenL1_v3;
-  TH2D * deltaGenL1_pT3050_eta1_v4;
-  TH2D * deltaGenL1_pT3050_eta2_v1;
-  TH2D * deltaGenL1_pT3050_eta2_v4;
-  TH2D * deltaGenL1_pT3050_eta3_v1;
-  TH2D * deltaGenL1_pT3050_eta3_v4;
-  TH2D * deltaGenL1_ntowers;
-  TH2D * deltaGenL1_R1;
-  TH2D * deltaGenL1_R2;
-  TH2D * deltaGenL1_R3;
-  TH2D * deltaGenL1_R4;
+      TH2D * r4_vs_npv_eta1_pt3050;
+      TH2D * r4_vs_npv_eta2_pt3050;
+      TH2D * r4_vs_npv_eta3_pt3050;
+      TH2D * r4_vs_npv_eta1_pt80100;
+      TH2D * r4_vs_npv_eta2_pt80100;
+      TH2D * r4_vs_npv_eta3_pt80100;
+
+      TH2D * deltaGenL1_pT3050_eta1_v1;
+      TH2D * deltaGenL1_v2;
+      TH2D * deltaGenL1_v3;
+      TH2D * deltaGenL1_pT3050_eta1_v4;
+      TH2D * deltaGenL1_pT3050_eta2_v1;
+      TH2D * deltaGenL1_pT3050_eta2_v4;
+      TH2D * deltaGenL1_pT3050_eta3_v1;
+      TH2D * deltaGenL1_pT3050_eta3_v4;
+      TH2D * deltaGenL1_ntowers;
+      TH2D * deltaGenL1_R1;
+      TH2D * deltaGenL1_R2;
+      TH2D * deltaGenL1_R3;
+      TH2D * deltaGenL1_R4;
 
 
-  TriggerTowerGeometry g; //to run the constructor -- could also make this static
+      TriggerTowerGeometry g; //to run the constructor -- could also make this static
 
-  std::map<std::string, TH1D * > col1_jet1_eta;
-  std::map<std::string, TH1D * > col1_jet2_eta;
-  std::map<std::string, TH1D * > col1_jet3_eta;
-  std::map<std::string, TH1D * > col1_jet4_eta;
-  std::map<std::string, TH1D * > col2_jet1_eta;
-  std::map<std::string, TH1D * > col2_jet2_eta;
-  std::map<std::string, TH1D * > col2_jet3_eta;
-  std::map<std::string, TH1D * > col2_jet4_eta;
-  std::map<std::string, TH1D * > col1_jet1_pt;
-  std::map<std::string, TH1D * > col1_jet2_pt;
-  std::map<std::string, TH1D * > col1_jet3_pt;
-  std::map<std::string, TH1D * > col1_jet4_pt;
-  std::map<std::string, TH1D * > col2_jet1_pt;
-  std::map<std::string, TH1D * > col2_jet2_pt;
-  std::map<std::string, TH1D * > col2_jet3_pt;
-  std::map<std::string, TH1D * > col2_jet4_pt;
-  std::map<std::string, TH1D * > col1_alljet_pt;
-  std::map<std::string, TH1D * > col2_alljet_pt;
-  std::map<std::string, TH1D * > col1_alljet_eta;
-  std::map<std::string, TH1D * > col2_alljet_eta;
-  std::map<std::string, TH1D * > col2_matched_local_alljet_pt;
-  std::map<std::string, TH1D * > col2_matched_local_alljet_eta;
-  std::map<std::string, TH2D * > col2_matched_local_ptcorr;
-  std::map<std::string, TH2D * > col2_matched_local_jet1_ptcorr;
-  std::map<std::string, TH2D * > col2_matched_local_jet2_ptcorr;
-  std::map<std::string, TH2D * > col2_matched_local_jet3_ptcorr;
-  std::map<std::string, TH2D * > col2_matched_local_jet4_ptcorr;
-  std::map<std::string, TH2D * > col2_matched_local_ptres;
-  std::map<std::string, TH1D * > col2_matched_local_jet1_pt;
-  std::map<std::string, TH1D * > col2_matched_local_jet2_pt;
-  std::map<std::string, TH1D * > col2_matched_local_jet3_pt;
-  std::map<std::string, TH1D * > col2_matched_local_jet4_pt;
-  std::map<std::string, TH1D * > col2_matched_local_jet1_eta;
-  std::map<std::string, TH1D * > col2_matched_local_jet2_eta;
-  std::map<std::string, TH1D * > col2_matched_local_jet3_eta;
-  std::map<std::string, TH1D * > col2_matched_local_jet4_eta;
+      std::map<std::string, TH1D * > col1_jet1_eta;
+      std::map<std::string, TH1D * > col1_jet2_eta;
+      std::map<std::string, TH1D * > col1_jet3_eta;
+      std::map<std::string, TH1D * > col1_jet4_eta;
+      std::map<std::string, TH1D * > col2_jet1_eta;
+      std::map<std::string, TH1D * > col2_jet2_eta;
+      std::map<std::string, TH1D * > col2_jet3_eta;
+      std::map<std::string, TH1D * > col2_jet4_eta;
+      std::map<std::string, TH1D * > col1_jet1_pt;
+      std::map<std::string, TH1D * > col1_jet2_pt;
+      std::map<std::string, TH1D * > col1_jet3_pt;
+      std::map<std::string, TH1D * > col1_jet4_pt;
+      std::map<std::string, TH1D * > col2_jet1_pt;
+      std::map<std::string, TH1D * > col2_jet2_pt;
+      std::map<std::string, TH1D * > col2_jet3_pt;
+      std::map<std::string, TH1D * > col2_jet4_pt;
+      std::map<std::string, TH1D * > col1_alljet_pt;
+      std::map<std::string, TH1D * > col2_alljet_pt;
+      std::map<std::string, TH1D * > col1_alljet_eta;
+      std::map<std::string, TH1D * > col2_alljet_eta;
+      std::map<std::string, TH1D * > col2_matched_local_alljet_pt;
+      std::map<std::string, TH1D * > col2_matched_local_alljet_eta;
+      std::map<std::string, TH2D * > col2_matched_local_ptcorr;
+      std::map<std::string, TH2D * > col2_matched_local_jet1_ptcorr;
+      std::map<std::string, TH2D * > col2_matched_local_jet2_ptcorr;
+      std::map<std::string, TH2D * > col2_matched_local_jet3_ptcorr;
+      std::map<std::string, TH2D * > col2_matched_local_jet4_ptcorr;
+      std::map<std::string, TH2D * > col2_matched_local_ptres;
+      std::map<std::string, TH1D * > col2_matched_local_jet1_pt;
+      std::map<std::string, TH1D * > col2_matched_local_jet2_pt;
+      std::map<std::string, TH1D * > col2_matched_local_jet3_pt;
+      std::map<std::string, TH1D * > col2_matched_local_jet4_pt;
+      std::map<std::string, TH1D * > col2_matched_local_jet1_eta;
+      std::map<std::string, TH1D * > col2_matched_local_jet2_eta;
+      std::map<std::string, TH1D * > col2_matched_local_jet3_eta;
+      std::map<std::string, TH1D * > col2_matched_local_jet4_eta;
 
-  std::map<std::string, TH1D * > col2_matched_global_alljet_pt;
-  std::map<std::string, TH1D * > col2_matched_global_alljet_eta;
-  std::map<std::string, TH2D * > col2_matched_global_ptcorr;
-  std::map<std::string, TH2D * > col2_matched_global_jet1_ptcorr;
-  std::map<std::string, TH2D * > col2_matched_global_jet2_ptcorr;
-  std::map<std::string, TH2D * > col2_matched_global_jet3_ptcorr;
-  std::map<std::string, TH2D * > col2_matched_global_jet4_ptcorr;
-  std::map<std::string, TH2D * > col2_matched_global_ptres;
-  std::map<std::string, TH1D * > col2_matched_global_jet1_pt;
-  std::map<std::string, TH1D * > col2_matched_global_jet2_pt;
-  std::map<std::string, TH1D * > col2_matched_global_jet3_pt;
-  std::map<std::string, TH1D * > col2_matched_global_jet4_pt;
-  std::map<std::string, TH1D * > col2_matched_global_jet1_eta;
-  std::map<std::string, TH1D * > col2_matched_global_jet2_eta;
-  std::map<std::string, TH1D * > col2_matched_global_jet3_eta;
-  std::map<std::string, TH1D * > col2_matched_global_jet4_eta;
+      std::map<std::string, TH1D * > col2_matched_global_alljet_pt;
+      std::map<std::string, TH1D * > col2_matched_global_alljet_eta;
+      std::map<std::string, TH2D * > col2_matched_global_ptcorr;
+      std::map<std::string, TH2D * > col2_matched_global_jet1_ptcorr;
+      std::map<std::string, TH2D * > col2_matched_global_jet2_ptcorr;
+      std::map<std::string, TH2D * > col2_matched_global_jet3_ptcorr;
+      std::map<std::string, TH2D * > col2_matched_global_jet4_ptcorr;
+      std::map<std::string, TH2D * > col2_matched_global_ptres;
+      std::map<std::string, TH1D * > col2_matched_global_jet1_pt;
+      std::map<std::string, TH1D * > col2_matched_global_jet2_pt;
+      std::map<std::string, TH1D * > col2_matched_global_jet3_pt;
+      std::map<std::string, TH1D * > col2_matched_global_jet4_pt;
+      std::map<std::string, TH1D * > col2_matched_global_jet1_eta;
+      std::map<std::string, TH1D * > col2_matched_global_jet2_eta;
+      std::map<std::string, TH1D * > col2_matched_global_jet3_eta;
+      std::map<std::string, TH1D * > col2_matched_global_jet4_eta;
 
 };
 
@@ -320,7 +321,7 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
 
 }
 
- 
+
 void CaloTowerAnalyser::printOneEvent(const edm::Handle<l1slhc::L1CaloTowerCollection> triggertowers, const std::map <TString,std::vector<jJet> > & L1jets, const std::map<TString,std::vector<fastjet::PseudoJet>> & ak4jets,std::map<TString,const reco::GenJetCollection *> ak4genjets) {
 
    edm::Service<TFileService> fs;
@@ -350,9 +351,9 @@ void CaloTowerAnalyser::printOneEvent(const edm::Handle<l1slhc::L1CaloTowerColle
    {
       std::cout << (*j).first << std::endl;
       TH2I* hjJet = dir.make<TH2I>((*j).first,";eta;phi", 57,-28.5,28.5, 72, 0.5, 72.5);
-	 for(std::vector<jJet>::const_iterator jet=(*j).second.begin(); jet!=(*j).second.end(); jet++) {
-	    hjJet->Fill(jet->iEta(), jet->iPhi(), jet->pt());
-	 }
+      for(std::vector<jJet>::const_iterator jet=(*j).second.begin(); jet!=(*j).second.end(); jet++) {
+	 hjJet->Fill(jet->iEta(), jet->iPhi(), jet->pt());
+      }
       hjJets.push_back(hjJet);
    } 
 
@@ -417,7 +418,7 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
 	 for(int k=(i-jetsize); k<=(i+jetsize); k++) {
 	    for(int l=(j-jetsize); l<=(j+jetsize); l++) {
 	       if(k < 0 || k > 55) continue; //i.e. out of bounds of eta<3
-	       //std::cout << " k = " << k << ", l = " << l << ", i =" << i << ", j = " << j << std::endl;
+	       //std::cou << " k = " << k << ", l = " << l << ", i =" << i << ", j = " << j << std::endl;
 
 	       //make a co-ordinate transform at the phi boundary
 	       int newl;
@@ -483,6 +484,99 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
    return L1_jJets;
 
 }
+std::vector<jJet> CaloTowerAnalyser::emuL1Jets(const std::vector< std::vector<int> > & input, int etasize, int phisize,int seedthresh1, int seedthresh2)
+{
+   std::vector<jJet> L1_jJets;
+   TriggerTowerGeometry g;
+
+   int mask[9][9] = {
+      { 2,2,2,2,2,2,2,2,2 },
+      { 1,2,2,2,2,2,2,2,2 },
+      { 1,1,2,2,2,2,2,2,2 },
+      { 1,1,1,2,2,2,2,2,2 },
+      { 1,1,1,1,0,2,2,2,2 },
+      { 1,1,1,1,1,1,2,2,2 },
+      { 1,1,1,1,1,1,1,2,2 },
+      { 1,1,1,1,1,1,1,1,2 },
+      { 1,1,1,1,1,1,1,1,1 }
+   };
+
+
+   // loop over jet positions
+   for ( int i = 0; i < (int)input.size(); i++) {
+      for ( int j = 0; j < (int)input[i].size(); j++) {
+
+	 int seedEt = input[i][j];
+	 std::vector<int> localsums(4+1,0); //to hold the ring sums (+1 for centre)
+	 std::vector<int> areas(4+1,0); //to hold the ring areas (i.e. when we get up against the boundaries)
+	 std::vector<int> outerstrips(4,0); //to hold the energies in the 4 surrounding outer strips (excluding corners)
+
+	 int iEt(seedEt);
+	 bool vetoCandidate(false);
+
+	 //Check it passes the seed threshold
+	 if(iEt < seedthresh1) continue;
+
+	 for(int k=(i-etasize); k!=(i+etasize); k++) {
+	    for(int l=(j-phisize); l!=(j+phisize); l++) {
+	       if(k < 0 || k > 55) continue; //i.e. out of bounds of eta<3
+	       //std::cou << " k = " << k << ", l = " << l << ", i =" << i << ", j = " << j << std::endl;
+	       int deta = i - k;
+	       int dphi = j - l;
+	       //make a co-ordinate transform at the phi boundary
+	       int newl;
+	       if(l < 0) { newl = l+72; } 
+	       else if (l > 71) { newl = l-72; } 
+	       else { newl = l; }
+
+	       int towEt = 0;
+	       // check jet mask and sum tower et
+	       // re-use calo tools sum method, but for single tower
+	       if( mask[deta+4][dphi+4] == 1 ) { //Do greater than
+		  if(k <= 55 && k>= 0){ //Only check if in the eta range
+		     towEt=input[k][newl];
+		     iEt+=towEt;
+		  }
+		  vetoCandidate=(seedEt<towEt);
+	       }
+	       else if( mask[deta+4][dphi+4] == 2 ) { //Do greater than equal to
+
+		  if(k <= 55 && k >= 0){ //Only check if in the eta range
+		     towEt=input[k][newl];
+		     iEt+=towEt;
+		  }
+		  vetoCandidate=(seedEt<=towEt);
+	       }
+	       if(vetoCandidate) break; 
+	    }
+	    if(vetoCandidate) break; 
+	 }
+
+	 // add the jet to the list
+	 if (!vetoCandidate) {
+	    /*
+	       if(doDonutSubtraction){
+	       std::vector<int> ring;
+	    //For 9x9 jets, subtract the 11x11 ring
+	    pusRing(ieta,iphi,5,ring,towers);
+
+	    //Using 2 strips with 9 towers for the subtraction
+	    //Need to scale it up to the jet size, ie 81/18 = 4.5
+	    int donutEt = 4.5*( ring[1]+ring[2] );
+
+	    iEt-=donutEt;
+	    }
+	     */
+	    if(iEt>0){
+	       L1_jJets.push_back(jJet(iEt, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips));
+	    }
+	 }
+
+      }
+   }
+   return L1_jJets;
+}
+
 
 std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<int> > & input, int phisize, int etasize, int vetophisize, int vetoetasize, int seedthresh1, int seedthresh2) {
 
@@ -863,7 +957,8 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
    std::vector<jJet> L1_4300_jJet = getL1Jets(myarray, 4, 3, 0, 0);
    std::vector<jJet> L1_4350_jJet = getL1Jets(myarray, 4, 3, 5, 0);
    std::vector<jJet> L1_4400_jJet = getL1Jets(myarray, 4, 4, 0, 0);
-   std::vector<jJet> L1_rect_jJet = getL1Jets(myarray, 8, 2,8,2, 0, 0);
+   std::vector<jJet> L1_4400_emu_jJet = emuL1Jets(myarray, 4, 4, 0, 0);
+   //std::vector<jJet> L1_rect_jJet = getL1Jets(myarray, 8, 2,8,2, 0, 0);
    std::vector<jJet> L1_4300donut_jJet;
    std::vector<jJet> L1_4350donut_jJet;
 
@@ -876,9 +971,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
    std::map <TString,const reco::GenJetCollection * > genMap;
 
    jJetMap["L1_4400"] = L1_4400_jJet;
-   jJetMap["L1_4350"] = L1_4350_jJet;
-   jJetMap["L1_4300"] = L1_4300_jJet;
-   jJetMap["L1_rect"] = L1_rect_jJet;
+   jJetMap["L1_emu"] = L1_4400_emu_jJet;
 
    ak4Map["ak4tt"] = ak4ttjets; 
    ak4Map["ak4gen"] = ak4genjetsp; 
@@ -889,7 +982,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
    {
       //std::cout << "Event Printed" << std::endl;
       //printOneEvent(triggertowers, L1_4400_jJet,ak4ttjets, genJetCol, ak4genjetsp);
-        printOneEvent(triggertowers, jJetMap,ak4Map,genMap);
+      printOneEvent(triggertowers, jJetMap,ak4Map,genMap);
    }
    this->mPrintMe = false;
    for(unsigned int i=0; i<L1_4300_jJet.size(); i++) {
