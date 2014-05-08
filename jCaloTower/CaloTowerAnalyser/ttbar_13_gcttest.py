@@ -11,7 +11,7 @@ process.MessageLogger.cerr.INFO = cms.untracked.PSet(
 #process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10000) )
                                                                     
 process.source = cms.Source("PoolSource",
     # replace 'myfile.root' with the source file you want to use
@@ -28,7 +28,7 @@ process.demo = cms.EDAnalyzer('CaloTowerAnalyser'
 )
 
 process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string('matchingeff2.root')
+                                   fileName = cms.string('global_PUS.root')
                                    #fileName = cms.string('histograms-ttbar_13TeV_PU40_50ns_test_v3.root')
                                    )
 
