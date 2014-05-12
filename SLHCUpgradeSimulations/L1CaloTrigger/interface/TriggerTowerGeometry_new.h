@@ -90,7 +90,7 @@ class TriggerTowerGeometry
       double phi_degrees = phi *  180.0 / TMath::Pi();
       int iPhi=0;
       if(phi_degrees < 0) {
-	iPhi = 73 - (int)(fabs(phi_degrees) / 5.0);
+	iPhi = 72 - (int)(fabs(phi_degrees) / 5.0);
       } else {
 	iPhi = 1 + (int)(phi_degrees / 5.0);
       } 

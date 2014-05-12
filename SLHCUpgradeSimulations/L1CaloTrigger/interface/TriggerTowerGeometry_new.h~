@@ -90,7 +90,7 @@ class TriggerTowerGeometry
       double phi_degrees = phi *  180.0 / TMath::Pi();
       int iPhi=0;
       if(phi_degrees < 0) {
-	iPhi = 73 - (int)(fabs(phi_degrees) / 5.0);
+	iPhi = 72 - (int)(fabs(phi_degrees) / 5.0);
       } else {
 	iPhi = 1 + (int)(phi_degrees / 5.0);
       } 
@@ -105,6 +105,16 @@ class TriggerTowerGeometry
 
     int new_iPhi(const int & iPhi) { //converts from iPhi to new_iPhi
       return iPhi - 1;
+    }
+
+    int old_iEta(const int & new_iEta) { //converts from new_iEta to iEta (0-56 --> -28,0,+28)
+      int oldiEta = new_iEta - 27;
+      if (oldiEta <= 0) { oldiEta--; }
+      return oldiEta;
+    }
+
+    int old_iPhi(const int & new_iPhi) { //converts from new_iPhi to iPhi
+      return new_iPhi + 1;
     }
 
     double towerEtaSize( const int& iEta ) {

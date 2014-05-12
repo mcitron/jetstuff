@@ -69,9 +69,9 @@
 #include "TH2.h"
 #include "TROOT.h"
 #include "TCanvas.h"
+#include "TProfile.h"
 
 //Switches
-//#define COMPARE_JET_COLLECTIONS
 //
 //
 // class declaration
@@ -96,6 +96,9 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     void setL1Sizes(std::vector<TString> l1Sizes);
     void setL1PusVars(std::vector<TString> l1Vars);
     void setGlobalPusVars(std::vector<TString> globalVars);
+    void setEtaBins(std::map<TString,int> etaBins);
+    void setPtBins(std::map<TString,int> ptBins);
+    void setNintBins(std::map<TString,int> nintBins);
     void bookPusHists(TString folderName);
 
   private:
@@ -120,9 +123,13 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
 
     std::map<TString, TH1F*> pusHists1d_;
     std::map<TString, TH2F*> pusHists2d_;
+    std::map<TString, TProfile*> pusProfile_;
     std::vector<TString> globalPusVars_;
     std::vector<TString> l1Sizes_;
     std::vector<TString> l1PusVars_;
+    std::map<TString, int> etaBins_;
+    std::map<TString, int> ptBins_;
+    std::map<TString, int> nintBins_;
 
     TH1D * genjet_pt;
     TH2D * ntowers_vs_npv;
@@ -219,6 +226,15 @@ void CaloTowerAnalyser::setL1PusVars(std::vector<TString> l1Vars){
 void CaloTowerAnalyser::setGlobalPusVars(std::vector<TString> globalVars){
   globalPusVars_=globalVars;
 }
+void CaloTowerAnalyser::setEtaBins(std::map<TString,int> etaBins){
+  etaBins_=etaBins;
+}
+void CaloTowerAnalyser::setPtBins(std::map<TString,int> ptBins){
+  ptBins_=ptBins;
+}
+void CaloTowerAnalyser::setNintBins(std::map<TString,int> nintBins){
+  nintBins_=nintBins;
+}
 
 void CaloTowerAnalyser::bookPusHists(TString folderName){
 
@@ -226,22 +242,85 @@ void CaloTowerAnalyser::bookPusHists(TString folderName){
   TFileDirectory dir = fs->mkdir(folderName.Data());
 
   for(std::vector<TString>::const_iterator gVIt=globalPusVars_.begin(); gVIt!=globalPusVars_.end(); gVIt++){
+
     pusHists1d_[*gVIt] = dir.make<TH1F>(*gVIt,";"+*gVIt,70,-0.5,69.5);
+
     for(std::vector<TString>::const_iterator gVIt2=gVIt+1; gVIt2!=globalPusVars_.end(); gVIt2++){
-      pusHists2d_[*gVIt+"_"+*gVIt2] = dir.make<TH2F>(*gVIt+"_"+*gVIt2,";"+*gVIt+";"+*gVIt2,70,-0.5,69.5,70,-0.5,69.5);
+
+      pusHists2d_[*gVIt+"_"+*gVIt2] = dir.make<TH2F>(*gVIt+"_"+*gVIt2,";"+*gVIt+";"+*gVIt2,35,-0.5,69.5,35,-0.5,69.5);
+      pusProfile_[*gVIt+"_"+*gVIt2] = dir.make<TProfile>(*gVIt+"_"+*gVIt2+"_profile",";"+*gVIt+";"+*gVIt2,35,-0.5,69.5,-0.5,69.5);
+
     }
   }
+  //Loop over sizes
   for(std::vector<TString>::const_iterator l1SIt=l1Sizes_.begin(); l1SIt!=l1Sizes_.end(); l1SIt++){
+
     TFileDirectory subdir = dir.mkdir(((TString)"Size_"+*l1SIt).Data());
+
+    //Loop over the different strip permutations
     for(std::vector<TString>::const_iterator l1VIt=l1PusVars_.begin(); l1VIt!=l1PusVars_.end(); l1VIt++){
+
       pusHists1d_[*l1SIt+"_"+*l1VIt] = subdir.make<TH1F>(*l1SIt+"_"+*l1VIt,"Size "+*l1SIt+" energy "+*l1VIt, 20,-0.5,19.5);
+
+      //Loop over the global 2D histograms
       for(std::vector<TString>::const_iterator gVIt=globalPusVars_.begin(); gVIt!=globalPusVars_.end(); gVIt++){
+
         TFileDirectory subsubdir = subdir.mkdir(gVIt->Data());
         pusHists2d_[*gVIt+"_"+*l1SIt+"_"+*l1VIt] = subsubdir.make<TH2F>(*gVIt+"_"+*l1SIt+"_"+*l1VIt,";"+*gVIt+";"+*l1SIt+"_"+*l1VIt,
-            70,-0.5,69.5,20,-0.5,19.5);
+            35,-0.5,69.5,10,-0.5,19.5);
+        pusProfile_[*gVIt+"_"+*l1SIt+"_"+*l1VIt] = subsubdir.make<TProfile>(*gVIt+"_"+*l1SIt+"_"+*l1VIt+"_profile",";"+*gVIt+";"+*l1SIt+"_"+*l1VIt,
+            35,-0.5,69.5,-0.5,19.5);
+
       }
-    }  
+    }
+
+    //Make histograms binned in pt and eta
+    //Loop over eta bins
+    for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
+
+      TFileDirectory etadir = subdir.mkdir(etaBinIt->first.Data());
+
+      //Loop over Pt bins
+      for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
+
+        TFileDirectory ptdir = etadir.mkdir(ptBinIt->first.Data());
+
+        //Loop over the different strip permutations
+        for(std::vector<TString>::const_iterator l1VIt=l1PusVars_.begin(); l1VIt!=l1PusVars_.end(); l1VIt++){
+
+          pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_"+*l1VIt] = 
+            ptdir.make<TH1F>(*l1SIt+"_"+*l1VIt,"Size "+*l1SIt+" energy "+*l1VIt, 20,-0.5,19.5);
+
+          //Loop over the global 2D histograms
+          for(std::vector<TString>::const_iterator gVIt=globalPusVars_.begin(); gVIt!=globalPusVars_.end(); gVIt++){
+
+            TFileDirectory subptdir = ptdir.mkdir(gVIt->Data());
+            pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_"+*l1VIt] = 
+              subptdir.make<TH2F>(*gVIt+"_"+*l1SIt+"_"+*l1VIt,";"+*gVIt+";"+*l1SIt+"_"+*l1VIt,35,-0.5,69.5,10,-0.5,19.5);
+            pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_"+*l1VIt] = 
+              subptdir.make<TProfile>(*gVIt+"_"+*l1SIt+"_"+*l1VIt+"_profile",";"+*gVIt+";"+*l1SIt+"_"+*l1VIt,35,-0.5,69.5,-0.5,19.5);
+
+          }
+        }
+
+      }
+    }
+
   }
+
+  //Make histograms in bins of Nint
+  TFileDirectory dir2 = fs->mkdir("ring_comparisons");
+
+  for(std::map<TString,int>::const_iterator nintBinIt=nintBins_.begin(); nintBinIt!=nintBins_.end(); nintBinIt++){
+    TFileDirectory nintDir = dir2.mkdir(nintBinIt->first.Data());
+    pusHists2d_[nintBinIt->first+"_ring0_total"] = nintDir.make<TH2F>("ring0_total",";ring0;total",50,0.,100.,50,0.,200.);
+    pusHists2d_[nintBinIt->first+"_ring1_ring0"] = nintDir.make<TH2F>("ring1_ring0",";ring1;ring0",50,0.,100.,50,0.,100.);
+    pusHists2d_[nintBinIt->first+"_ring2_ring1"] = nintDir.make<TH2F>("ring2_ring1",";ring2;ring1",50,0.,100.,50,0.,100.);
+    pusHists2d_[nintBinIt->first+"_ring3_ring2"] = nintDir.make<TH2F>("ring3_ring2",";ring3;ring2",50,0.,100.,50,0.,100.);
+    pusHists2d_[nintBinIt->first+"_ring4_ring3"] = nintDir.make<TH2F>("ring4_ring3",";ring4;ring3",50,0.,100.,50,0.,100.);
+    pusHists2d_[nintBinIt->first+"_ring5_ring4"] = nintDir.make<TH2F>("ring5_ring4",";ring5;ring4",50,0.,100.,50,0.,100.);
+  }
+
 }
 void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, const std::vector<jJet> & col2, std::string folderName) {
 
@@ -515,7 +594,6 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
       for(int k=(i-jetsize); k<=(i+jetsize); k++) {
         for(int l=(j-jetsize); l<=(j+jetsize); l++) {
           if(k < 0 || k > 55) continue; //i.e. out of bounds of eta<3
-          //std::cout << " k = " << k << ", l = " << l << ", i =" << i << ", j = " << j << std::endl;
 
           //make a co-ordinate transform at the phi boundary
           int newl;
@@ -765,15 +843,15 @@ CaloTowerAnalyser::CaloTowerAnalyser(const edm::ParameterSet& iConfig) {
   deltaGenL1_R3 = dir.make<TH2D>("deltaGenL1_R3",";delta(Gen,L1);R3",100, -50.5, 49.5, 100, -0.5, 99.5);
   deltaGenL1_R4 = dir.make<TH2D>("deltaGenL1_R4",";delta(Gen,L1);R4",100, -50.5, 49.5, 100, -0.5, 99.5);
   mEventNumber=1;
-
+#ifdef PUS_HISTS
   std::vector<TString> l1Sizes;
   l1Sizes.push_back("3");
   l1Sizes.push_back("4");
   this->setL1Sizes(l1Sizes);
 
   std::vector<TString> globalVars;
-  globalVars.push_back("rhott");
-  globalVars.push_back("rhogen");
+  //globalVars.push_back("rhott");
+  //globalVars.push_back("rhogen");
   globalVars.push_back("nint");
   this->setGlobalPusVars(globalVars);
 
@@ -792,9 +870,33 @@ CaloTowerAnalyser::CaloTowerAnalyser(const edm::ParameterSet& iConfig) {
   l1Vars.push_back("out2_middle2");
   this->setL1PusVars(l1Vars);
 
+  std::map<TString,int> etaBins;
+  etaBins["eta_bin1"] = -14;
+  etaBins["eta_bin2"] = 0;
+  etaBins["eta_bin3"] = 14;
+  etaBins["eta_bin4"] = 28;
+  this->setEtaBins(etaBins);
+
+  std::map<TString,int> ptBins;
+  ptBins["pt_0to40"] = 40; 
+  ptBins["pt_40to80"] = 80; 
+  ptBins["pt_80to120"] = 120; 
+  ptBins["pt_120to160"] = 160; 
+  ptBins["pt_160to200"] = 200; 
+  ptBins["pt_200to240"] = 240; 
+  ptBins["pt_above240"] = 999; 
+  this->setPtBins(ptBins);
+
+  std::map<TString, int> nintBins;
+  nintBins["nint_30to35"] = 35;
+  nintBins["nint_35to40"] = 40;
+  nintBins["nint_40to45"] = 45;
+  nintBins["nint_45to50"] = 50;
+  this->setNintBins(nintBins);
+
   //Make the necessary histograms
   this->bookPusHists("pus_histograms");
-
+#endif
 
 }
 
@@ -994,13 +1096,11 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     ak4tt_jJet.push_back(jJet(ak4ttjets[i].pt(), g.iEta(ak4ttjets[i].eta()), g.iPhi(ak4ttjets[i].phi())));
   }
 
+#ifdef COMPARE_COLLECTIONS
   this->compareJetCollections(ak4tt_jJet, ak4genjetsp_jJet, "ak4tt_ak4genjetsp");
+#endif
 
-  std::map<TString,double> globalPusVarsMap;
-  globalPusVarsMap["rhott"] = rhoTt;
-  globalPusVarsMap["rhogen"] = rhoGen;
-  globalPusVarsMap["nint"] = mNPV;
-  
+
   //make a container for the L1 jets
   std::vector<jJet> L1_4300_jJet = getL1Jets(myarray, 4, 3, 0, 0);
   std::vector<jJet> L1_4350_jJet = getL1Jets(myarray, 4, 3, 5, 0);
@@ -1009,65 +1109,220 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   std::vector<jJet> L1_4300donut_jJet;
   std::vector<jJet> L1_4350donut_jJet;
   std::map<TString, std::vector<jJet> > L1_jJet_map;
+  std::map <TString,std::vector<jJet> > jJetMap;
+  jJetMap["L1_4400"] = L1_4400_jJet;
 
+  std::vector<jJet> L1_5450_jJet = getL1Jets(myarray, 5, 4 , 5, 0);
+
+  
+  
+  for(std::vector<jJet>::const_iterator L1_5450=L1_5450_jJet.begin(); L1_5450!=L1_5450_jJet.end(); L1_5450++){
+    for(std::map<TString,int>::const_iterator nintIt = nintBins_.begin(); nintIt!=nintBins_.end(); nintIt++){
+      if(mNPV<nintIt->second && mNPV>nintIt->second-5){
+        pusHists2d_[nintIt->first+"_ring0_total"]->Fill(L1_5450->ringSums().at(0),L1_5450->pt());
+        pusHists2d_[nintIt->first+"_ring1_ring0"]->Fill(L1_5450->ringSums().at(1),L1_5450->ringSums().at(0));
+        pusHists2d_[nintIt->first+"_ring2_ring1"]->Fill(L1_5450->ringSums().at(2),L1_5450->ringSums().at(1));
+        pusHists2d_[nintIt->first+"_ring3_ring2"]->Fill(L1_5450->ringSums().at(3),L1_5450->ringSums().at(2));
+        pusHists2d_[nintIt->first+"_ring4_ring3"]->Fill(L1_5450->ringSums().at(4),L1_5450->ringSums().at(3));
+        pusHists2d_[nintIt->first+"_ring5_ring4"]->Fill(L1_5450->ringSums().at(5),L1_5450->ringSums().at(4));
+      }
+    }
+  }
+
+#ifdef PUS_HISTS
   //Fill the map with the sizes
   for(std::vector<TString>::const_iterator l1SIt=l1Sizes_.begin(); l1SIt!=l1Sizes_.end(); l1SIt++){
     L1_jJet_map[*l1SIt+"_out1"] = getL1Jets(myarray, atoi(l1SIt->Data())+1,atoi(l1SIt->Data()),0,0);
     L1_jJet_map[*l1SIt+"_out2"] = getL1Jets(myarray, atoi(l1SIt->Data())+2,atoi(l1SIt->Data()),0,0);
   }
 
-  std::map <TString,std::vector<jJet> > jJetMap;
-  std::map <TString,std::vector<fastjet::PseudoJet> > ak4Map;
-  std::map <TString,const reco::GenJetCollection * > genMap;
 
-  jJetMap["L1_4400"] = L1_4400_jJet;
+  std::map<TString,double> globalPusVarsMap;
+  globalPusVarsMap["rhott"] = rhoTt;
+  globalPusVarsMap["rhogen"] = rhoGen;
+  globalPusVarsMap["nint"] = mNPV;
 
-  ak4Map["ak4tt"] = ak4ttjets; 
-  ak4Map["ak4gen"] = ak4genjetsp; 
 
-  genMap["genp"] = genJetCol;
-
-#ifdef PUS_HISTS
- for(std::vector<TString>::const_iterator gVIt=globalPusVars_.begin(); gVIt!=globalPusVars_.end(); gVIt++){
+  //Fill the global hists
+  for(std::vector<TString>::const_iterator gVIt=globalPusVars_.begin(); gVIt!=globalPusVars_.end(); gVIt++){
     pusHists1d_[*gVIt]->Fill(globalPusVarsMap[*gVIt]);
     for(std::vector<TString>::const_iterator gVIt2=gVIt+1; gVIt2!=globalPusVars_.end(); gVIt2++){
       pusHists2d_[*gVIt+"_"+*gVIt2]->Fill(globalPusVarsMap[*gVIt],globalPusVarsMap[*gVIt2]);
+      pusProfile_[*gVIt+"_"+*gVIt2]->Fill(globalPusVarsMap[*gVIt],globalPusVarsMap[*gVIt2]);
     }
   }
 
+  //Only do it for well separated jets?
+  bool isolatedOnly = true;
+  double dR2Max=49.0;
+
+  //Fill the all jets hists
   for(std::vector<TString>::const_iterator l1SIt=l1Sizes_.begin(); l1SIt!=l1Sizes_.end(); l1SIt++){
     for(unsigned i=0; i<L1_jJet_map[*l1SIt+"_out1"].size(); i++){
+      if(isolatedOnly){
+        if( !(L1_jJet_map[*l1SIt+"_out1"][i].isolatedJet(L1_jJet_map[*l1SIt+"_out1"],dR2Max))) continue;
+      }
       pusHists1d_[*l1SIt+"_strip1"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0]);
       pusHists1d_[*l1SIt+"_strip2"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1]);
       pusHists1d_[*l1SIt+"_strip3"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[2]);
       pusHists1d_[*l1SIt+"_strip4"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[3]);
       pusHists1d_[*l1SIt+"_out1_middle2"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].PUE());
+      //Fill the different binned hists
+      for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
+        if(L1_jJet_map[*l1SIt+"_out1"][i].iEta() > etaBinIt->second || L1_jJet_map[*l1SIt+"_out1"][i].iEta() < etaBinIt->second-14)
+          continue; 
+        for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
+
+          if(L1_jJet_map[*l1SIt+"_out1"][i].pt() > ptBinIt->second || L1_jJet_map[*l1SIt+"_out1"][i].pt() < ptBinIt->second-40)
+            continue; 
+
+          pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip1"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0]);
+          pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip2"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1]);
+          pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip3"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[2]);
+          pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip4"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[3]);
+          pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_out1_middle2"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].PUE());
+
+
+        }
+      }
+
     }
     for(unsigned i=0; i<L1_jJet_map[*l1SIt+"_out2"].size(); i++){
+      if(isolatedOnly){
+        if( !(L1_jJet_map[*l1SIt+"_out2"][i].isolatedJet(L1_jJet_map[*l1SIt+"_out2"],dR2Max))) continue;
+      }
       pusHists1d_[*l1SIt+"_strip5"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0]);
       pusHists1d_[*l1SIt+"_strip6"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1]);
       pusHists1d_[*l1SIt+"_strip7"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[2]);
       pusHists1d_[*l1SIt+"_strip8"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[3]);
       pusHists1d_[*l1SIt+"_out2_middle2"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].PUE());
+
+      //Fill the different binned hists
+      for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
+        if(L1_jJet_map[*l1SIt+"_out2"][i].iEta() > etaBinIt->second || L1_jJet_map[*l1SIt+"_out2"][i].iEta() < etaBinIt->second-14)
+          continue; 
+        for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
+
+          if(L1_jJet_map[*l1SIt+"_out2"][i].pt() > ptBinIt->second || L1_jJet_map[*l1SIt+"_out2"][i].pt() < ptBinIt->second-40)
+            continue; 
+
+          pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip5"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0]);
+          pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip6"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1]);
+          pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip7"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[2]);
+          pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip8"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[3]);
+          pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_out2_middle2"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].PUE());
+
+
+        }
+      }
     }
   }
 
+  //Fill the 2d histograms for all hists
   for(std::vector<TString>::const_iterator gVIt=globalPusVars_.begin(); gVIt!=globalPusVars_.end(); gVIt++){
     for(std::vector<TString>::const_iterator l1SIt=l1Sizes_.begin(); l1SIt!=l1Sizes_.end(); l1SIt++){
 
       for(unsigned i=0; i<L1_jJet_map[*l1SIt+"_out1"].size(); i++){
+        if(isolatedOnly){
+          if( !(L1_jJet_map[*l1SIt+"_out1"][i].isolatedJet(L1_jJet_map[*l1SIt+"_out1"],dR2Max))) continue;
+        }
         pusHists2d_[*gVIt+"_"+*l1SIt+"_strip1"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0]);
         pusHists2d_[*gVIt+"_"+*l1SIt+"_strip2"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1]);
         pusHists2d_[*gVIt+"_"+*l1SIt+"_strip3"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[2]);
         pusHists2d_[*gVIt+"_"+*l1SIt+"_strip4"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[3]);
         pusHists2d_[*gVIt+"_"+*l1SIt+"_out1_middle2"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].PUE());
+
+        pusProfile_[*gVIt+"_"+*l1SIt+"_strip1"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0]);
+        pusProfile_[*gVIt+"_"+*l1SIt+"_strip2"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1]);
+        pusProfile_[*gVIt+"_"+*l1SIt+"_strip3"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[2]);
+        pusProfile_[*gVIt+"_"+*l1SIt+"_strip4"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[3]);
+        pusProfile_[*gVIt+"_"+*l1SIt+"_out1_middle2"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].PUE());
+
+        for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
+          if(L1_jJet_map[*l1SIt+"_out1"][i].iEta() > etaBinIt->second || L1_jJet_map[*l1SIt+"_out1"][i].iEta() < etaBinIt->second-14)
+            continue; 
+          for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
+
+            if(L1_jJet_map[*l1SIt+"_out1"][i].pt() > ptBinIt->second || L1_jJet_map[*l1SIt+"_out1"][i].pt() < ptBinIt->second-40)
+              continue; 
+
+            pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip1"]->Fill(
+                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0]);
+            pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip2"]->Fill(
+                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1]);
+            pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip3"]->Fill(
+                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[2]);
+            pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip4"]->Fill(
+                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[3]);
+            pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_out1_middle2"]->Fill(
+                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].PUE());
+
+            pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip1"]->Fill(
+                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0]);
+            pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip2"]->Fill(
+                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1]);
+            pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip3"]->Fill(
+                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[2]);
+            pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip4"]->Fill(
+                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[3]);
+            pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_out1_middle2"]->Fill(
+                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].PUE());
+
+          }
+        }
+
+
       }
       for(unsigned i=0; i<L1_jJet_map[*l1SIt+"_out2"].size(); i++){
+        if(isolatedOnly){
+          if( !(L1_jJet_map[*l1SIt+"_out2"][i].isolatedJet(L1_jJet_map[*l1SIt+"_out2"],dR2Max))) continue;
+        }
         pusHists2d_[*gVIt+"_"+*l1SIt+"_strip5"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0]);
         pusHists2d_[*gVIt+"_"+*l1SIt+"_strip6"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1]);
         pusHists2d_[*gVIt+"_"+*l1SIt+"_strip7"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[2]);
         pusHists2d_[*gVIt+"_"+*l1SIt+"_strip8"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[3]);
         pusHists2d_[*gVIt+"_"+*l1SIt+"_out2_middle2"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].PUE());
+
+        pusProfile_[*gVIt+"_"+*l1SIt+"_strip5"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0]);
+        pusProfile_[*gVIt+"_"+*l1SIt+"_strip6"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1]);
+        pusProfile_[*gVIt+"_"+*l1SIt+"_strip7"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[2]);
+        pusProfile_[*gVIt+"_"+*l1SIt+"_strip8"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[3]);
+        pusProfile_[*gVIt+"_"+*l1SIt+"_out2_middle2"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].PUE());
+
+        for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
+          if(L1_jJet_map[*l1SIt+"_out1"][i].iEta() > etaBinIt->second || L1_jJet_map[*l1SIt+"_out1"][i].iEta() < etaBinIt->second-14)
+            continue; 
+          for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
+
+            if(L1_jJet_map[*l1SIt+"_out1"][i].pt() > ptBinIt->second || L1_jJet_map[*l1SIt+"_out1"][i].pt() < ptBinIt->second-40)
+              continue; 
+
+            pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip5"]->Fill(
+                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0]);
+            pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip6"]->Fill(
+                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1]);
+            pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip7"]->Fill(
+                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[2]);
+            pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip8"]->Fill(
+                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[3]);
+            pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_out2_middle2"]->Fill(
+                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].PUE());
+
+            pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip5"]->Fill(
+                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0]);
+            pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip6"]->Fill(
+                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1]);
+            pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip7"]->Fill(
+                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[2]);
+            pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip8"]->Fill(
+                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[3]);
+            pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_out2_middle2"]->Fill(
+                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].PUE());
+
+          }
+        }
+
+
       }
     }
   }

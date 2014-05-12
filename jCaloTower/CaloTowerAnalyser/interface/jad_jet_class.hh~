@@ -20,9 +20,10 @@ public:
   double pt() const;
   std::vector<int> ringSums() const;
   std::vector<int> ringAreas() const;
-  std::vector<int> getOuterRings() const;
+  std::vector<int> getOuterStrips() const;
   int DeltaR2(const jJet & jet2) const;
   int PUE();
+  bool isolatedJet(const std::vector<jJet>& jetCollection, double dR2Max);
   double eatDonut(); //the energy after PUsubtraction
 
 private:
@@ -32,6 +33,7 @@ private:
   std::vector<int> mringsums;
   std::vector<int> mringareas;
   std::vector<int> mouterstrips;
+  std::vector<int> strips_; //The strips in a jet, starting from the middle out, the outer strips are stored without corners
 };
 
 jJet::jJet(double pt, int ieta, int iphi) : mpt(pt), mieta(ieta), miphi(iphi) {}
@@ -44,6 +46,7 @@ int jJet::iPhi() const { return miphi; }
 double jJet::pt() const { return mpt; }
 std::vector<int> jJet::ringSums() const { return mringsums; }
 std::vector<int> jJet::ringAreas() const { return mringareas; }
+std::vector<int> jJet::getOuterStrips() const { return mouterstrips; }
 int jJet::PUE() { return (mouterstrips[1] + mouterstrips[2]); } //i.e. sum up the middle two energies
 
 double jJet::eatDonut() {
@@ -70,6 +73,16 @@ int jJet::DeltaR2(const jJet & jet2) const {
 
   return deltaR2;
 
+}
+
+bool jJet::isolatedJet(const std::vector<jJet>& jetCollection, double dR2Max){
+  int closeJets=0;
+  for(std::vector<jJet>::const_iterator jetIt = jetCollection.begin();
+      jetIt!=jetCollection.end(); jetIt++){
+    if(this->DeltaR2(*jetIt)<dR2Max) closeJets++;//Check it's not witin 7x7
+  }
+  if(closeJets>1) return false;
+  else return true;
 }
 
 bool sortbypt(const jJet &a, const jJet &b) { return a.pt() > b.pt(); }
