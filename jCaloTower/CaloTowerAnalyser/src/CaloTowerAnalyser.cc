@@ -5,11 +5,11 @@
 // 
 /**\class CaloTowerAnalyser CaloTowerAnalyser.cc jCaloTower/CaloTowerAnalyser/src/CaloTowerAnalyser.cc
 
- Description: [one line class summary]
+Description: [one line class summary]
 
- Implementation:
-     [Notes on implementation]
-*/
+Implementation:
+[Notes on implementation]
+ */
 //
 // Original Author:  Jad Marrouche
 //         Created:  Fri Jun 21 08:28:06 BST 2013
@@ -71,158 +71,193 @@
 #include "TProfile.h"
 
 //Switches
-#define COMPARE_JET_COLLECTIONS
 //
 //
 // class declaration
 //
 
 class CaloTowerAnalyser : public edm::EDAnalyzer {
-  public:
-    explicit CaloTowerAnalyser(const edm::ParameterSet&);
-    ~CaloTowerAnalyser();
+   public:
+      explicit CaloTowerAnalyser(const edm::ParameterSet&);
+      ~CaloTowerAnalyser();
 
-    static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
+      static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
-    void getJets(std::vector < fastjet::PseudoJet > &constits,std::vector < fastjet::PseudoJet > &jets);
-    std::vector<jJet> getL1Jets(const std::vector< std::vector<int> > & input, int phisize, int etasize, int vetophisize, int vetoetasize, int seedthresh1, int seedthresh2);
-    std::vector<jJet> getL1Jets(const std::vector< std::vector<int> > & input, int jetsize, int vetowindowsize, int seedthresh1, int seedthresh2); 
-    void compareJetCollections(const std::vector<jJet> & col1, const std::vector<jJet> & col2, std::string folderName);
-    void printOneEvent(const edm::Handle<l1slhc::L1CaloTowerCollection> triggertowers, const std::vector<jJet> & L1jets, const std::vector<fastjet::PseudoJet> & ak4ttjets, const reco::GenJetCollection * ak4genjets, std::vector<fastjet::PseudoJet> & ak4genjetsp);
-    void printOneEvent(const edm::Handle<l1slhc::L1CaloTowerCollection> triggertowers, const std::map <TString,std::vector<jJet> > & L1jets, const std::map<TString,std::vector<fastjet::PseudoJet>> & ak4jets,std::map<TString,const reco::GenJetCollection *> ak4genjets);
-    std::vector<int> closestJetDistance(const std::vector<jJet> & jJets);
-    void SetNPV(int NPV);
-    int GetNPV();
-    void setL1Sizes(std::vector<TString> l1Sizes);
-    void setL1PusVars(std::vector<TString> l1Vars);
-    void setGlobalPusVars(std::vector<TString> globalVars);
-    void bookPusHists(TString folderName);
-    double getMedian(const std::vector<jJet> & jets);
+      void getJets(std::vector < fastjet::PseudoJet > &constits,std::vector < fastjet::PseudoJet > &jets);
+      std::vector<jJet> getL1Jets(const std::vector< std::vector<int> > & input, int phisize, int etasize, int vetophisize, int vetoetasize, int seedthresh1, int seedthresh2);
+      std::vector<jJet> getL1Jets(const std::vector< std::vector<int> > & input, int jetsize, int vetowindowsize, int seedthresh1, int seedthresh2); 
+      void compareJetCollections(const std::vector<jJet> & col1, const std::vector<jJet> & col2, std::string folderName, bool isgct);
+      void printOneEvent(const edm::Handle<l1slhc::L1CaloTowerCollection> triggertowers, const std::vector<jJet> & L1jets, const std::vector<fastjet::PseudoJet> & ak4ttjets, const reco::GenJetCollection * ak4genjets, std::vector<fastjet::PseudoJet> & ak4genjetsp);
+      void printOneEvent(const edm::Handle<l1slhc::L1CaloTowerCollection> triggertowers, const std::map <TString,std::vector<jJet> > & L1jets, const std::map<TString,std::vector<fastjet::PseudoJet>> & ak4jets,std::map<TString,const reco::GenJetCollection *> ak4genjets);
+      std::vector<int> closestJetDistance(const std::vector<jJet> & jJets);
+      void SetNPV(int NPV);
+      int GetNPV();
+      void setL1Sizes(std::vector<TString> l1Sizes);
+      void setL1PusVars(std::vector<TString> l1Vars);
+      void setGlobalPusVars(std::vector<TString> globalVars);
+      void bookPusHists(TString folderName);
+      double getMedian(const std::vector<jJet> & jets);
 
-  private:
-
-
-    bool mPrintMe=false;
-    virtual void beginJob() ;
-    virtual void analyze(const edm::Event&, const edm::EventSetup&);
-    virtual void endJob() ;
-
-    //void Make2DMap(const edm::Handle<l1slhc::L1CaloTowerCollection> triggertowers, const edm::Handle<CaloTowerCollection> calotowers, const int eventNumber);
-
-    //virtual void beginRun(edm::Run const&, edm::EventSetup const&);
-    //virtual void endRun(edm::Run const&, edm::EventSetup const&);
-    //virtual void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
-    //virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
-
-    // ----------member data ---------------------------
-    int mEventNumber;
-    int mNPV;
-    std::vector<pair_info> pairs;
-    TH1D * num_tops_per_event;
-    TH1D * median_energy_per_event;
-    TH1D * median_jet_energy_per_event;
-    TH2D * median_energy_jet_tower_per_event;
-    std::map<TString, TH1F*> pusHists1d_;
-    std::map<TString, TH2F*> pusHists2d_;
-    std::vector<TString> globalPusVars_;
-    std::vector<TString> l1Sizes_;
-    std::vector<TString> l1PusVars_;
-
-    TH1D * genjet_pt;
-    TH1D * tower_pt_real; 
-    TH1D * tower_pt_pu; 
-    TH2D * ntowers_vs_npv;
-
-    TH2D * r4_vs_npv_eta1_pt3050;
-    TH2D * r4_vs_npv_eta2_pt3050;
-    TH2D * r4_vs_npv_eta3_pt3050;
-    TH2D * r4_vs_npv_eta1_pt80100;
-    TH2D * r4_vs_npv_eta2_pt80100;
-    TH2D * r4_vs_npv_eta3_pt80100;
-
-    TH2D * deltaGenL1_pT3050_eta1_v1;
-    TH2D * deltaGenL1_v2;
-    TH2D * deltaGenL1_v3;
-    TH2D * deltaGenL1_pT3050_eta1_v4;
-    TH2D * deltaGenL1_pT3050_eta2_v1;
-    TH2D * deltaGenL1_pT3050_eta2_v4;
-    TH2D * deltaGenL1_pT3050_eta3_v1;
-    TH2D * deltaGenL1_pT3050_eta3_v4;
-    TH2D * deltaGenL1_ntowers;
-    TH2D * deltaGenL1_R1;
-    TH2D * deltaGenL1_R2;
-    TH2D * deltaGenL1_R3;
-    TH2D * deltaGenL1_R4;
+   private:
 
 
-    TriggerTowerGeometry g; //to run the constructor -- could also make this static
+      bool mPrintMe=false;
+      virtual void beginJob() ;
+      virtual void analyze(const edm::Event&, const edm::EventSetup&);
+      virtual void endJob() ;
 
-    std::map<std::string, TH1D * > col1_jet1_eta;
-    std::map<std::string, TH1D * > col1_jet2_eta;
-    std::map<std::string, TH1D * > col1_jet3_eta;
-    std::map<std::string, TH1D * > col1_jet4_eta;
-    std::map<std::string, TH1D * > col2_jet1_eta;
-    std::map<std::string, TH1D * > col2_jet2_eta;
-    std::map<std::string, TH1D * > col2_jet3_eta;
-    std::map<std::string, TH1D * > col2_jet4_eta;
-    std::map<std::string, TH1D * > col1_jet1_pt;
-    std::map<std::string, TH1D * > col1_jet2_pt;
-    std::map<std::string, TH1D * > col1_jet3_pt;
-    std::map<std::string, TH1D * > col1_jet4_pt;
-    std::map<std::string, TH1D * > col2_jet1_pt;
-    std::map<std::string, TH1D * > col2_jet2_pt;
-    std::map<std::string, TH1D * > col2_jet3_pt;
-    std::map<std::string, TH1D * > col2_jet4_pt;
-    std::map<std::string, TH1D * > col1_alljet_pt;
-    std::map<std::string, TH1D * > col2_alljet_pt;
-    std::map<std::string, TH1D * > col1_alljet_eta;
-    std::map<std::string, TH1D * > col2_alljet_eta;
-    std::map<std::string, TH1D * > col2_matched_algo1_alljet_pt;
-    std::map<std::string, TH1D * > col2_matched_algo1_alljet_eta;
-    std::map<std::string, TH2D * > col2_matched_algo1_ptcorr;
-    std::map<std::string, TH2D * > col2_matched_algo1_jet1_ptcorr;
-    std::map<std::string, TH2D * > col2_matched_algo1_jet2_ptcorr;
-    std::map<std::string, TH2D * > col2_matched_algo1_jet3_ptcorr;
-    std::map<std::string, TH2D * > col2_matched_algo1_jet4_ptcorr;
-    std::map<std::string, TH2D * > col2_matched_algo1_ptres;
-    std::map<std::string, TH1D * > col2_matched_algo1_jet1_pt;
-    std::map<std::string, TH1D * > col2_matched_algo1_jet2_pt;
-    std::map<std::string, TH1D * > col2_matched_algo1_jet3_pt;
-    std::map<std::string, TH1D * > col2_matched_algo1_jet4_pt;
-    std::map<std::string, TH1D * > col2_matched_algo1_jet1_eta;
-    std::map<std::string, TH1D * > col2_matched_algo1_jet2_eta;
-    std::map<std::string, TH1D * > col2_matched_algo1_jet3_eta;
-    std::map<std::string, TH1D * > col2_matched_algo1_jet4_eta;
+      //void Make2DMap(const edm::Handle<l1slhc::L1CaloTowerCollection> triggertowers, const edm::Handle<CaloTowerCollection> calotowers, const int eventNumber);
 
-    std::map<std::string, TH1D * > col2_matched_algo2_alljet_pt;
-    std::map<std::string, TH1D * > col2_matched_algo2_alljet_eta;
-    std::map<std::string, TH2D * > col2_matched_algo2_ptcorr;
-    std::map<std::string, TH2D * > col2_matched_algo2_jet1_ptcorr;
-    std::map<std::string, TH2D * > col2_matched_algo2_jet2_ptcorr;
-    std::map<std::string, TH2D * > col2_matched_algo2_jet3_ptcorr;
-    std::map<std::string, TH2D * > col2_matched_algo2_jet4_ptcorr;
-    std::map<std::string, TH2D * > col2_matched_algo2_ptres;
-    std::map<std::string, TH1D * > col2_matched_algo2_jet1_pt;
-    std::map<std::string, TH1D * > col2_matched_algo2_jet2_pt;
-    std::map<std::string, TH1D * > col2_matched_algo2_jet3_pt;
-    std::map<std::string, TH1D * > col2_matched_algo2_jet4_pt;
-    std::map<std::string, TH1D * > col2_matched_algo2_jet1_eta;
-    std::map<std::string, TH1D * > col2_matched_algo2_jet2_eta;
-    std::map<std::string, TH1D * > col2_matched_algo2_jet3_eta;
-    std::map<std::string, TH1D * > col2_matched_algo2_jet4_eta;
-//PLOTS FOR JAD
-    std::map<TString, TH2D * > pt_ratio_nvts_algo1_alljet;
-    std::map<TString, TProfile * > pt_ratio_nvts_algo1_alljet_profile;
+      //virtual void beginRun(edm::Run const&, edm::EventSetup const&);
+      //virtual void endRun(edm::Run const&, edm::EventSetup const&);
+      //virtual void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
+      //virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
 
-    std::map<TString, TH2D * > pt_ratio_nvts_algo1_jet1;
-    std::map<TString, TProfile * > pt_ratio_nvts_algo1_jet1_profile;
-    std::map<TString, TH2D * > pt_ratio_nvts_algo1_jet2;
-    std::map<TString, TProfile * > pt_ratio_nvts_algo1_jet2_profile;
-    std::map<TString, TH2D * > pt_ratio_nvts_algo1_jet3;
-    std::map<TString, TProfile * > pt_ratio_nvts_algo1_jet3_profile;
-    std::map<TString, TH2D * > pt_ratio_nvts_algo1_jet4;
-    std::map<TString, TProfile * > pt_ratio_nvts_algo1_jet4_profile;
-    std::map<TString,bool> pMade;
+      // ----------member data ---------------------------
+      int mEventNumber;
+      int mNPV;
+      std::vector<pair_info> pairs;
+      TH1D * num_tops_per_event;
+      TH1D * median_energy_per_event;
+
+      TH1D * median_jet_5400_energy_per_event;
+      TH2D * median_energy_5400_jet_tower_per_event;
+
+      TH1D * median_jet_4300_energy_per_event;
+      TH2D * median_energy_4300_jet_tower_per_event;
+
+      std::map<TString, TH1F*> pusHists1d_;
+      std::map<TString, TH2F*> pusHists2d_;
+      std::vector<TString> globalPusVars_;
+      std::vector<TString> l1Sizes_;
+      std::vector<TString> l1PusVars_;
+
+      TH1D * eff_over_x1_top;
+      TH1D * eff_over_x2_top;
+      TH1D * eff_over_x3_top;
+      TH1D * eff_over_x4_top;
+      TH1D * mean_top_pt_hist;
+
+
+      TH1D * genjet_pt;
+      TH1D * tower_pt_real; 
+      TH1D * num_tower_pt_real; 
+      TH2D * tower_pt_real_jetpt; 
+      TH2D * num_tower_pt_real_jetpt; 
+      TH1D * tower_pt_pu; 
+      TH1D * num_tower_pt_pu; 
+      TH2D * tower_pt_pu_jetpt; 
+      TH2D * num_tower_pt_pu_jetpt; 
+      TH2D * ntowers_vs_npv;
+
+      TH2D * r4_vs_npv_eta1_pt3050;
+      TH2D * r4_vs_npv_eta2_pt3050;
+      TH2D * r4_vs_npv_eta3_pt3050;
+      TH2D * r4_vs_npv_eta1_pt80100;
+      TH2D * r4_vs_npv_eta2_pt80100;
+      TH2D * r4_vs_npv_eta3_pt80100;
+
+      TH2D * deltaGenL1_pT3050_eta1_v1;
+      TH2D * deltaGenL1_v2;
+      TH2D * deltaGenL1_v3;
+      TH2D * deltaGenL1_pT3050_eta1_v4;
+      TH2D * deltaGenL1_pT3050_eta2_v1;
+      TH2D * deltaGenL1_pT3050_eta2_v4;
+      TH2D * deltaGenL1_pT3050_eta3_v1;
+      TH2D * deltaGenL1_pT3050_eta3_v4;
+      TH2D * deltaGenL1_ntowers;
+      TH2D * deltaGenL1_R1;
+      TH2D * deltaGenL1_R2;
+      TH2D * deltaGenL1_R3;
+      TH2D * deltaGenL1_R4;
+
+
+      TriggerTowerGeometry g; //to run the constructor -- could also make this static
+
+      std::map<std::string, TH1D * > col1_jet1_eta;
+      std::map<std::string, TH1D * > col1_jet2_eta;
+      std::map<std::string, TH1D * > col1_jet3_eta;
+      std::map<std::string, TH1D * > col1_jet4_eta;
+      std::map<std::string, TH1D * > col2_jet1_eta;
+      std::map<std::string, TH1D * > col2_jet2_eta;
+      std::map<std::string, TH1D * > col2_jet3_eta;
+      std::map<std::string, TH1D * > col2_jet4_eta;
+      std::map<std::string, TH1D * > col1_jet1_pt;
+      std::map<std::string, TH1D * > col1_jet2_pt;
+      std::map<std::string, TH1D * > col1_jet3_pt;
+      std::map<std::string, TH1D * > col1_jet4_pt;
+      std::map<std::string, TH1D * > col2_jet1_pt;
+      std::map<std::string, TH1D * > col2_jet2_pt;
+      std::map<std::string, TH1D * > col2_jet3_pt;
+      std::map<std::string, TH1D * > col2_jet4_pt;
+      std::map<std::string, TH1D * > col1_alljet_pt;
+      std::map<std::string, TH1D * > col2_alljet_pt;
+      std::map<std::string, TH1D * > col1_alljet_eta;
+      std::map<std::string, TH1D * > col2_alljet_eta;
+      std::map<std::string, TH1D * > col2_matched_algo1_alljet_pt;
+      std::map<std::string, TH1D * > col2_matched_algo1_alljet_eta;
+      std::map<std::string, TH2D * > col2_matched_algo1_ptcorr;
+      std::map<std::string, TH2D * > col2_matched_algo1_jet1_ptcorr;
+      std::map<std::string, TH2D * > col2_matched_algo1_jet2_ptcorr;
+      std::map<std::string, TH2D * > col2_matched_algo1_jet3_ptcorr;
+      std::map<std::string, TH2D * > col2_matched_algo1_jet4_ptcorr;
+      std::map<std::string, TProfile * > col2_matched_algo1_ptres_profile;
+      std::map<std::string, TH2D * > col2_matched_algo1_ptres;
+      std::map<std::string, TH2D * > col2_matched_algo1_ptratio;
+      std::map<std::string, TH1D * > col2_matched_algo1_jet1_pt;
+      std::map<std::string, TH1D * > col2_matched_algo1_jet2_pt;
+      std::map<std::string, TH1D * > col2_matched_algo1_jet3_pt;
+      std::map<std::string, TH1D * > col2_matched_algo1_jet4_pt;
+      std::map<std::string, TH1D * > col2_matched_algo1_jet1_eta;
+      std::map<std::string, TH1D * > col2_matched_algo1_jet2_eta;
+      std::map<std::string, TH1D * > col2_matched_algo1_jet3_eta;
+      std::map<std::string, TH1D * > col2_matched_algo1_jet4_eta;
+
+      std::map<std::string, TH1D * > col2_matched_algo2_alljet_pt;
+      std::map<std::string, TH1D * > col2_matched_algo2_alljet_eta;
+      std::map<std::string, TH2D * > col2_matched_algo2_ptcorr;
+      std::map<std::string, TH2D * > col2_matched_algo2_jet1_ptcorr;
+      std::map<std::string, TH2D * > col2_matched_algo2_jet2_ptcorr;
+      std::map<std::string, TH2D * > col2_matched_algo2_jet3_ptcorr;
+      std::map<std::string, TH2D * > col2_matched_algo2_jet4_ptcorr;
+      std::map<std::string, TH2D * > col2_matched_algo2_ptres;
+      std::map<std::string, TProfile * > col2_matched_algo2_ptres_profile;
+      std::map<std::string, TH2D * > col2_matched_algo2_ptratio;
+      std::map<std::string, TH1D * > col2_matched_algo2_jet1_pt;
+      std::map<std::string, TH1D * > col2_matched_algo2_jet2_pt;
+      std::map<std::string, TH1D * > col2_matched_algo2_jet3_pt;
+      std::map<std::string, TH1D * > col2_matched_algo2_jet4_pt;
+      std::map<std::string, TH1D * > col2_matched_algo2_jet1_eta;
+      std::map<std::string, TH1D * > col2_matched_algo2_jet2_eta;
+      std::map<std::string, TH1D * > col2_matched_algo2_jet3_eta;
+      std::map<std::string, TH1D * > col2_matched_algo2_jet4_eta;
+      //PLOTS FOR JAD
+      std::map<std::string,TH2D * > col2_saved_algo2;
+
+      std::map<TString, TH2D * > pt_ratio_nvts_algo1_alljet;
+      std::map<TString, TProfile * > pt_ratio_nvts_algo1_alljet_profile;
+
+      std::map<TString, TH2D * > pt_ratio_nvts_algo1_jet1;
+      std::map<TString, TProfile * > pt_ratio_nvts_algo1_jet1_profile;
+      std::map<TString, TH2D * > pt_ratio_nvts_algo1_jet2;
+      std::map<TString, TProfile * > pt_ratio_nvts_algo1_jet2_profile;
+      std::map<TString, TH2D * > pt_ratio_nvts_algo1_jet3;
+      std::map<TString, TProfile * > pt_ratio_nvts_algo1_jet3_profile;
+      std::map<TString, TH2D * > pt_ratio_nvts_algo1_jet4;
+      std::map<TString, TProfile * > pt_ratio_nvts_algo1_jet4_profile;
+      std::map<TString,bool> pMade;
+      //Turn ons
+      std::map<TString,TH1D*> col2_matched_algo1_alljet_cut;
+      std::map<TString,TH1D*> col2_matched_algo1_jet1_cut;
+      std::map<TString,TH1D*> col2_matched_algo1_jet2_cut;
+      std::map<TString,TH1D*> col2_matched_algo1_jet3_cut;
+      std::map<TString,TH1D*> col2_matched_algo1_jet4_cut;
+
+      std::map<TString,TH2D*> col1_alljet_pt_NPV;
+      std::map<TString,TH2D*> col1_jet1_pt_NPV;
+      std::map<TString,TH2D*> col1_jet2_pt_NPV;
+      std::map<TString,TH2D*> col1_jet3_pt_NPV;
+      std::map<TString,TH2D*> col1_jet4_pt_NPV;
 
 };
 
@@ -262,23 +297,27 @@ void CaloTowerAnalyser::bookPusHists(TString folderName){
       }  
    }
 }
-void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, const std::vector<jJet> & col2, std::string folderName) {
+void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, const std::vector<jJet> & col2, std::string folderName, bool isgct) {
+   std::map<TString,int> ptBins_;
+   ptBins_["pt_0to20"] = 20;
+   ptBins_["pt_20to40"] = 40;
+   ptBins_["pt_40to60"] = 60;
+   ptBins_["pt_60to80"] = 80;
+   ptBins_["pt_80to100"] = 100;
+   ptBins_["pt_100to120"] = 120;
+   ptBins_["pt_above120"] = 999;
 
-    std::map<TString,int> ptBins_;
-    ptBins_["pt_0to40"] = 40;
-    ptBins_["pt_40to80"] = 80;
-    ptBins_["pt_80to120"] = 120;
-    ptBins_["pt_120to160"] = 160;
-    ptBins_["pt_160to200"] = 200;
-    ptBins_["pt_200to240"] = 240;
-    ptBins_["pt_above240"] = 999;
+   std::map<TString,int> etaBins_;
+   etaBins_["eta_-28to-14"] = -14;
+   etaBins_["eta_-14to0"] = 0;
+   etaBins_["eta_0to14"] = 14;
+   etaBins_["eta_14to28"] = 28;
 
-    std::map<TString,int> etaBins_;
-    etaBins_["eta_-28to-14"] = -14;
-    etaBins_["eta_-14to0"] = 0;
-    etaBins_["eta_0to14"] = 14;
-    etaBins_["eta_14to28"] = 28;
-
+   std::map<TString,int> ptCut;
+   ptCut["pt20"] = 20;
+   ptCut["pt40"] = 40;
+   ptCut["pt60"] = 60;
+   ptCut["pt80"] = 80;
    edm::Service<TFileService> fs;
    TFileDirectory dir = fs->mkdir(folderName);
 
@@ -287,26 +326,41 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
    if(col1_jet2_eta.count(folderName) == 0) { col1_jet2_eta[folderName] = dir.make<TH1D>("col1_jet2_eta",";eta jet2;",57, -0.5, 56.5); }
    if(col1_jet3_eta.count(folderName) == 0) { col1_jet3_eta[folderName] = dir.make<TH1D>("col1_jet3_eta",";eta jet3;",57, -0.5, 56.5); }
    if(col1_jet4_eta.count(folderName) == 0) { col1_jet4_eta[folderName] = dir.make<TH1D>("col1_jet4_eta",";eta jet4;",57, -0.5, 56.5); }
+
    if(col2_jet1_eta.count(folderName) == 0) { col2_jet1_eta[folderName] = dir.make<TH1D>("col2_jet1_eta",";eta jet1;",57, -0.5, 56.5); }
    if(col2_jet2_eta.count(folderName) == 0) { col2_jet2_eta[folderName] = dir.make<TH1D>("col2_jet2_eta",";eta jet2;",57, -0.5, 56.5); }
    if(col2_jet3_eta.count(folderName) == 0) { col2_jet3_eta[folderName] = dir.make<TH1D>("col2_jet3_eta",";eta jet3;",57, -0.5, 56.5); }
    if(col2_jet4_eta.count(folderName) == 0) { col2_jet4_eta[folderName] = dir.make<TH1D>("col2_jet4_eta",";eta jet4;",57, -0.5, 56.5); }
+
    if(col1_jet1_pt.count(folderName) == 0) { col1_jet1_pt[folderName] = dir.make<TH1D>("col1_jet1_pt",";p_{T} jet1;",1000, -0.5, 999.5); }
    if(col1_jet2_pt.count(folderName) == 0) { col1_jet2_pt[folderName] = dir.make<TH1D>("col1_jet2_pt",";p_{T} jet2;",1000, -0.5, 999.5); }
    if(col1_jet3_pt.count(folderName) == 0) { col1_jet3_pt[folderName] = dir.make<TH1D>("col1_jet3_pt",";p_{T} jet3;",1000, -0.5, 999.5); }
    if(col1_jet4_pt.count(folderName) == 0) { col1_jet4_pt[folderName] = dir.make<TH1D>("col1_jet4_pt",";p_{T} jet4;",1000, -0.5, 999.5); }
+
+   if(col1_alljet_pt_NPV.count(folderName) == 0) { col1_alljet_pt_NPV[folderName] = dir.make<TH2D>("col1_alljet_pt_NPV",";NPV;p_{T} jet1",100,-0.5,99.5,1000, -0.5, 999.5); }
+   if(col1_jet1_pt_NPV.count(folderName) == 0) { col1_jet1_pt_NPV[folderName] = dir.make<TH2D>("col1_jet1_pt_NPV",";NPV;p_{T} jet1",100,-0.5,99.5,1000, -0.5, 999.5); }
+   if(col1_jet2_pt_NPV.count(folderName) == 0) { col1_jet2_pt_NPV[folderName] = dir.make<TH2D>("col1_jet2_pt_NPV",";NPV;p_{T} jet2",100,-0.5,99.5,1000, -0.5, 999.5); }
+   if(col1_jet3_pt_NPV.count(folderName) == 0) { col1_jet3_pt_NPV[folderName] = dir.make<TH2D>("col1_jet3_pt_NPV",";NPV;p_{T} jet3",100,-0.5,99.5,1000, -0.5, 999.5); }
+   if(col1_jet4_pt_NPV.count(folderName) == 0) { col1_jet4_pt_NPV[folderName] = dir.make<TH2D>("col1_jet4_pt_NPV",";NPV;p_{T} jet4",100,-0.5,99.5,1000, -0.5, 999.5); }
+
    if(col2_jet1_pt.count(folderName) == 0) { col2_jet1_pt[folderName] = dir.make<TH1D>("col2_jet1_pt",";p_{T} jet1;",1000, -0.5, 999.5); }
    if(col2_jet2_pt.count(folderName) == 0) { col2_jet2_pt[folderName] = dir.make<TH1D>("col2_jet2_pt",";p_{T} jet2;",1000, -0.5, 999.5); }
    if(col2_jet3_pt.count(folderName) == 0) { col2_jet3_pt[folderName] = dir.make<TH1D>("col2_jet3_pt",";p_{T} jet3;",1000, -0.5, 999.5); }
    if(col2_jet4_pt.count(folderName) == 0) { col2_jet4_pt[folderName] = dir.make<TH1D>("col2_jet4_pt",";p_{T} jet4;",1000, -0.5, 999.5); }
+
    if(col1_alljet_pt.count(folderName) == 0) { col1_alljet_pt[folderName] = dir.make<TH1D>("col1_alljet_pt",";p_{T} all jets;",1000, -0.5, 999.5); }
    if(col2_alljet_pt.count(folderName) == 0) { col2_alljet_pt[folderName] = dir.make<TH1D>("col2_alljet_pt",";p_{T} all jets;",1000, -0.5, 999.5); }
    if(col1_alljet_eta.count(folderName) == 0) { col1_alljet_eta[folderName] = dir.make<TH1D>("col1_alljet_eta",";eta all jets;",57, -0.5, 56.5); }
    if(col2_alljet_eta.count(folderName) == 0) { col2_alljet_eta[folderName] = dir.make<TH1D>("col2_alljet_eta",";eta all jets;",57, -0.5, 56.5);}
+
    if(col2_matched_algo1_alljet_pt.count(folderName) == 0) { col2_matched_algo1_alljet_pt[folderName] = dir.make<TH1D>("col2_matched_algo1_alljet_pt",";p_{T} all jets matched;",1000, -0.5, 999.5); }
    if(col2_matched_algo1_alljet_eta.count(folderName) == 0) { col2_matched_algo1_alljet_eta[folderName] = dir.make<TH1D>("col2_matched_algo1_alljet_eta",";eta all jets matched;",57, -0.5, 56.5); }
-   if(col2_matched_algo1_ptcorr.count(folderName) == 0) { col2_matched_algo1_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo1_ptcorr", ";col1 pT;col2 pT", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
-   if(col2_matched_algo1_ptres.count(folderName) == 0) { col2_matched_algo1_ptres[folderName] = dir.make<TH2D>("col2_matched_algo1_ptres", ";col1 pT; (col2 - col1) / col1 pT", 1000, -0.5, 999.5, 200, -10.05, 10.95); }
+   if(col2_matched_algo1_ptcorr.count(folderName) == 0) { col2_matched_algo1_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo1_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
+
+   if(col2_matched_algo1_ptres_profile.count(folderName) == 0) { col2_matched_algo1_ptres_profile[folderName] = dir.make<TProfile>("col2_matched_algo1_ptres_profile", ";col2 p_{T}; (col1 - col2) / col2 p_{T}", 1000, -0.5, 999.5); }
+   if(col2_matched_algo1_ptres.count(folderName) == 0) { col2_matched_algo1_ptres[folderName] = dir.make<TH2D>("col2_matched_algo1_ptres", ";col2 p_{T}; (col1 - col2) / col2 p_{T}", 1000, -0.5, 999.5, 200, -10.05, 10.95); }
+
+   if(col2_matched_algo1_ptratio.count(folderName) == 0) { col2_matched_algo1_ptratio[folderName] = dir.make<TH2D>("col2_matched_algo1_ptratio", ";col2 p_{T}; (col1) / col2 p_{T}", 1000, -0.5, 999.5, 200, -10.05, 10.95); }
    if(col2_matched_algo1_jet1_pt.count(folderName) == 0) { col2_matched_algo1_jet1_pt[folderName] = dir.make<TH1D>("col2_matched_algo1_jet1_pt",";p_{T} jet1 matched;",1000, -0.5, 999.5); }
    if(col2_matched_algo1_jet2_pt.count(folderName) == 0) { col2_matched_algo1_jet2_pt[folderName] = dir.make<TH1D>("col2_matched_algo1_jet2_pt",";p_{T} jet2 matched;",1000, -0.5, 999.5); }
    if(col2_matched_algo1_jet3_pt.count(folderName) == 0) { col2_matched_algo1_jet3_pt[folderName] = dir.make<TH1D>("col2_matched_algo1_jet3_pt",";p_{T} jet3 matched;",1000, -0.5, 999.5); }
@@ -315,15 +369,18 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
    if(col2_matched_algo1_jet2_eta.count(folderName) == 0) { col2_matched_algo1_jet2_eta[folderName] = dir.make<TH1D>("col2_matched_algo1_jet2_eta",";eta jet2 matched;",57, -0.5, 56.5); }
    if(col2_matched_algo1_jet3_eta.count(folderName) == 0) { col2_matched_algo1_jet3_eta[folderName] = dir.make<TH1D>("col2_matched_algo1_jet3_eta",";eta jet3 matched;",57, -0.5, 56.5); }
    if(col2_matched_algo1_jet4_eta.count(folderName) == 0) { col2_matched_algo1_jet4_eta[folderName] = dir.make<TH1D>("col2_matched_algo1_jet4_eta",";eta jet4 matched;",57, -0.5, 56.5); }
-   if(col2_matched_algo1_jet1_ptcorr.count(folderName) == 0) { col2_matched_algo1_jet1_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo1_jet1_ptcorr", ";col1 pT;col2 pT", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
-   if(col2_matched_algo1_jet2_ptcorr.count(folderName) == 0) { col2_matched_algo1_jet2_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo1_jet2_ptcorr", ";col1 pT;col2 pT", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
-   if(col2_matched_algo1_jet3_ptcorr.count(folderName) == 0) { col2_matched_algo1_jet3_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo1_jet3_ptcorr", ";col1 pT;col2 pT", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
-   if(col2_matched_algo1_jet4_ptcorr.count(folderName) == 0) { col2_matched_algo1_jet4_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo1_jet4_ptcorr", ";col1 pT;col2 pT", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
-
+   if(col2_matched_algo1_jet1_ptcorr.count(folderName) == 0) { col2_matched_algo1_jet1_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo1_jet1_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
+   if(col2_matched_algo1_jet2_ptcorr.count(folderName) == 0) { col2_matched_algo1_jet2_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo1_jet2_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
+   if(col2_matched_algo1_jet3_ptcorr.count(folderName) == 0) { col2_matched_algo1_jet3_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo1_jet3_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
+   if(col2_matched_algo1_jet4_ptcorr.count(folderName) == 0) { col2_matched_algo1_jet4_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo1_jet4_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
    if(col2_matched_algo2_alljet_pt.count(folderName) == 0) { col2_matched_algo2_alljet_pt[folderName] = dir.make<TH1D>("col2_matched_algo2_alljet_pt",";p_{T} all jets matched;",1000, -0.5, 999.5); }
    if(col2_matched_algo2_alljet_eta.count(folderName) == 0) { col2_matched_algo2_alljet_eta[folderName] = dir.make<TH1D>("col2_matched_algo2_alljet_eta",";eta all jets matched;",57, -0.5, 56.5); }
-   if(col2_matched_algo2_ptcorr.count(folderName) == 0) { col2_matched_algo2_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo2_ptcorr", ";col1 pT;col2 pT", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
-   if(col2_matched_algo2_ptres.count(folderName) == 0) { col2_matched_algo2_ptres[folderName] = dir.make<TH2D>("col2_matched_algo2_ptres", ";col1 pT; (col2 - col1) / col1 pT", 1000, -0.5, 999.5, 200, -10.05, 10.95); }
+   if(col2_matched_algo2_ptcorr.count(folderName) == 0) { col2_matched_algo2_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo2_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
+
+   if(col2_matched_algo2_ptres_profile.count(folderName) == 0) { col2_matched_algo1_ptres_profile[folderName] = dir.make<TProfile>("col2_matched_algo1_ptres_profile", ";col2 p_{T}; (col1 - col2) / col2 p_{T}", 1000, -0.5, 999.5); }
+   if(col2_matched_algo2_ptres.count(folderName) == 0) { col2_matched_algo2_ptres[folderName] = dir.make<TH2D>("col2_matched_algo2_ptres", ";col2 p_{T}; (col1 - col2) / col2 p_{T}", 1000, -0.5, 999.5, 200, -10.05, 10.95); }
+
+   if(col2_matched_algo2_ptratio.count(folderName) == 0) { col2_matched_algo2_ptratio[folderName] = dir.make<TH2D>("col2_matched_algo2_ptratio", ";col2 p_{T}; (col1) / col2 p_{T}", 1000, -0.5, 999.5, 200, -10.05, 10.95); }
    if(col2_matched_algo2_jet1_pt.count(folderName) == 0) { col2_matched_algo2_jet1_pt[folderName] = dir.make<TH1D>("col2_matched_algo2_jet1_pt",";p_{T} jet1 matched;",1000, -0.5, 999.5); }
    if(col2_matched_algo2_jet2_pt.count(folderName) == 0) { col2_matched_algo2_jet2_pt[folderName] = dir.make<TH1D>("col2_matched_algo2_jet2_pt",";p_{T} jet2 matched;",1000, -0.5, 999.5); }
    if(col2_matched_algo2_jet3_pt.count(folderName) == 0) { col2_matched_algo2_jet3_pt[folderName] = dir.make<TH1D>("col2_matched_algo2_jet3_pt",";p_{T} jet3 matched;",1000, -0.5, 999.5); }
@@ -332,13 +389,26 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
    if(col2_matched_algo2_jet2_eta.count(folderName) == 0) { col2_matched_algo2_jet2_eta[folderName] = dir.make<TH1D>("col2_matched_algo2_jet2_eta",";eta jet2 matched;",57, -0.5, 56.5); }
    if(col2_matched_algo2_jet3_eta.count(folderName) == 0) { col2_matched_algo2_jet3_eta[folderName] = dir.make<TH1D>("col2_matched_algo2_jet3_eta",";eta jet3 matched;",57, -0.5, 56.5); }
    if(col2_matched_algo2_jet4_eta.count(folderName) == 0) { col2_matched_algo2_jet4_eta[folderName] = dir.make<TH1D>("col2_matched_algo2_jet4_eta",";eta jet4 matched;",57, -0.5, 56.5); }
-   if(col2_matched_algo2_jet1_ptcorr.count(folderName) == 0) { col2_matched_algo2_jet1_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo2_jet1_ptcorr", ";col1 pT;col2 pT", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
-   if(col2_matched_algo2_jet2_ptcorr.count(folderName) == 0) { col2_matched_algo2_jet2_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo2_jet2_ptcorr", ";col1 pT;col2 pT", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
-   if(col2_matched_algo2_jet3_ptcorr.count(folderName) == 0) { col2_matched_algo2_jet3_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo2_jet3_ptcorr", ";col1 pT;col2 pT", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
-   if(col2_matched_algo2_jet4_ptcorr.count(folderName) == 0) { col2_matched_algo2_jet4_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo2_jet4_ptcorr", ";col1 pT;col2 pT", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
+   if(col2_matched_algo2_jet1_ptcorr.count(folderName) == 0) { col2_matched_algo2_jet1_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo2_jet1_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
+   if(col2_matched_algo2_jet2_ptcorr.count(folderName) == 0) { col2_matched_algo2_jet2_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo2_jet2_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
+   if(col2_matched_algo2_jet3_ptcorr.count(folderName) == 0) { col2_matched_algo2_jet3_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo2_jet3_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
+   if(col2_matched_algo2_jet4_ptcorr.count(folderName) == 0) { col2_matched_algo2_jet4_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo2_jet4_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
+   if(col2_saved_algo2.count(folderName) == 0) { col2_saved_algo2[folderName] = dir.make<TH2D>("col2_saved_algo2",";col2 p_{T};Max Matched p_{T};", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
    //New plots
-   if(pMade.count(folderName)==0)
+   //Loop over Pt bins
+   if(pMade.count(folderName) ==0)
    {
+      for(std::map<TString,int>::const_iterator ptCutIt=ptCut.begin(); ptCutIt != ptCut.end(); ptCutIt++)
+      {
+	 std::cout << TString(folderName)+ptCutIt->first << std::endl;
+	 col2_matched_algo1_alljet_cut[TString(folderName)+ptCutIt->first]=dir.make<TH1D>("col2_matched_algo1_alljet_cut_"+ptCutIt->first,";p_{T};",1000,-0.5,999.5);
+	 col2_matched_algo1_jet1_cut[TString(folderName)+ptCutIt->first]=dir.make<TH1D>("col2_matched_algo1_jet1_cut_"+ptCutIt->first,";p_{T};",1000,-0.5,999.5);
+	 col2_matched_algo1_jet2_cut[TString(folderName)+ptCutIt->first]=dir.make<TH1D>("col2_matched_algo1_jet2_cut_"+ptCutIt->first,";p_{T};",1000,-0.5,999.5);
+	 col2_matched_algo1_jet3_cut[TString(folderName)+ptCutIt->first]=dir.make<TH1D>("col2_matched_algo1_jet3_cut_"+ptCutIt->first,";p_{T};",1000,-0.5,999.5);
+	 col2_matched_algo1_jet4_cut[TString(folderName)+ptCutIt->first]=dir.make<TH1D>("col2_matched_algo1_jet4_cut_"+ptCutIt->first,";p_{T};",1000,-0.5,999.5);
+
+      }
+      std::cout << folderName << std::endl;
       pMade[folderName] = true;
       for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
 
@@ -349,26 +419,28 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
 
 	    TFileDirectory ptdir = etadir.mkdir(ptBinIt->first.Data());
 
-	    pt_ratio_nvts_algo1_alljet[ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TH2D>("pt_ratio_nvts_algo1_alljet", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5, 600, -3.005, 2.995); 
-	    pt_ratio_nvts_algo1_alljet_profile[ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TProfile>("pt_ratio_nvts_algo1_alljet_profile", ";(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5); 
-	    pt_ratio_nvts_algo1_jet1[ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TH2D>("pt_ratio_nvts_algo1_jet1", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5, 600, -3.005, 2.995); 
-	    pt_ratio_nvts_algo1_jet1_profile[ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TProfile>("pt_ratio_nvts_algo1_jet1_profile", ";(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5); 
-	    pt_ratio_nvts_algo1_jet2[ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TH2D>("pt_ratio_nvts_algo1_jet2", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5, 600, -3.005, 2.995); 
-	    pt_ratio_nvts_algo1_jet2_profile[ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TProfile>("pt_ratio_nvts_algo1_jet2_profile", ";(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5); 
-	    pt_ratio_nvts_algo1_jet3[ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TH2D>("pt_ratio_nvts_algo1_jet3", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5, 600, -3.005, 2.995); 
-	    pt_ratio_nvts_algo1_jet3_profile[ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TProfile>("pt_ratio_nvts_algo1_jet3_profile", ";(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5); 
-	    pt_ratio_nvts_algo1_jet4[ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TH2D>("pt_ratio_nvts_algo1_jet4", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5, 600, -3.005, 2.995); 
-	    pt_ratio_nvts_algo1_jet4_profile[ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TProfile>("pt_ratio_nvts_algo1_jet4_profile", ";(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5); 
+	    pt_ratio_nvts_algo1_alljet[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TH2D>("pt_ratio_nvts_algo1_alljet", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5, 600, -3.005, 2.995); 
+	    pt_ratio_nvts_algo1_alljet_profile[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TProfile>("pt_ratio_nvts_algo1_alljet_profile", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5); 
+	    pt_ratio_nvts_algo1_jet1[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TH2D>("pt_ratio_nvts_algo1_jet1", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5, 600, -3.005, 2.995); 
+	    pt_ratio_nvts_algo1_jet1_profile[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TProfile>("pt_ratio_nvts_algo1_jet1_profile", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5); 
+	    pt_ratio_nvts_algo1_jet2[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TH2D>("pt_ratio_nvts_algo1_jet2", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5, 600, -3.005, 2.995); 
+	    pt_ratio_nvts_algo1_jet2_profile[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TProfile>("pt_ratio_nvts_algo1_jet2_profile", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5); 
+	    pt_ratio_nvts_algo1_jet3[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TH2D>("pt_ratio_nvts_algo1_jet3", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5, 600, -3.005, 2.995); 
+	    pt_ratio_nvts_algo1_jet3_profile[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TProfile>("pt_ratio_nvts_algo1_jet3_profile", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5); 
+	    pt_ratio_nvts_algo1_jet4[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TH2D>("pt_ratio_nvts_algo1_jet4", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5, 600, -3.005, 2.995); 
+	    pt_ratio_nvts_algo1_jet4_profile[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TProfile>("pt_ratio_nvts_algo1_jet4_profile", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5); 
 	 }
       }
    }
+  
    for(unsigned int i=0; i<col1.size(); i++) {
       col1_alljet_pt[folderName]->Fill(col1[i].pt());
+      col1_alljet_pt_NPV[folderName]->Fill(mNPV,col1[i].pt());
       col1_alljet_eta[folderName]->Fill(g.new_iEta(col1[i].iEta()));
-      if(i == 0) { col1_jet1_pt[folderName]->Fill(col1[i].pt()); col1_jet1_eta[folderName]->Fill(g.new_iEta(col1[i].iEta())); }
-      if(i == 1) { col1_jet2_pt[folderName]->Fill(col1[i].pt()); col1_jet2_eta[folderName]->Fill(g.new_iEta(col1[i].iEta())); }
-      if(i == 2) { col1_jet3_pt[folderName]->Fill(col1[i].pt()); col1_jet3_eta[folderName]->Fill(g.new_iEta(col1[i].iEta())); }
-      if(i == 3) { col1_jet4_pt[folderName]->Fill(col1[i].pt()); col1_jet4_eta[folderName]->Fill(g.new_iEta(col1[i].iEta())); }
+      if(i == 0) { col1_jet1_pt[folderName]->Fill(col1[i].pt()); col1_jet1_eta[folderName]->Fill(g.new_iEta(col1[i].iEta()));col1_jet1_pt_NPV[folderName]->Fill(mNPV,col1[i].pt()); }
+      if(i == 1) { col1_jet2_pt[folderName]->Fill(col1[i].pt()); col1_jet2_eta[folderName]->Fill(g.new_iEta(col1[i].iEta()));col1_jet2_pt_NPV[folderName]->Fill(mNPV,col1[i].pt()); }
+      if(i == 2) { col1_jet3_pt[folderName]->Fill(col1[i].pt()); col1_jet3_eta[folderName]->Fill(g.new_iEta(col1[i].iEta()));col1_jet3_pt_NPV[folderName]->Fill(mNPV,col1[i].pt()); }
+      if(i == 3) { col1_jet4_pt[folderName]->Fill(col1[i].pt()); col1_jet4_eta[folderName]->Fill(g.new_iEta(col1[i].iEta()));col1_jet4_pt_NPV[folderName]->Fill(mNPV,col1[i].pt()); }
    }
    for(unsigned int i=0; i<col2.size(); i++) {
       col2_alljet_pt[folderName]->Fill(col2[i].pt());
@@ -378,122 +450,179 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
       if(i == 2) { col2_jet3_pt[folderName]->Fill(col2[i].pt()); col2_jet3_eta[folderName]->Fill(g.new_iEta(col2[i].iEta())); }
       if(i == 3) { col2_jet4_pt[folderName]->Fill(col2[i].pt()); col2_jet4_eta[folderName]->Fill(g.new_iEta(col2[i].iEta())); }
    }
-
-   pairs = make_pairs(col1, col2);
-   std::vector<int> col2_matched_index_local = analyse_pairs_local(pairs, col2.size(), 26);
-   std::vector<int> col2_matched_index_global = analyse_pairs_global(pairs, col2.size(), 26);
-   // std::vector<int> col2_matched_index_local = analyse_pairs_global(pairs, col2.size(), 25);
-   for(unsigned int i=0; i<col2_matched_index_local.size(); i++) {
+   pairs = (isgct) ? make_gct_pairs(col1,col2) : make_pairs(col1, col2);
+   std::vector<int> col2_matched_index = analyse_pairs_local(pairs, col2.size(), 33);
+   //std::vector<int> col1_matched_index_local = analyse_pairs_global(pairs, col2.size(), 25);
+   for(unsigned int i=0; i<col2_matched_index.size(); i++) {
       //std::cout << "ak4genjetp with index " << i << " is matched to ak4ttjet with index " << ak4tt_matched_index[i] << std::endl;
-      if(col2_matched_index_local[i] != -1) {
+      if(col2_matched_index[i] != -1) {
 	 //New plots
-	    for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
+	 for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
 
-	       for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
-if (col2[i].pt() > ptBinIt->second && col2[i].iEta()< etaBinIt->second && col2[i].iEta() > etaBinIt->second-14)
-{
-		  pt_ratio_nvts_algo1_alljet[ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index_local[i]].pt())/col2[i].pt());
-		  pt_ratio_nvts_algo1_alljet_profile[ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index_local[i]].pt())/col2[i].pt());
-}
+	    for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
+	       if (col2[i].pt() > ptBinIt->second && col2[i].iEta()< etaBinIt->second && col2[i].iEta() > etaBinIt->second-14)
+	       {
+		  pt_ratio_nvts_algo1_alljet[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index[i]].pt())/col2[i].pt());
+		  pt_ratio_nvts_algo1_alljet_profile[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index[i]].pt())/col2[i].pt());
 	       }
 	    }
-	 //
+	 }
+	 //Turn On Plots
+	 for(std::map<TString,int>::const_iterator ptCutIt=ptCut.begin(); ptCutIt!=ptCut.end(); ptCutIt++)
+	 {
+	    if (col1[col2_matched_index[i]].pt() > ptCutIt->second)
+	    {
+	       col2_matched_algo1_alljet_cut[TString(folderName)+ptCutIt->first]->Fill(col2[i].pt());
+	    }
+	 }
+	 //std::cout << col2[i].pt() << std::endl;
 	 col2_matched_algo1_alljet_pt[folderName]->Fill(col2[i].pt());
 	 col2_matched_algo1_alljet_eta[folderName]->Fill(g.new_iEta(col2[i].iEta()));
-	 col2_matched_algo1_ptcorr[folderName]->Fill(col1[col2_matched_index_local[i]].pt(), col2[i].pt());
+	 col2_matched_algo1_ptcorr[folderName]->Fill(col1[col2_matched_index[i]].pt(), col2[i].pt());
 	 if(col2[i].pt() > 0.0) {
-	    col2_matched_algo1_ptres[folderName]->Fill(col2[i].pt(), (col1[col2_matched_index_local[i]].pt() / col2[i].pt()) - 1.0 );
+	    col2_matched_algo1_ptres[folderName]->Fill(col2[i].pt(), (col1[col2_matched_index[i]].pt() / col2[i].pt()) - 1.0 );
+	    col2_matched_algo1_ptres_profile[folderName]->Fill(col2[i].pt(), (col1[col2_matched_index[i]].pt() / col2[i].pt()) - 1.0 );
+	    col2_matched_algo1_ptratio[folderName]->Fill(col2[i].pt(), (col1[col2_matched_index[i]].pt() / col2[i].pt()));
 	 }
-
 	 if(i == 0) { col2_matched_algo1_jet1_pt[folderName]->Fill(col2[i].pt()); col2_matched_algo1_jet1_eta[folderName]->Fill(g.new_iEta(col2[i].iEta())); 
-	    col2_matched_algo1_jet1_ptcorr[folderName]->Fill(col1[col2_matched_index_local[i]].pt(), col2[i].pt()); 
+	    col2_matched_algo1_jet1_ptcorr[folderName]->Fill(col1[col2_matched_index[i]].pt(), col2[i].pt()); 
 
 
 	    for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
 
 	       for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
-if (col2[i].pt() > ptBinIt->second && col2[i].iEta()< etaBinIt->second && col2[i].iEta() > etaBinIt->second-14)
-{
-		  pt_ratio_nvts_algo1_jet1[ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index_local[i]].pt())/col2[i].pt());
-		  pt_ratio_nvts_algo1_jet1_profile[ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index_local[i]].pt())/col2[i].pt());
-}
+		  if (col2[i].pt() > ptBinIt->second && col2[i].iEta()< etaBinIt->second && col2[i].iEta() > etaBinIt->second-14)
+		  {
+		     pt_ratio_nvts_algo1_jet1[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index[i]].pt())/col2[i].pt());
+		     pt_ratio_nvts_algo1_jet1_profile[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index[i]].pt())/col2[i].pt());
+		  }
+	       }
+	    }
+
+	    //Turn On Plots
+	    for(std::map<TString,int>::const_iterator ptCutIt=ptCut.begin(); ptCutIt!=ptCut.end(); ptCutIt++)
+	    {
+	       if (col1[col2_matched_index[i]].pt() > ptCutIt->second)
+	       {
+		  col2_matched_algo1_jet1_cut[TString(folderName)+ptCutIt->first]->Fill(col2[i].pt());
+	       }
+	    }
+
+	 }
+	 if(i == 1) { col2_matched_algo1_jet2_pt[folderName]->Fill(col2[i].pt()); col2_matched_algo1_jet2_eta[folderName]->Fill(g.new_iEta(col2[i].iEta())); col2_matched_algo1_jet2_ptcorr[folderName]->Fill(col1[col2_matched_index[i]].pt(), col2[i].pt()); 
+
+	    for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
+
+	       for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
+		  if (col2[i].pt() > ptBinIt->second && col2[i].iEta()< etaBinIt->second && col2[i].iEta() > etaBinIt->second-14)
+		  {
+		     pt_ratio_nvts_algo1_jet2[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index[i]].pt())/col2[i].pt());
+		     pt_ratio_nvts_algo1_jet2_profile[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index[i]].pt())/col2[i].pt());
+		  }
+	       }
+	    }
+
+	    //Turn On Plots
+	    for(std::map<TString,int>::const_iterator ptCutIt=ptCut.begin(); ptCutIt!=ptCut.end(); ptCutIt++)
+	    {
+	       if (col1[col2_matched_index[i]].pt() > ptCutIt->second)
+	       {
+		  col2_matched_algo1_jet2_cut[TString(folderName)+ptCutIt->first]->Fill(col2[i].pt());
 	       }
 	    }
 
 
 	 }
-	 if(i == 1) { col2_matched_algo1_jet2_pt[folderName]->Fill(col2[i].pt()); col2_matched_algo1_jet2_eta[folderName]->Fill(g.new_iEta(col2[i].iEta())); col2_matched_algo1_jet2_ptcorr[folderName]->Fill(col1[col2_matched_index_local[i]].pt(), col2[i].pt()); 
+
+
+	 if(i == 2) { col2_matched_algo1_jet3_pt[folderName]->Fill(col2[i].pt()); col2_matched_algo1_jet3_eta[folderName]->Fill(g.new_iEta(col2[i].iEta())); col2_matched_algo1_jet3_ptcorr[folderName]->Fill(col1[col2_matched_index[i]].pt(), col2[i].pt());
 
 	    for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
 
 	       for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
-if (col2[i].pt() > ptBinIt->second && col2[i].iEta()< etaBinIt->second && col2[i].iEta() > etaBinIt->second-14)
-{
-		  pt_ratio_nvts_algo1_jet2[ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index_local[i]].pt())/col2[i].pt());
-		  pt_ratio_nvts_algo1_jet2_profile[ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index_local[i]].pt())/col2[i].pt());
-}
+		  if (col2[i].pt() > ptBinIt->second && col2[i].iEta()< etaBinIt->second && col2[i].iEta() > etaBinIt->second-14)
+		  {
+		     pt_ratio_nvts_algo1_jet3[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index[i]].pt())/col2[i].pt());
+		     pt_ratio_nvts_algo1_jet3_profile[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index[i]].pt())/col2[i].pt());
+		  }
 	       }
 	    }
-
-
-}
-	 if(i == 2) { col2_matched_algo1_jet3_pt[folderName]->Fill(col2[i].pt()); col2_matched_algo1_jet3_eta[folderName]->Fill(g.new_iEta(col2[i].iEta())); col2_matched_algo1_jet3_ptcorr[folderName]->Fill(col1[col2_matched_index_local[i]].pt(), col2[i].pt());
-
-	    for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
-
-	       for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
-if (col2[i].pt() > ptBinIt->second && col2[i].iEta()< etaBinIt->second && col2[i].iEta() > etaBinIt->second-14)
-{
-		  pt_ratio_nvts_algo1_jet3[ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index_local[i]].pt())/col2[i].pt());
-		  pt_ratio_nvts_algo1_jet3_profile[ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index_local[i]].pt())/col2[i].pt());
-}
+	    //Turn On Plots
+	    for(std::map<TString,int>::const_iterator ptCutIt=ptCut.begin(); ptCutIt!=ptCut.end(); ptCutIt++)
+	    {
+	       if (col1[col2_matched_index[i]].pt() > ptCutIt->second)
+	       {
+		  col2_matched_algo1_jet3_cut[TString(folderName)+ptCutIt->first]->Fill(col2[i].pt());
 	       }
 	    }
 
 
 
- }
-	 if(i == 3) { col2_matched_algo1_jet4_pt[folderName]->Fill(col2[i].pt()); col2_matched_algo1_jet4_eta[folderName]->Fill(g.new_iEta(col2[i].iEta())); col2_matched_algo1_jet4_ptcorr[folderName]->Fill(col1[col2_matched_index_local[i]].pt(), col2[i].pt()); 
+	 }
+
+	 if(i == 3) { col2_matched_algo1_jet4_pt[folderName]->Fill(col2[i].pt()); col2_matched_algo1_jet4_eta[folderName]->Fill(g.new_iEta(col2[i].iEta())); col2_matched_algo1_jet4_ptcorr[folderName]->Fill(col1[col2_matched_index[i]].pt(), col2[i].pt()); 
 
 	    for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
 
 	       for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
-if (col2[i].pt() > ptBinIt->second && col2[i].iEta()< etaBinIt->second && col2[i].iEta() > etaBinIt->second-14)
-{
-		  pt_ratio_nvts_algo1_jet4[ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index_local[i]].pt())/col2[i].pt());
-		  pt_ratio_nvts_algo1_jet4_profile[ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index_local[i]].pt())/col2[i].pt());
-}
+		  if (col2[i].pt() > ptBinIt->second && col2[i].iEta()< etaBinIt->second && col2[i].iEta() > etaBinIt->second-14)
+		  {
+		     pt_ratio_nvts_algo1_jet4[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index[i]].pt())/col2[i].pt());
+		     pt_ratio_nvts_algo1_jet4_profile[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index[i]].pt())/col2[i].pt());
+		  }
+	       }
+	    }
+	    //Turn On Plots
+	    for(std::map<TString,int>::const_iterator ptCutIt=ptCut.begin(); ptCutIt!=ptCut.end(); ptCutIt++)
+	    {
+	       if (col1[col2_matched_index[i]].pt() > ptCutIt->second)
+	       {
+		  col2_matched_algo1_jet4_cut[TString(folderName)+ptCutIt->first]->Fill(col2[i].pt());
 	       }
 	    }
 
 
-}
-
+	 }
       } 
-      //  else{
-      //    if (col2[i].pt() > 200. && folderName =="gen_l1trigger" ) {this->mPrintMe = true; std::cout << mPrintMe << std::endl;}
-      // }
-
    }
-   for(unsigned int i=0; i<col2_matched_index_global.size(); i++) {
+   //ALGO 2
+  //pairs = (isgct) ? make_gct_pairs(col2,col1) : make_pairs(col2, col1);
+//std::cout << non0 << "\t";
+  col2_matched_index = analyse_pairs_global(pairs, col2.size(), 33);
+   for(unsigned int i=0; i<col2_matched_index.size(); i++) {
       //std::cout << "ak4genjetp with index " << i << " is matched to ak4ttjet with index " << ak4tt_matched_index[i] << std::endl;
-      if(col2_matched_index_global[i] != -1) {
+      if(col2_matched_index[i] != -1) {
 	 col2_matched_algo2_alljet_pt[folderName]->Fill(col2[i].pt());
 	 col2_matched_algo2_alljet_eta[folderName]->Fill(g.new_iEta(col2[i].iEta()));
-	 col2_matched_algo2_ptcorr[folderName]->Fill(col1[col2_matched_index_global[i]].pt(), col2[i].pt());
+	 col2_matched_algo2_ptcorr[folderName]->Fill(col1[col2_matched_index[i]].pt(), col2[i].pt());
 	 if(col2[i].pt() > 0.0) {
-	    col2_matched_algo2_ptres[folderName]->Fill(col2[i].pt(), (col1[col2_matched_index_global[i]].pt() / col2[i].pt()) - 1.0 );
+	    col2_matched_algo2_ptres[folderName]->Fill(col2[i].pt(), (col1[col2_matched_index[i]].pt() / col2[i].pt()) - 1.0 );
+	    col2_matched_algo2_ptres_profile[folderName]->Fill(col2[i].pt(), (col1[col2_matched_index[i]].pt() / col2[i].pt()) - 1.0 );
+	    col2_matched_algo2_ptratio[folderName]->Fill(col2[i].pt(), (col1[col2_matched_index[i]].pt() / col2[i].pt()));
 	 }
 
-	 if(i == 0) { col2_matched_algo2_jet1_pt[folderName]->Fill(col2[i].pt()); col2_matched_algo2_jet1_eta[folderName]->Fill(g.new_iEta(col2[i].iEta())); col2_matched_algo2_jet1_ptcorr[folderName]->Fill(col1[col2_matched_index_global[i]].pt(), col2[i].pt()); }
-	 if(i == 1) { col2_matched_algo2_jet2_pt[folderName]->Fill(col2[i].pt()); col2_matched_algo2_jet2_eta[folderName]->Fill(g.new_iEta(col2[i].iEta())); col2_matched_algo2_jet2_ptcorr[folderName]->Fill(col1[col2_matched_index_global[i]].pt(), col2[i].pt()); }
-	 if(i == 2) { col2_matched_algo2_jet3_pt[folderName]->Fill(col2[i].pt()); col2_matched_algo2_jet3_eta[folderName]->Fill(g.new_iEta(col2[i].iEta())); col2_matched_algo2_jet3_ptcorr[folderName]->Fill(col1[col2_matched_index_global[i]].pt(), col2[i].pt()); }
-	 if(i == 3) { col2_matched_algo2_jet4_pt[folderName]->Fill(col2[i].pt()); col2_matched_algo2_jet4_eta[folderName]->Fill(g.new_iEta(col2[i].iEta())); col2_matched_algo2_jet4_ptcorr[folderName]->Fill(col1[col2_matched_index_global[i]].pt(), col2[i].pt()); }
+	 if(i == 0) { col2_matched_algo2_jet1_pt[folderName]->Fill(col2[i].pt()); col2_matched_algo2_jet1_eta[folderName]->Fill(g.new_iEta(col2[i].iEta())); col2_matched_algo2_jet1_ptcorr[folderName]->Fill(col1[col2_matched_index[i]].pt(), col2[i].pt()); }
+	 if(i == 1) { col2_matched_algo2_jet2_pt[folderName]->Fill(col2[i].pt()); col2_matched_algo2_jet2_eta[folderName]->Fill(g.new_iEta(col2[i].iEta())); col2_matched_algo2_jet2_ptcorr[folderName]->Fill(col1[col2_matched_index[i]].pt(), col2[i].pt()); }
+	 if(i == 2) { col2_matched_algo2_jet3_pt[folderName]->Fill(col2[i].pt()); col2_matched_algo2_jet3_eta[folderName]->Fill(g.new_iEta(col2[i].iEta())); col2_matched_algo2_jet3_ptcorr[folderName]->Fill(col1[col2_matched_index[i]].pt(), col2[i].pt()); }
+	 if(i == 3) { col2_matched_algo2_jet4_pt[folderName]->Fill(col2[i].pt()); col2_matched_algo2_jet4_eta[folderName]->Fill(g.new_iEta(col2[i].iEta())); col2_matched_algo2_jet4_ptcorr[folderName]->Fill(col1[col2_matched_index[i]].pt(), col2[i].pt()); }
 
       } 
+      //if (col1[col2_matched_index[i]].pt()/col2[i].pt() > 900. && folderName =="5400_donut_gen" ) {this->mPrintMe = true; std::cout << mPrintMe << std::endl;}
 
+      else
+      {
+	 if (col2[i].pt()>200. && folderName=="5400_nopus_gen") {
+	    int max=0;
+	    for (unsigned int j =0; j <col1.size();j++)
+	    {
+	       if (max < col1[j].pt()) max = col1[j].pt();
+	    }
+	    col2_saved_algo2[folderName]->Fill(col2[i].pt(),max);
+	    if (max < col2[i].pt()) this->mPrintMe=true; std::cout << "PRINT "<<col2[i].pt() <<std::endl; 
+	    //	    break;
+	 }
+      } 
    }
-
    return;
 
 }
@@ -610,6 +739,7 @@ void CaloTowerAnalyser::getJets(std::vector < fastjet::PseudoJet > &constits,std
    fastjet::AreaDefinition fjAreaDefinition( fastjet::active_area, fjActiveArea );
    fastjet::ClusterSequenceArea* thisClustering_ = new fastjet::ClusterSequenceArea(constits, jetDef, fjAreaDefinition);
    std::vector<fastjet::PseudoJet> out_jets = sorted_by_pt(thisClustering_->inclusive_jets(5.0));
+   delete thisClustering_;
    for(unsigned int i0 = 0; i0 < out_jets.size(); i0++) jets.push_back(out_jets[i0]);
 
    return;
@@ -623,17 +753,18 @@ double CaloTowerAnalyser::getMedian(const std::vector<jJet> & jets)
    if(jetSort.size() > 2) {
       if(jetSort.size() % 2 == 0 ) {
 	 int index1 = jetSort.size() / 2;
-	 median_energy=((double)(jetSort.at(index1).pt() + jetSort.at(index1+1).pt()) / 2.0);
+	 median_energy=((double)((double)jetSort.at(index1).pt()/(double)jetSort.at(index1).area() + (double)jetSort.at(index1+1).pt()/(double)jetSort.at(index1+1).area()))/2.0;
       } else {
 	 int index1 = (int)jetSort.size() / 2;
-	 median_energy=(jetSort.at(index1).pt());
+	 median_energy=((double)jetSort.at(index1).pt()/(double)jetSort.at(index1).area());
       }
    }
    return median_energy;
 
 }
-
-std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<int> > & input, int jetsize, int vetowindowsize, int seedthresh1, int seedthresh2) {
+///MASK VERSION
+/*
+std::vector<jJet> CaloTowerAnalyser::getL1JetsMask(const std::vector< std::vector<int> > & input, int jetsize, int mask, int seedthresh1, int seedthresh2) {
    //seedthresh1 is the seedthreshold on the central tower
    //seedthresh2 is the threshold on all towers a la zero suppression
    //jetsize is the +/- number to span i.e. +/- 1 = 3x3
@@ -642,11 +773,11 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
    std::vector<jJet> L1_jJets;
    TriggerTowerGeometry g;
 
-   //std::vector<int> jetTower;
    //std::cout << input.size() << ", " << input[0].size() << std::endl;
 
    for ( int i = 0; i < (int)input.size(); i++) {
       for ( int j = 0; j < (int)input[i].size(); j++) {
+	 std::vector<int> jetTower;
 	 //std::cout << "new: (" << i << ", " << j << ", " << input[i][j] << ")" << std::endl;
 	 int numtowersaboveme=0;
 	 int numtowersabovethresh=0;
@@ -654,7 +785,7 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
 	 std::vector<int> localsums(jetsize+1,0); //to hold the ring sums (+1 for centre)
 	 std::vector<int> areas(jetsize+1,0); //to hold the ring areas (i.e. when we get up against the boundaries)
 	 std::vector<int> outerstrips(4,0); //to hold the energies in the 4 surrounding outer strips (excluding corners)
-
+	 int jetarea = 1;
 	 for(int k=(i-jetsize); k<=(i+jetsize); k++) {
 	    for(int l=(j-jetsize); l<=(j+jetsize); l++) {
 	       if(k < 0 || k > 55) continue; //i.e. out of bounds of eta<3
@@ -665,17 +796,18 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
 	       if(l < 0) { newl = l+72; } 
 	       else if (l > 71) { newl = l-72; } 
 	       else { newl = l; }
-
+	       if (l != j && k != i)
+	       {
+		  jetTower.push_back(input[k][newl]);
+	       }
 	       if(input[k][newl] > seedthresh2) { numtowersabovethresh++; }
-	       //jetTower.push_back(input[k][newl]);
 
 	       //to decide which ring to assign energy to
-	       for( int m=0; m<jetsize+1;m++) { //+1 for centre of jet
+	       for( int m=0; m<jetsize+1;m++) { //+1 for centre of jet (n steps is n+1 rings!)
 		  if((abs(i-k) == m && abs(j-l) <= m) || (abs(i-k) <= m && abs(j-l) == m)) { 
 		     //i.e. we are now in ring m
-		     localsums[m] += input[k][newl]; 
+		     if (m <= vetowindowsize) localsums[m] += input[k][newl]; 
 		     areas[m] += 1;
-
 		     if(m == jetsize) { //i.e. we are in the outer ring and want to parameterise PU
 			if( (k-i) == m && abs(j-l) <= (m-1) ) { outerstrips[0] += input[k][newl]; }
 			if( (i-k) == m && abs(j-l) <= (m-1) ) { outerstrips[1] += input[k][newl]; }
@@ -684,7 +816,7 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
 		     }
 
 		     if(m > 0 && m <= vetowindowsize) { //i.e. don't compare the central tower or towers outside vetowindowsize
-
+			jetarea++;
 			if((k+l) > (i+j) ) { if(input[k][newl] > input[i][j]) { numtowersaboveme++; } }
 			else if( ((k+l) == (i+j)) && (k-i) > (l-j)) { if(input[k][newl] > input[i][j]) { numtowersaboveme++; } } //this line is to break the degeneracy along the diagonal treating top left different to bottom right
 			else { if(input[k][newl] >= input[i][j]) { numtowersaboveme++; } }
@@ -711,7 +843,7 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
 
 	    //this means we have a viable candidate
 	    if(totalenergy > 0.0) {
-	       L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips));
+	       L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetTower,jetarea));
 	    }
 
 	 }
@@ -725,9 +857,8 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
    return L1_jJets;
 
 }
-
-std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<int> > & input, int phisize, int etasize, int vetophisize, int vetoetasize, int seedthresh1, int seedthresh2) {
-
+*/
+std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<int> > & input, int jetsize, int vetowindowsize, int seedthresh1, int seedthresh2) {
    //seedthresh1 is the seedthreshold on the central tower
    //seedthresh2 is the threshold on all towers a la zero suppression
    //jetsize is the +/- number to span i.e. +/- 1 = 3x3
@@ -736,21 +867,21 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
    std::vector<jJet> L1_jJets;
    TriggerTowerGeometry g;
 
-
    //std::cout << input.size() << ", " << input[0].size() << std::endl;
 
    for ( int i = 0; i < (int)input.size(); i++) {
       for ( int j = 0; j < (int)input[i].size(); j++) {
+	 std::vector<int> jetTower;
 	 //std::cout << "new: (" << i << ", " << j << ", " << input[i][j] << ")" << std::endl;
 	 int numtowersaboveme=0;
 	 int numtowersabovethresh=0;
-	 int jetsize=4;
+
 	 std::vector<int> localsums(jetsize+1,0); //to hold the ring sums (+1 for centre)
 	 std::vector<int> areas(jetsize+1,0); //to hold the ring areas (i.e. when we get up against the boundaries)
 	 std::vector<int> outerstrips(4,0); //to hold the energies in the 4 surrounding outer strips (excluding corners)
-
-	 for(int k=(i-phisize); k<=(i+phisize); k++) {
-	    for(int l=(j-etasize); l<=(j+etasize); l++) {
+	 int jetarea = 1;
+	 for(int k=(i-jetsize); k<=(i+jetsize); k++) {
+	    for(int l=(j-jetsize); l<=(j+jetsize); l++) {
 	       if(k < 0 || k > 55) continue; //i.e. out of bounds of eta<3
 	       //std::cout << " k = " << k << ", l = " << l << ", i =" << i << ", j = " << j << std::endl;
 
@@ -759,27 +890,27 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
 	       if(l < 0) { newl = l+72; } 
 	       else if (l > 71) { newl = l-72; } 
 	       else { newl = l; }
-
+	       if (l != j && k != i)
+	       {
+		  jetTower.push_back(input[k][newl]);
+	       }
 	       if(input[k][newl] > seedthresh2) { numtowersabovethresh++; }
 
 	       //to decide which ring to assign energy to
-
-	       jetsize = (phisize > etasize) ? phisize:etasize;
-
-	       for( int m=0; m<jetsize+1;m++) { //+1 for centre of jet
+	       for( int m=0; m<jetsize+1;m++) { //+1 for centre of jet (n steps is n+1 rings!)
 		  if((abs(i-k) == m && abs(j-l) <= m) || (abs(i-k) <= m && abs(j-l) == m)) { 
 		     //i.e. we are now in ring m
-		     localsums[m] += input[k][newl]; 
+		     if (m <= vetowindowsize) localsums[m] += input[k][newl]; 
 		     areas[m] += 1;
+		     if(m == jetsize) { //i.e. we are in the outer ring and want to parameterise PU
+			if( (k-i) == m && abs(j-l) <= (m-1) ) { outerstrips[0] += input[k][newl]; }
+			if( (i-k) == m && abs(j-l) <= (m-1) ) { outerstrips[1] += input[k][newl]; }
+			if( (l-j) == m && abs(i-k) <= (m-1) ) { outerstrips[2] += input[k][newl]; }
+			if( (j-l) == m && abs(i-k) <= (m-1) ) { outerstrips[3] += input[k][newl]; }
+		     }
 
-		     //Outer Rings
-		     if( (k-i) == phisize && abs(j-l) <= (etasize-1) ) { outerstrips[0] += input[k][newl]; }
-		     if( (i-k) == phisize && abs(j-l) <= (etasize-1) ) { outerstrips[1] += input[k][newl]; }
-		     if( (l-j) == etasize && abs(i-k) <= (phisize-1) ) { outerstrips[2] += input[k][newl]; }
-		     if( (j-l) == etasize && abs(i-k) <= (phisize-1) ) { outerstrips[3] += input[k][newl]; }
-
-		     if(m > 0 && abs(l-j) <= vetoetasize && abs(i-k) <= vetophisize) { //i.e. don't compare the central tower or towers outside vetowindowsize
-
+		     if(m > 0 && m <= vetowindowsize) { //i.e. don't compare the central tower or towers outside vetowindowsize
+			jetarea++;
 			if((k+l) > (i+j) ) { if(input[k][newl] > input[i][j]) { numtowersaboveme++; } }
 			else if( ((k+l) == (i+j)) && (k-i) > (l-j)) { if(input[k][newl] > input[i][j]) { numtowersaboveme++; } } //this line is to break the degeneracy along the diagonal treating top left different to bottom right
 			else { if(input[k][newl] >= input[i][j]) { numtowersaboveme++; } }
@@ -806,7 +937,7 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
 
 	    //this means we have a viable candidate
 	    if(totalenergy > 0.0) {
-	       L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips));
+	       L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetTower,jetarea));
 	    }
 
 	 }
@@ -820,6 +951,7 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
    return L1_jJets;
 
 }
+
 
 std::vector<int> CaloTowerAnalyser::closestJetDistance(const std::vector<jJet> & jJets) {
 
@@ -880,15 +1012,32 @@ CaloTowerAnalyser::CaloTowerAnalyser(const edm::ParameterSet& iConfig) {
    TriggerTowerGeometry g; //to run the constructor -- could also make this static
 
    genjet_pt = dir.make<TH1D>("genjet_pt",";p_{T};",1000, -0.5, 999.5);
+
    tower_pt_real= dir.make<TH1D>("towers_real", ";pt;", 100, -0.5, 99.5);
+   num_tower_pt_real= dir.make<TH1D>("num_towers_real", ";pt;", 100, -0.5, 99.5);
+   tower_pt_real_jetpt= dir.make<TH2D>("towers_real_jet_pt", ";pt;jetpt", 100, -0.5, 99.5,100,-0.5,99.5);
+   num_tower_pt_real_jetpt= dir.make<TH2D>("num_towers_real_jet_pt", ";pt;jetpt", 100, -0.5, 99.5,100,-0.5,99.5);
+
    tower_pt_pu= dir.make<TH1D>("towers_pu", ";pt;", 100, -0.5, 99.5);
+   num_tower_pt_pu= dir.make<TH1D>("num_towers_pu", ";pt;", 100, -0.5, 99.5);
+   tower_pt_pu_jetpt= dir.make<TH2D>("towers_pu_jet_pt", ";pt;jetpt", 100, -0.5, 99.5,100,-0.5,99.5);
+   num_tower_pt_pu_jetpt= dir.make<TH2D>("num_towers_pu_jet_pt", ";pt;jetpt", 100, -0.5, 99.5,100,-0.5,99.5);
+
    //genjet_pt_nomunu_far = dir.make<TH1D>("genjet_pt_nomunu_far",";p_{T};",1000, -0.5, 999.5);
    //genjet_pt_nomunu_far_match_L1 = dir.make<TH1D>("genjet_pt_nomunu_far_match_L1",";p_{T};",1000, -0.5, 999.5);
    median_energy_per_event = dir.make<TH1D>("median_energy_per_event",";median energy per event;",100, -0.5, 99.5);
-   median_jet_energy_per_event = dir.make<TH1D>("median_jet_energy_per_event",";median energy per event;",100, -0.5, 99.5);
-   median_energy_jet_tower_per_event = dir.make<TH2D>("median_energy_jet_tower_per_event",";median tower;median jet",100, -0.5, 99.5,100,-0.5,99.5);
-   num_tops_per_event = dir.make<TH1D>("Number of tops",";median energy per event;",100, -0.5, 99.5);
+   median_jet_5400_energy_per_event = dir.make<TH1D>("median_jet_energy_per_event",";median energy per event;",100, -0.5, 99.5);
+   median_energy_5400_jet_tower_per_event = dir.make<TH2D>("median_energy_jet_tower_per_event",";median tower;median jet",100, -0.5, 99.5,100,-0.5,99.5);
 
+   median_jet_4300_energy_per_event = dir.make<TH1D>("median_jet_energy_per_event",";median energy per event;",100, -0.5, 99.5);
+   median_energy_4300_jet_tower_per_event = dir.make<TH2D>("median_energy_jet_tower_per_event",";median tower;median jet",100, -0.5, 99.5,100,-0.5,99.5);
+
+   num_tops_per_event = dir.make<TH1D>("Number_of_tops",";Num;",100, -0.5, 99.5);
+   mean_top_pt_hist = dir.make<TH1D>("mean_top",";median_top;",1000, -0.5, 999.5);
+   eff_over_x1_top = dir.make<TH1D>("Efficiency_x1",";Eff;",1000,-0.5,999.5); 
+   eff_over_x2_top = dir.make<TH1D>("Efficiency_x2",";Eff;",1000,-0.5,999.5); 
+   eff_over_x3_top = dir.make<TH1D>("Efficiency_x3",";Eff;",1000,-0.5,999.5); 
+   eff_over_x4_top = dir.make<TH1D>("Efficiency_x4",";Eff;",1000,-0.5,999.5); 
    ntowers_vs_npv = dir.make<TH2D>("ntowers_vs_npv", ";ntowers;NPV", 500, -5, 4995, 100, -0.5, 99.5);
 
    r4_vs_npv_eta1_pt3050 = dir.make<TH2D>("r4_vs_npv_eta1_pt3050", ";r4;NPV", 100, -0.5, 99.5, 100, -0.5, 99.5);
@@ -965,22 +1114,28 @@ CaloTowerAnalyser::~CaloTowerAnalyser()
    void
 CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
+   //std::cout <<"EVENT " << mEventNumber << std::endl;
    if (mEventNumber % 100 == 0) { std::cout << "starting event " << mEventNumber << std::endl; }
 
 
-   /*
-      std::cout << "at event " << mEventNumber << std::endl;
+
+   //    std::cout << "at event " << mEventNumber << std::endl;
 
    // Get GCT jets (uncalib) collection
    edm::Handle<L1GctJetCandCollection> GctUncalibCenJets;
    edm::InputTag gctUncalibCenJets("valGctDigis","cenJets","jadtest");
    iEvent.getByLabel(gctUncalibCenJets, GctUncalibCenJets);
-
+   std::vector<jJet> gct_jJet;
    for(unsigned int i=0; i<GctUncalibCenJets->size(); i++) {
-   std::cout << GctUncalibCenJets->at(i).rank() << ", " << GctUncalibCenJets->at(i).regionId().ieta() << ", " << GctUncalibCenJets->at(i).regionId().iphi() << std::endl;
+      if (GctUncalibCenJets->at(i).bx()==0)
+      {
+	 //std::cout << GctUncalibCenJets->at(i).rank() << ", " << GctUncalibCenJets->at(i).regionId().ieta() << ", " << GctUncalibCenJets->at(i).regionId().iphi() << std::endl;
+	 gct_jJet.push_back(jJet(GctUncalibCenJets->at(i).rank()*8,GctUncalibCenJets->at(i).regionId().ieta(),GctUncalibCenJets->at(i).regionId().iphi(),GctUncalibCenJets->at(i).bx()));
+      } 
    }
 
-   // Get GCT jets (uncalib) collection
+   /*
+   // Get GCT jets (calib) collection
    edm::Handle<L1GctJetCandCollection> GctCalibCenJets;
    edm::InputTag gctCalibCenJets("gctDigis","cenJets","jadtest");
    iEvent.getByLabel(gctCalibCenJets, GctCalibCenJets);
@@ -1033,6 +1188,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
    std::vector<fastjet::PseudoJet> pseudoak4genjetsp;
    std::vector<fastjet::PseudoJet> ak4genjetsp;
 
+   std::vector<jJet> top_jJet;
    for(unsigned int i = 0; i < genphandle->size(); i++) {
       const reco::GenParticle* p = &((*genphandle)[i]);
       if ( (p->status() == 1) && p->pt() > 0.0 && abs(p->pdgId()) != 12 && abs(p->pdgId()) != 13 && abs(p->pdgId()) != 14 && abs(p->pdgId()) != 16 && abs(p->eta()) < 3.0) {
@@ -1041,7 +1197,12 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	 curPseudoJet.reset_PtYPhiM( p->pt(), p->eta(), p->phi(), 0.0); //last argument is mass
 	 pseudoak4genjetsp.push_back(curPseudoJet);
       }
+      if ((p->pdgId() == 6 || p->pdgId() == -6) && p->status()==22)
+      {
+	 top_jJet.push_back(jJet(p->pt(),g.iEta(p->eta()),g.iPhi(p->phi())));
+      }
    }
+   num_tops_per_event->Fill(top_jJet.size());
    // Handle<l1slhc::L1CaloTowerCollection> offlinetriggertowers;
    // iEvent.getByLabel("L1OfflineCaloTowerProducer", offlinetriggertowers);
    // LogInfo("Demo") << "number of L1 offline trigger towers: " << offlinetriggertowers->size();
@@ -1153,23 +1314,39 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
    globalPusVarsMap["nint"] = mNPV;
 
    //Testing discriminator
-   std::vector<jJet> L1_4400_real_jJet;
-   std::vector<jJet> L1_4400_pu_jJet;
+   std::vector<jJet> L1_5400_real_jJet;
+   std::vector<jJet> L1_5400_pu_jJet;
+
+   std::vector<jJet> L1_4300_real_jJet;
+   std::vector<jJet> L1_4300_pu_jJet;
 
    //make a container for the L1 jets
+   //std::vector<jJet> L1_4300_jJet = getL1Jets(myarray, 4, 3, 0, 0);
+   //std::vector<jJet> L1_4350_jJet = getL1Jets(myarray, 4, 3, 5, 0);
+   std::vector<jJet> L1_5400_jJet = getL1Jets(myarray, 5, 4, 0, 0);
+   std::vector<jJet> L1_5450_jJet = getL1Jets(myarray, 5, 4, 5, 0);
+   std::vector<jJet> L1_6550_jJet = getL1Jets(myarray, 6, 5, 5, 0);
    std::vector<jJet> L1_4300_jJet = getL1Jets(myarray, 4, 3, 0, 0);
-   std::vector<jJet> L1_4350_jJet = getL1Jets(myarray, 4, 3, 5, 0);
-   std::vector<jJet> L1_4400_jJet = getL1Jets(myarray, 4, 4, 0, 0);
+   //std::vector<jJet> L1_4400_jJet = getL1Jets(myarray, 4, 4, 0, 0);
+   //std::vector<jJet> L1_4300donut_jJet;
+   //std::vector<jJet> L1_4350donut_jJet;
+   std::vector<jJet> L1_5400donut_jJet;
+   std::vector<jJet> L1_5400global_jJet;
+   std::vector<jJet> L1_5450donut_jJet;
+   std::vector<jJet> L1_5450global_jJet;
+
    std::vector<jJet> L1_4300donut_jJet;
-   std::vector<jJet> L1_4350donut_jJet;
-   std::vector<jJet> L1_4400donut_jJet;
-   std::vector<jJet> L1_4400global_jJet;
+   std::vector<jJet> L1_4300global_jJet;
 
 
    std::map<TString, std::vector<jJet> > L1_jJet_map;
-   double median_jet = getMedian(L1_4400_jJet);
-   median_jet_energy_per_event->Fill(median_jet);
-   median_energy_jet_tower_per_event->Fill(median_tower,median_jet);
+   double median_jet_5400 = getMedian(L1_5400_jJet);
+   double median_jet_5450 = getMedian(L1_5450_jJet);
+   double median_jet_4300 = getMedian(L1_4300_jJet);
+   median_jet_5400_energy_per_event->Fill(median_jet_5400);
+   median_jet_4300_energy_per_event->Fill(median_jet_5400);
+   median_energy_5400_jet_tower_per_event->Fill(median_tower,median_jet_5400);
+   median_energy_4300_jet_tower_per_event->Fill(median_tower,median_jet_4300);
 
    //Fill the map with the sizes
    for(std::vector<TString>::const_iterator l1SIt=l1Sizes_.begin(); l1SIt!=l1Sizes_.end(); l1SIt++){
@@ -1181,59 +1358,167 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
    std::map <TString,std::vector<fastjet::PseudoJet> > ak4Map;
    std::map <TString,const reco::GenJetCollection * > genMap;
 
-   jJetMap["L1_4400"] = L1_4400_jJet;
+   jJetMap["L1_5400"] = L1_5400_jJet;
 
    ak4Map["ak4tt"] = ak4ttjets; 
    ak4Map["ak4gen"] = ak4genjetsp; 
 
    genMap["genp"] = genJetCol;
 
-   for(unsigned int i=0; i<L1_4400_jJet.size(); i++) {
-      double newenergydonut=L1_4400_jJet[i].eatDonut();
-      double newenergyglobal=L1_4400_jJet[i].eatGlobe(median_jet);
-      //Fill Real and pu jjet vectors
-      if(newenergydonut > 0.0) { 
-	 L1_4400donut_jJet.push_back(jJet(newenergydonut, L1_4400_jJet[i].iEta(), L1_4400_jJet[i].iPhi()));
-	 L1_4400_real_jJet.push_back(L1_4400_jJet[i]);
+   for(unsigned int i=0; i<L1_5400_jJet.size(); i++) {
+      double newenergydonut5400=L1_5400_jJet[i].eatDonut();
+      double newenergyglobal5400=L1_5400_jJet[i].eatGlobe(median_jet_5400);
+      if(newenergydonut5400 >= 0.0) { 
+	 L1_5400donut_jJet.push_back(jJet(newenergydonut5400, L1_5400_jJet[i].iEta(), L1_5400_jJet[i].iPhi()));
+	 L1_5400_real_jJet.push_back(L1_5400_jJet[i]);
       }
-      else L1_4400_pu_jJet.push_back(L1_4400_jJet[i]);
+      else
+      {
+	 L1_5400_pu_jJet.push_back(L1_5400_jJet[i]);
+      }
+      if(newenergyglobal5400 >= 0.0) {
+	 L1_5400global_jJet.push_back(jJet(newenergyglobal5400, L1_5400_jJet[i].iEta(), L1_5400_jJet[i].iPhi())); 
 
-      if(newenergyglobal > 0.0) { L1_4400global_jJet.push_back(jJet(newenergyglobal, L1_4400_jJet[i].iEta(), L1_4400_jJet[i].iPhi())); }
+      }
    }
-   for(unsigned int i=0; i<L1_4350_jJet.size(); i++) {
-      double newenergy=L1_4350_jJet[i].eatDonut();
-      if(newenergy > 0.0) { L1_4350donut_jJet.push_back(jJet(newenergy, L1_4350_jJet[i].iEta(), L1_4350_jJet[i].iPhi())); }
-   }
-   this->compareJetCollections(L1_4400donut_jJet, ak4genjetsp_jJet,"donut_gen");
-   this->compareJetCollections(L1_4400_jJet, ak4genjetsp_jJet,"nopus_gen");
-   this->compareJetCollections(L1_4400global_jJet, ak4genjetsp_jJet, "global_gen");
-   //  this->compareJetCollections(ak4genjetsp_jJet,L1_4400donut_jJet,"ak4_donut_pus");
-   //  this->compareJetCollections(ak4genjetsp_jJet,L1_4400_jJet,"ak4_nopus_pus");
-   //  this->compareJetCollections(ak4genjetsp_jJet,L1_4400global_jJet,"ak4_median_pus");
-   /*
-      for (std::vector<jJet>::const_iterator jet = L1_4400_real_jJet.begin();jet!=L1_4400_real_jJet.end();++jet)
+   for(unsigned int i=0; i<L1_4300_jJet.size(); i++) {
+      double newenergydonut4300=L1_4300_jJet[i].eatDonut();
+      double newenergyglobal4300=L1_4300_jJet[i].eatGlobe(median_jet_4300);
+      if(newenergydonut4300 >= 0.0) { 
+	 L1_4300donut_jJet.push_back(jJet(newenergydonut4300, L1_4300_jJet[i].iEta(), L1_4300_jJet[i].iPhi()));
+	 L1_4300_real_jJet.push_back(L1_4300_jJet[i]);
+      }
+      else
       {
+	 L1_4300_pu_jJet.push_back(L1_4300_jJet[i]);
+      }
+      if(newenergyglobal4300 >= 0.0) {
+	 L1_4300global_jJet.push_back(jJet(newenergyglobal4300, L1_4300_jJet[i].iEta(), L1_4300_jJet[i].iPhi())); 
+
+      }
+   }
+   for(unsigned int i=0; i<L1_5450_jJet.size(); i++) {
+      double newenergydonut5450=L1_5450_jJet[i].eatDonut();
+      double newenergyglobal5450=L1_5450_jJet[i].eatGlobe(median_jet_5450);
+      //Fill Real and pu jjet vectors
+      if(newenergydonut5450 >= 0.0) { 
+	 L1_5450donut_jJet.push_back(jJet(newenergydonut5450, L1_5450_jJet[i].iEta(), L1_5450_jJet[i].iPhi()));
+      }
+      if(newenergyglobal5450 >= 0.0) {
+	 L1_5450global_jJet.push_back(jJet(newenergyglobal5450, L1_5450_jJet[i].iEta(), L1_5450_jJet[i].iPhi())); 
+
+      }
+   }
+
+   this->mPrintMe = false;
+
+   this->compareJetCollections(L1_5400donut_jJet, ak4genjetsp_jJet,"5400_donut_gen",false);
+   this->compareJetCollections(L1_5400_jJet, ak4genjetsp_jJet,"5400_nopus_gen",false);
+   this->compareJetCollections(L1_5400global_jJet, ak4genjetsp_jJet, "5400_global_gen",false);
+
+   this->compareJetCollections(L1_4300donut_jJet, ak4genjetsp_jJet,"4300_donut_gen",false);
+   this->compareJetCollections(L1_4300_jJet, ak4genjetsp_jJet,"4300_nopus_gen",false);
+   this->compareJetCollections(L1_4300global_jJet, ak4genjetsp_jJet, "4300_global_gen",false);
+
+   this->compareJetCollections(L1_5450donut_jJet, ak4genjetsp_jJet,"5450_donut_gen",false);
+   this->compareJetCollections(L1_5450_jJet, ak4genjetsp_jJet,"5450_nopus_gen",false);
+   this->compareJetCollections(L1_5450global_jJet, ak4genjetsp_jJet, "5450_global_gen",false);
+
+   this->compareJetCollections(L1_6550_jJet, ak4genjetsp_jJet,"6550_nopus_gen",false);
+
+   this->compareJetCollections(top_jJet, ak4genjetsp_jJet, "top_gen",false);
+   this->compareJetCollections(top_jJet, ak4tt_jJet, "top_tt_gen",false);
+
+
+   this->compareJetCollections(gct_jJet, ak4genjetsp_jJet, "gct_gen",true);
+
+   double mean_top_pt=0.;
+   for (auto iTop = top_jJet.begin();iTop != top_jJet.end(); iTop++)
+   {
+      mean_top_pt += double(iTop->pt())/top_jJet.size();
+   }
+   //Means,xi, for i jets
+   int x1 = 196;
+   int x2 = 125;
+   int x3 = 79;
+   int x4 = 52;
+
+   if (L1_5400donut_jJet.size() > 0 && L1_5400donut_jJet.at(0).pt() > x1) eff_over_x1_top->Fill(mean_top_pt);
+   if (L1_5400donut_jJet.size() > 1 && L1_5400donut_jJet.at(1).pt() > x2) eff_over_x2_top->Fill(mean_top_pt);
+   if (L1_5400donut_jJet.size() > 2 && L1_5400donut_jJet.at(2).pt() > x3) eff_over_x3_top->Fill(mean_top_pt);
+   if (L1_5400donut_jJet.size() > 3 && L1_5400donut_jJet.at(3).pt() > x4) eff_over_x4_top->Fill(mean_top_pt);
+   mean_top_pt_hist->Fill(mean_top_pt);
+   //this->compareJetCollections(L1_5400donut_jJet, top_jJet,"5400_donut_top",false);
+   //this->compareJetCollections(L1_5400_jJet, top_jJet,"5400_nopus_top",false);
+   //this->compareJetCollections(L1_5400global_jJet, top_jJet,"5400_global_top",false);
+
+   //this->compareJetCollections(top_jJet, L1_5400donut_jJet,"5400_top_donut",false);
+   //this->compareJetCollections(top_jJet, L1_5400_jJet,"5400_top_nopus",false);
+   //this->compareJetCollections(top_jJet, L1_5400global_jJet,"5400_top_global",false);
+
+   //std::cout << mPrintMe << std::endl;
+   jJetMap["L1_5400_Donut"] = L1_5400donut_jJet;
+   jJetMap["L1_4300_Donut"] = L1_4300donut_jJet;
+   if(this->mPrintMe)
+   {
+      std::cout << "Event Printed" << std::endl;
+      //printOneEvent(triggertowers, L1_5400_jJet,ak4ttjets, genJetCol, ak4genjetsp);
+      printOneEvent(triggertowers, jJetMap,ak4Map,genMap);
+   }
+   this->mPrintMe = false;
+
+
+   int maxtower; 
+   for (std::vector<jJet>::const_iterator jet = L1_5400_real_jJet.begin();jet!=L1_5400_real_jJet.end();++jet)
+   {
       std::vector<int> towers=jet->getTowers();
-      int maxtower = 0; 
-      maxtower = towers[-1];
+      auto it = max_element(std::begin(towers), std::end(towers));
+      maxtower = *it;
       int nbins = tower_pt_real->GetXaxis()->FindBin(maxtower);
+      int nbinsy = tower_pt_real_jetpt->GetYaxis()->FindBin(jet->pt());
+      //int nbinsx = tower_pt_real_jetpt->GetXaxis()->FindBin(maxtower);
       for (int bins = 0; bins < nbins; bins++)
       {
-      tower_pt_real->AddBinContent(bins,1);
+	 int numt = 0;
+	 for (auto tower = towers.begin(); tower != towers.end(); tower++)
+	 {
+	    if (*tower >= (tower_pt_real->GetBinCenter(bins)))
+	    {
+	       numt++;
+	    }
+	 }
+	 tower_pt_real->AddBinContent(bins,1);
+	 num_tower_pt_real->AddBinContent(bins,numt);
+	 tower_pt_real_jetpt->SetBinContent(bins,nbinsy,tower_pt_real_jetpt->GetBinContent(bins,nbinsy)+1);
+	 num_tower_pt_real_jetpt->SetBinContent(bins,nbinsy,num_tower_pt_real_jetpt->GetBinContent(bins,nbinsy)+numt);
       }
-      }
-      for (std::vector<jJet>::const_iterator jet = L1_4400_pu_jJet.begin();jet!=L1_4400_pu_jJet.end();++jet)
-      {
+   }
+   for (std::vector<jJet>::const_iterator jet = L1_5400_pu_jJet.begin();jet!=L1_5400_pu_jJet.end();++jet)
+   {
       std::vector<int> towers=jet->getTowers();
-      int maxtower = towers[-1]; 
+      auto it = max_element(std::begin(towers), std::end(towers));
+      maxtower = *it;
       int nbins = tower_pt_pu->GetXaxis()->FindBin(maxtower);
+      int nbinsy = tower_pt_pu_jetpt->GetYaxis()->FindBin(jet->pt());
+      //int nbinsx = tower_pt_pu_jetpt->GetXaxis()->FindBin(maxtower);
       for (int bins = 0; bins < nbins; bins++)
       {
-      tower_pt_pu->AddBinContent(bins,1);
+	 int numt = 0;
+	 for (auto tower = towers.begin(); tower != towers.end(); tower++)
+	 {
+	    if (*tower >= (tower_pt_pu->GetBinCenter(bins)))
+	    {
+	       numt++;
+	    }
+	 }
+	 tower_pt_pu->AddBinContent(bins,1);
+	 num_tower_pt_pu->AddBinContent(bins,numt);
+	 tower_pt_pu_jetpt->SetBinContent(bins,nbinsy,tower_pt_pu_jetpt->GetBinContent(bins,nbinsy)+1);
+	 num_tower_pt_pu_jetpt->SetBinContent(bins,nbinsy,num_tower_pt_pu_jetpt->GetBinContent(bins,nbinsy)+numt);
       }
-      }
+   }
    //Make histos for rates
-    */
+
    /*
       for(std::vector<TString>::const_iterator gVIt=globalPusVars_.begin(); gVIt!=globalPusVars_.end(); gVIt++){
       pusHists1d_[*gVIt]->Fill(globalPusVarsMap[*gVIt]);
@@ -1279,23 +1564,12 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       }
       }
     */
-   /* this->mPrintMe = false;
-      this->compareJetCollections(L1_4400_jJet, ak4genjetsp_jJet, "gen_l1trigger");
-   //std::cout << mPrintMe << std::endl;
-   if(this->mPrintMe)
-   {
-   std::cout << "Event Printed" << std::endl;
-   //printOneEvent(triggertowers, L1_4400_jJet,ak4ttjets, genJetCol, ak4genjetsp);
-   printOneEvent(triggertowers, jJetMap,ak4Map,genMap);
-   }
-   this->mPrintMe = false;
-    */
    /*
       this->compareJetCollections(L1_4300_jJet, ak4genjetsp_jJet, "L14300_ak4genjetsp");
       this->compareJetCollections(L1_4300donut_jJet, ak4genjetsp_jJet, "L14300donut_ak4genjetsp");
       this->compareJetCollections(L1_4350_jJet, ak4genjetsp_jJet, "L14350_ak4genjetsp");
       this->compareJetCollections(L1_4350donut_jJet, ak4genjetsp_jJet, "L14350donut_ak4genjetsp");
-      this->compareJetCollections(L1_4400_jJet, ak4genjetsp_jJet, "L14400_ak4genjetsp");
+      this->compareJetCollections(L1_5400_jJet, ak4genjetsp_jJet, "L15400_ak4genjetsp");
 
       if(this->GetNPV() > 30 && this->GetNPV() <=35) { 
       this->compareJetCollections(L1_4300_jJet, ak4genjetsp_jJet, "L14300_ak4genjetsp_npv3035"); 
@@ -1321,7 +1595,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
       this->compareJetCollections(L1_4300_jJet, ak4tt_jJet, "L14300_ak4tt");
       this->compareJetCollections(L1_4300donut_jJet, ak4tt_jJet, "L14300donut_ak4tt");
-      this->compareJetCollections(L1_4400_jJet, ak4tt_jJet, "L14400_ak4tt");
+      this->compareJetCollections(L1_5400_jJet, ak4tt_jJet, "L15400_ak4tt");
     */  
    //  printOneEvent(triggertowers, L1_jJet, ak4ttjets, genJetCol, ak4genjetsp); 
 
@@ -1329,7 +1603,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 
 
-   //if(mEventNumber == 18 || mEventNumber == 80 || mEventNumber == 94) { printOneEvent(triggertowers, L1_4400_jJet, ak4ttjets, genJetCol, ak4genjetsp); }
+   //if(mEventNumber == 18 || mEventNumber == 80 || mEventNumber == 94) { printOneEvent(triggertowers, L1_5400_jJet, ak4ttjets, genJetCol, ak4genjetsp); }
    mEventNumber++;
    //std::cout << "reached end of event loop" << std::endl;
 }

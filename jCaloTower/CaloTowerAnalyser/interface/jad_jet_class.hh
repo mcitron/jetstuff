@@ -14,11 +14,15 @@ class jJet {
 
 public:
   jJet(double pt, int ieta, int iphi);
-  jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<int> outerstrips);
-  jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<int> outerstrips,std::vector<int> towers);
+  jJet(double pt, int ieta, int iphi,int bx);
+  jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<int> outerstrips, int jetarea);
+  jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<int> outerstrips,std::vector<int> towers, int jetarea);
   int iEta() const;
   int iPhi() const;
+  int gEta() const;
+  int gPhi() const;
   double pt() const;
+  bool isolatedJet(const std::vector<jJet>& jetCollection, double dR2Max);
   std::vector<int> ringSums() const;
   std::vector<int> ringAreas() const;
   std::vector<int> getOuterStrips() const;
@@ -27,43 +31,67 @@ public:
   int PUE();
   double eatDonut(); //the energy after PUsubtraction
   double eatGlobe(double median); //the energy after global PUsubtraction
-
+  int area() const;
+  int getOuterSum() const;
 private:
   double mpt;
   int mieta;
   int miphi;
+  int mgeta;
+  int mgphi;
+  int mbx;
   std::vector<int> mringsums;
   std::vector<int> mringareas;
   std::vector<int> mouterstrips;
   std::vector<int> mtowers;
+  int marea;
 };
 
 jJet::jJet(double pt, int ieta, int iphi) : mpt(pt), mieta(ieta), miphi(iphi) {}
-jJet::jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<int> outerstrips) : mpt(pt), mieta(ieta), miphi(iphi), mringsums(ringsums), mringareas(ringareas), mouterstrips(outerstrips) {
+jJet::jJet(double pt, int geta, int gphi,int bx) : mpt(pt), mgeta(geta), mgphi(gphi),mbx(bx) {}
+jJet::jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<int> outerstrips, int jetarea) : mpt(pt), mieta(ieta), miphi(iphi), mringsums(ringsums), mringareas(ringareas), mouterstrips(outerstrips),marea(jetarea) {
    std::sort(mouterstrips.begin(), mouterstrips.end());
 }
-jJet::jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<int> outerstrips,std::vector<int> towers) : mpt(pt), mieta(ieta), miphi(iphi), mringsums(ringsums), mringareas(ringareas), mouterstrips(outerstrips),mtowers(towers) {
+jJet::jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<int> outerstrips, std::vector<int> towers, int jetarea) : mpt(pt), mieta(ieta), miphi(iphi), mringsums(ringsums), mringareas(ringareas), mouterstrips(outerstrips),mtowers(towers),marea(jetarea) {
    std::sort(mouterstrips.begin(), mouterstrips.end());
-   //std::sort(mtowers.begin(), mtowers.end());
+   std::sort(mtowers.begin(), mtowers.end());
 }
 
 int jJet::iEta() const { return mieta; }
 int jJet::iPhi() const { return miphi; }
+int jJet::gEta() const { return mgeta; }
+int jJet::gPhi() const { return mgphi; }
 double jJet::pt() const { return mpt; }
 std::vector<int> jJet::ringSums() const { return mringsums; }
 std::vector<int> jJet::ringAreas() const { return mringareas; }
 std::vector<int> jJet::getOuterStrips() const { return mouterstrips; }
 std::vector<int> jJet::getTowers() const { return mtowers; }
+
+int jJet::getOuterSum() const 
+{ 
+   int outerRing = 0;
+   for (auto ring = mouterstrips.begin(); ring != mouterstrips.end(); ring++) outerRing+=*ring;
+   return outerRing;
+}
 int jJet::PUE() { return (mouterstrips[1] + mouterstrips[2]); } //i.e. sum up the middle two energies
 
 double jJet::eatDonut() {
-   double lastringsum = this->ringSums().at(this->ringSums().size() - 1);
-   double donutenergy = this->PUE() * 3.5; //3.5 = 7x7 / 2x7
-   return (this->pt() - lastringsum - donutenergy);
+   //double lastringsum = this->ringSums().at(this->ringSums().size() - 1);
+   double scaleDonut = marea/(mringareas.at(mringareas.size()-1)/2.0);
+   double donutenergy = this->PUE() * scaleDonut; //3.5 = 7x7 / 2x7
+   return (this->pt() - donutenergy);
 }
-
 double jJet::eatGlobe(double median) {
-   return (this->pt() - median);
+   return (this->pt() - median*this->area());
+}
+bool jJet::isolatedJet(const std::vector<jJet>& jetCollection, double dR2Max){
+  int closeJets=0;
+  for(std::vector<jJet>::const_iterator jetIt = jetCollection.begin();
+      jetIt!=jetCollection.end(); jetIt++){
+    if(this->DeltaR2(*jetIt)<dR2Max) closeJets++;//Check it's not witin 7x7
+  }
+  if(closeJets>1) return false;
+  else return true;
 }
 
 int jJet::DeltaR2(const jJet & jet2) const {
@@ -85,15 +113,14 @@ int jJet::DeltaR2(const jJet & jet2) const {
    return deltaR2;
 
 }
-
+int jJet::area() const
+{
+   return marea;
+}
 bool sortbypt(const jJet &a, const jJet &b) { return a.pt() > b.pt(); }
 
 bool sortbyrho(const jJet &a, const jJet &b) { 
- int  area1=0;
- int  area2=0;
-   for(std::vector<int>::iterator j=a.ringAreas().begin();j!=a.ringAreas().end();++j) area1 += *j;
-   for(std::vector<int>::iterator j=b.ringAreas().begin();j!=b.ringAreas().end();++j) area2 += *j;
-   return a.pt()/area1 > b.pt()/area2;
+   return a.pt()/a.area() > b.pt()/b.area();
 }
 
 #endif

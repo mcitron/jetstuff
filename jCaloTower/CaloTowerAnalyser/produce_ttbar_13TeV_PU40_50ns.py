@@ -3,8 +3,10 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("jadtest")
 process.load("FWCore.MessageService.MessageLogger_cfi")
 
+
 process.MessageLogger = cms.Service("MessageLogger",
 ####                     destinations       =  cms.untracked.vstring('/dev/null/file.txt'),
+threshold  = cms.untracked.string('ERROR')
 )
 
 
@@ -12,8 +14,8 @@ process.MessageLogger = cms.Service("MessageLogger",
 process.source = cms.Source("PoolSource",
  fileNames = cms.untracked.vstring(
     #ttbar13 PU40 50ns
-     'root://xrootd.unl.edu//store/mc/Fall13dr/TT_Tune4C_13TeV-pythia8-tauola/GEN-SIM-RAW/tsg_PU40bx50_POSTLS162_V2-v1/00000/00E707E5-0D75-E311-B109-003048678BAE.root',
-     'root://xrootd.unl.edu//store/mc/Fall13dr/TT_Tune4C_13TeV-pythia8-tauola/GEN-SIM-RAW/tsg_PU40bx50_POSTLS162_V2-v1/00000/00EE7C4E-A976-E311-AFE2-003048678BEA.root',
+   #  'root://xrootd.unl.edu//store/mc/Fall13dr/TT_Tune4C_13TeV-pythia8-tauola/GEN-SIM-RAW/tsg_PU40bx50_POSTLS162_V2-v1/00000/00E707E5-0D75-E311-B109-003048678BAE.root',
+   #  'root://xrootd.unl.edu//store/mc/Fall13dr/TT_Tune4C_13TeV-pythia8-tauola/GEN-SIM-RAW/tsg_PU40bx50_POSTLS162_V2-v1/00000/00EE7C4E-A976-E311-AFE2-003048678BEA.root',
      'root://xrootd.unl.edu//store/mc/Fall13dr/TT_Tune4C_13TeV-pythia8-tauola/GEN-SIM-RAW/tsg_PU40bx50_POSTLS162_V2-v1/00000/02732ACE-4175-E311-ACDE-003048679266.root',
      'root://xrootd.unl.edu//store/mc/Fall13dr/TT_Tune4C_13TeV-pythia8-tauola/GEN-SIM-RAW/tsg_PU40bx50_POSTLS162_V2-v1/00000/02B61C65-F874-E311-96DB-003048678B92.root',
      'root://xrootd.unl.edu//store/mc/Fall13dr/TT_Tune4C_13TeV-pythia8-tauola/GEN-SIM-RAW/tsg_PU40bx50_POSTLS162_V2-v1/00000/02BA8038-1C75-E311-9228-0025905A60F2.root',
@@ -22,17 +24,18 @@ process.source = cms.Source("PoolSource",
      'root://xrootd.unl.edu//store/mc/Fall13dr/TT_Tune4C_13TeV-pythia8-tauola/GEN-SIM-RAW/tsg_PU40bx50_POSTLS162_V2-v1/00000/040974D0-3A75-E311-B258-002590596484.root',
      'root://xrootd.unl.edu//store/mc/Fall13dr/TT_Tune4C_13TeV-pythia8-tauola/GEN-SIM-RAW/tsg_PU40bx50_POSTLS162_V2-v1/00000/04A84408-3975-E311-9724-002618943856.root',
      'root://xrootd.unl.edu//store/mc/Fall13dr/TT_Tune4C_13TeV-pythia8-tauola/GEN-SIM-RAW/tsg_PU40bx50_POSTLS162_V2-v1/00000/0636E18D-5975-E311-85AB-00261894386A.root'
-     #'root://xrootd.unl.edu//store/mc/Fall13dr/TT_Tune4C_13TeV-pythia8-tauola/GEN-SIM-RAW/tsg_PU40bx50_POSTLS162_V2-v1/00000/0696C6C5-FD76-E311-81EF-003048678E8A.root',
-     #'root://xrootd.unl.edu//store/mc/Fall13dr/TT_Tune4C_13TeV-pythia8-tauola/GEN-SIM-RAW/tsg_PU40bx50_POSTLS162_V2-v1/00000/08427EB7-3475-E311-9360-00261894398B.root',
-     #'root://xrootd.unl.edu//store/mc/Fall13dr/TT_Tune4C_13TeV-pythia8-tauola/GEN-SIM-RAW/tsg_PU40bx50_POSTLS162_V2-v1/00000/08C3DA9B-5975-E311-9D7F-00261894395B.root',
-     #'root://xrootd.unl.edu//store/mc/Fall13dr/TT_Tune4C_13TeV-pythia8-tauola/GEN-SIM-RAW/tsg_PU40bx50_POSTLS162_V2-v1/00000/08CF202A-F774-E311-9F22-0025905A6132.root',
-     #'root://xrootd.unl.edu//store/mc/Fall13dr/TT_Tune4C_13TeV-pythia8-tauola/GEN-SIM-RAW/tsg_PU40bx50_POSTLS162_V2-v1/00000/08D540FE-4775-E311-B9CC-002618FDA21D.root',
-     #'root://xrootd.unl.edu//store/mc/Fall13dr/TT_Tune4C_13TeV-pythia8-tauola/GEN-SIM-RAW/tsg_PU40bx50_POSTLS162_V2-v1/00000/08DC0110-5A75-E311-9050-0025905A48D6.root',
-     #'root://xrootd.unl.edu//store/mc/Fall13dr/TT_Tune4C_13TeV-pythia8-tauola/GEN-SIM-RAW/tsg_PU40bx50_POSTLS162_V2-v1/00000/0ADDCD85-0175-E311-9B1E-0025905A48EC.root',
-     #'root://xrootd.unl.edu//store/mc/Fall13dr/TT_Tune4C_13TeV-pythia8-tauola/GEN-SIM-RAW/tsg_PU40bx50_POSTLS162_V2-v1/00000/0C00F3D5-4375-E311-B632-0025905A60BE.root',
-     #'root://xrootd.unl.edu//store/mc/Fall13dr/TT_Tune4C_13TeV-pythia8-tauola/GEN-SIM-RAW/tsg_PU40bx50_POSTLS162_V2-v1/00000/1073CC0F-3C75-E311-8543-0025905A60FE.root',
-     #'root://xrootd.unl.edu//store/mc/Fall13dr/TT_Tune4C_13TeV-pythia8-tauola/GEN-SIM-RAW/tsg_PU40bx50_POSTLS162_V2-v1/00000/1214DA45-FB74-E311-9784-0025905A6110.root',          
+     'root://xrootd.unl.edu//store/mc/Fall13dr/TT_Tune4C_13TeV-pythia8-tauola/GEN-SIM-RAW/tsg_PU40bx50_POSTLS162_V2-v1/00000/0696C6C5-FD76-E311-81EF-003048678E8A.root',
+     'root://xrootd.unl.edu//store/mc/Fall13dr/TT_Tune4C_13TeV-pythia8-tauola/GEN-SIM-RAW/tsg_PU40bx50_POSTLS162_V2-v1/00000/08427EB7-3475-E311-9360-00261894398B.root',
+     'root://xrootd.unl.edu//store/mc/Fall13dr/TT_Tune4C_13TeV-pythia8-tauola/GEN-SIM-RAW/tsg_PU40bx50_POSTLS162_V2-v1/00000/08C3DA9B-5975-E311-9D7F-00261894395B.root',
+     'root://xrootd.unl.edu//store/mc/Fall13dr/TT_Tune4C_13TeV-pythia8-tauola/GEN-SIM-RAW/tsg_PU40bx50_POSTLS162_V2-v1/00000/08CF202A-F774-E311-9F22-0025905A6132.root',
+     'root://xrootd.unl.edu//store/mc/Fall13dr/TT_Tune4C_13TeV-pythia8-tauola/GEN-SIM-RAW/tsg_PU40bx50_POSTLS162_V2-v1/00000/08D540FE-4775-E311-B9CC-002618FDA21D.root',
+     'root://xrootd.unl.edu//store/mc/Fall13dr/TT_Tune4C_13TeV-pythia8-tauola/GEN-SIM-RAW/tsg_PU40bx50_POSTLS162_V2-v1/00000/08DC0110-5A75-E311-9050-0025905A48D6.root',
+     'root://xrootd.unl.edu//store/mc/Fall13dr/TT_Tune4C_13TeV-pythia8-tauola/GEN-SIM-RAW/tsg_PU40bx50_POSTLS162_V2-v1/00000/0ADDCD85-0175-E311-9B1E-0025905A48EC.root',
+     'root://xrootd.unl.edu//store/mc/Fall13dr/TT_Tune4C_13TeV-pythia8-tauola/GEN-SIM-RAW/tsg_PU40bx50_POSTLS162_V2-v1/00000/0C00F3D5-4375-E311-B632-0025905A60BE.root',
+     'root://xrootd.unl.edu//store/mc/Fall13dr/TT_Tune4C_13TeV-pythia8-tauola/GEN-SIM-RAW/tsg_PU40bx50_POSTLS162_V2-v1/00000/1073CC0F-3C75-E311-8543-0025905A60FE.root',
+     'root://xrootd.unl.edu//store/mc/Fall13dr/TT_Tune4C_13TeV-pythia8-tauola/GEN-SIM-RAW/tsg_PU40bx50_POSTLS162_V2-v1/00000/1214DA45-FB74-E311-9784-0025905A6110.root',          
    ),
+
 
    # RAW files
    secondaryFileNames = cms.untracked.vstring(
@@ -42,7 +45,7 @@ process.source = cms.Source("PoolSource",
 
 
 process.o1 = cms.OutputModule("PoolOutputModule",
-  fileName = cms.untracked.string('/afs/cern.ch/work/j/jad/public/TriggerTowers_TTbar_13TeV_PU40_50ns_1-10_skimmed_v3.root'),
+  fileName = cms.untracked.string('/afs/cern.ch/work/m/mcitron/public/TriggerTowers_TTbar_13TeV_PU40_50ns_1-10_skimmed_v3.root'),
 #   fileName = cms.untracked.string('output.root'),
     #SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('trigger_')),
     outputCommands = cms.untracked.vstring(

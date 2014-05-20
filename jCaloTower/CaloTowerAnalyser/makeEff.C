@@ -1,65 +1,54 @@
 void makeEff()
 {
 
-TFile * f = TFile::Open("./global_PUS.root");
-TH1D * allhistDonut =  (f->Get("demo/ak4_donut_pus/col2_alljet_pt"));
-TH1D * globalDonut = (f->Get("demo/ak4_donut_pus/col2_matched_global_alljet_pt"));
-TH1D * localDonut =f->Get("demo/ak4_donut_pus/col2_matched_local_alljet_pt");
+   TFile * f = TFile::Open("./batch/ttbar5/ttbar_out.root");
+// TFile * f = TFile::Open("./global_PUS_TEST.root");
 
-TH1D * allhistNopus =  (f->Get("demo/ak4_nopus_pus/col2_alljet_pt"));
-TH1D * globalNopus = f->Get("demo/ak4_nopus_pus/col2_matched_global_alljet_pt");
-TH1D * localNopus = f->Get("demo/ak4_nopus_pus/col2_matched_local_alljet_pt");
+   std::vector<TString> PUSregime;
+   PUSregime.push_back("5400_nopus");
+   PUSregime.push_back("5450_nopus");
+   //PUSregime.push_back("4300_nopus");
+   PUSregime.push_back("5400_donut");
+   PUSregime.push_back("5450_donut");
+  // PUSregime.push_back("4300_donut");
+   PUSregime.push_back("5400_global");
+   //PUSregime.push_back("4300_global");
+   PUSregime.push_back("gct");
+   std::vector<TString> algo;
+   algo.push_back("algo1");
+   algo.push_back("algo2");
+   std::vector<TString> jetnum;
+   //jetnum.push_back("alljet");
+   jetnum.push_back("jet1");
+   //jetnum.push_back("jet2");
+   //jetnum.push_back("jet3");
+   //jetnum.push_back("jet4");
 
-TH1D * allhistMedian =  (f->Get("demo/ak4_median_pus/col2_alljet_pt"));
-TH1D * globalMedian = f->Get("demo/ak4_median_pus/col2_matched_global_alljet_pt");
-TH1D * localMedian = f->Get("demo/ak4_median_pus/col2_matched_local_alljet_pt");
+   TFile *top = new TFile("ttbar_match.root","recreate");
+   //TH1D * matchedhist_global_global =  (f->Get("demo/ak4_global_pus/col2_matched_global_alljet_pt"));
+   //TH1D * matchedhist_local_global =  (f->Get("demo/ak4_global_pus/col2_matched_local_alljet_pt"));
+   for (auto iPUS = PUSregime.begin(); iPUS!=PUSregime.end(); iPUS++)
+   {      
+      TDirectory * dir = top->mkdir((*iPUS).Data());
+      dir->cd();
+      for (auto iJet = jetnum.begin(); iJet!=jetnum.end(); iJet++)
+      {
+	 TH1D * denom = f->Get(("demo/"+*iPUS+"_gen/col2_"+*iJet+"_pt").Data());
+	 denom->Rebin(10);
+	 denom->Sumw2();
+	 for (auto iAlgo = algo.begin(); iAlgo!=algo.end(); iAlgo++)
+	 {
+	    TH1D *num=(f->Get(("demo/"+*iPUS+"_gen/col2_matched_"+*iAlgo+"_"+*iJet+"_pt").Data()));
+	    num->Rebin(10);
+	    num->Sumw2();
+	    TGraphAsymmErrors * result=(effDiv(num,denom));
+	    result->Write((*iJet+"_"+*iAlgo));
+	 } 
+      }
+   }
 
-TFile *top = new TFile("matchingEff.root","recreate");
-//TH1D * matchedhist_global_global =  (f->Get("demo/ak4_global_pus/col2_matched_global_alljet_pt"));
-//TH1D * matchedhist_local_global =  (f->Get("demo/ak4_global_pus/col2_matched_local_alljet_pt"));
+   top->Write();
 
-allhistDonut->Rebin(10);
-allhistDonut->Sumw2();
-allhistMedian->Rebin(10);
-allhistMedian->Sumw2();
-allhistNopus->Rebin(10);
-allhistNopus->Sumw2();
-
-globalNopus->Rebin(10);
-localNopus->Rebin(10);
-globalNopus->Sumw2();
-localNopus->Sumw2();
-
-globalDonut->Rebin(10);
-localDonut->Rebin(10);
-globalDonut->Sumw2();
-localDonut->Sumw2();
-
-globalMedian->Rebin(10);
-localMedian->Rebin(10);
-globalMedian->Sumw2();
-localMedian->Sumw2();
-
-//TH1D matcheff = ((*matchedhist).Divide(allhist));
-//matchedhist->Divide(allhist);
-//matchedhist->Draw();
-TGraphAsymmErrors * matchCurvelocaldonut = effDiv(localDonut,allhistDonut);
-TGraphAsymmErrors * matchCurveglobaldonut = effDiv(globalDonut,allhistDonut);
-
-TGraphAsymmErrors * matchCurvelocalnopus = effDiv(localNopus,allhistNopus);
-TGraphAsymmErrors * matchCurveglobalnopus = effDiv(globalNopus,allhistNopus);
-
-TGraphAsymmErrors * matchCurvelocalmedian = effDiv(localMedian,allhistMedian);
-TGraphAsymmErrors * matchCurveglobalmedian = effDiv(globalMedian,allhistMedian);
-
-top->cd();
-matchCurvelocaldonut->Write("local_donut");
-matchCurveglobaldonut->Write("global_donut");
-matchCurvelocalnopus->Write("local_nopus");
-matchCurveglobalnopus->Write("global_nopus");
-matchCurvelocalmedian->Write("local_median");
-matchCurveglobalmedian->Write("global_median");
-top->Write();
 }
 
 TGraphAsymmErrors * effDiv(TH1D * matchedhist, TH1D * allhist)

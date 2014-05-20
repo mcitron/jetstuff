@@ -55,15 +55,15 @@ bool sortDR(pair_info vec1, pair_info vec2) {
   
 }
 
-//std::vector<pair_info> make_pairs(const std::vector<TLorentzVector> & gen_vec, const std::vector<TLorentzVector> & reco_vec) {
+//std::vector<pair_info> make_pairs(const std::vector<TLorentzVector> & col1, const std::vector<TLorentzVector> & reco_vec) {
 
-std::vector<pair_info> make_pairs(const std::vector<jJet> & gen_vec, const std::vector<jJet> & reco_vec) {
+std::vector<pair_info> make_pairs(const std::vector<jJet> & col1, const std::vector<jJet> & col2) {
 
   std::vector<pair_info> pinfo;
 
-  for(unsigned int i=0; i<gen_vec.size(); i++) {
-    for(unsigned int j=0; j<reco_vec.size(); j++) {
-      pinfo.push_back(pair_info(i,j, gen_vec[i].DeltaR2(reco_vec[j])));
+  for(unsigned int i=0; i<col1.size(); i++) {
+    for(unsigned int j=0; j<col2.size(); j++) {
+      pinfo.push_back(pair_info(i,j, col1[i].DeltaR2(col2[j])));
     }
   }
 
@@ -71,6 +71,23 @@ std::vector<pair_info> make_pairs(const std::vector<jJet> & gen_vec, const std::
 
   return pinfo;
 
+}
+
+std::vector<pair_info> make_gct_pairs(const std::vector<jJet> & gct_vec, const std::vector<jJet> & col1) {
+
+  std::vector<pair_info> pinfo;
+  TriggerTowerGeometry g;
+
+  for(unsigned int i=0; i<gct_vec.size(); i++) {
+    for(unsigned int j=0; j<col1.size(); j++) {
+
+        int dEta = gct_vec.at(i).gEta() - g.gct_iEta(col1.at(j).iEta()); 
+        int dPhi = gct_vec.at(i).gPhi() - g.gct_iPhi(col1.at(j).iPhi()); 
+        int deltaR2 = (dEta*dEta+dPhi*dPhi)*16;
+        pinfo.push_back(pair_info(i,j, deltaR2));
+    }
+  }
+  return pinfo;
 }
 
 //std::string get_flavour(int gen_index) {
