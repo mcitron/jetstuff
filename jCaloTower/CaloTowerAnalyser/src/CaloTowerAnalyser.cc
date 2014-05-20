@@ -21,198 +21,7 @@
 //#define COMPARE_COLLECTIONS
 #define PUS_HISTS
 
-// system include files
-#include <memory>
-
-// user include files
-#include "FWCore/Framework/interface/Frameworkfwd.h"
-#include "FWCore/Framework/interface/EDAnalyzer.h"
-
-#include "FWCore/Framework/interface/Event.h"
-#include "FWCore/Framework/interface/MakerMacros.h"
-
-#include "FWCore/ParameterSet/interface/ParameterSet.h"
-
-#include "FWCore/MessageLogger/interface/MessageLogger.h"
-
-#include "DataFormats/JetReco/interface/GenJetCollection.h"
-
-#include "DataFormats/CaloTowers/interface/CaloTower.h"
-#include "DataFormats/CaloTowers/interface/CaloTowerFwd.h"
-
-#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
-
-#include "DataFormats/L1GlobalCaloTrigger/interface/L1GctCollections.h"
-
-#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
-
-#include "SimDataFormats/SLHC/interface/L1CaloTower.h"
-#include "SimDataFormats/SLHC/interface/L1CaloTowerFwd.h"
-
-#include "SLHCUpgradeSimulations/L1CaloTrigger/interface/TriggerTowerGeometry_new.h"
-
-#include "jCaloTower/CaloTowerAnalyser/interface/jad_jet_class.hh"
-#include "jCaloTower/CaloTowerAnalyser/interface/matching_algo.hh"
-
-#include "fastjet/GhostedAreaSpec.hh"
-#include "fastjet/ClusterSequenceArea.hh"
-#include "fastjet/tools/Filter.hh"
-#include "fastjet/tools/Pruner.hh"
-#include "fastjet/GhostedAreaSpec.hh"
-#include "fastjet/tools/GridMedianBackgroundEstimator.hh"
-#include <fastjet/PseudoJet.hh>
-
-#include "FWCore/ServiceRegistry/interface/Service.h"
-#include "CommonTools/UtilAlgos/interface/TFileService.h"
-#include "TH1.h"
-#include "TString.h"
-#include "TH2.h"
-#include "TROOT.h"
-#include "TCanvas.h"
-#include "TProfile.h"
-
-//Switches
-//
-//
-// class declaration
-//
-
-class CaloTowerAnalyser : public edm::EDAnalyzer {
-  public:
-    explicit CaloTowerAnalyser(const edm::ParameterSet&);
-    ~CaloTowerAnalyser();
-
-    static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
-
-    void getJets(std::vector < fastjet::PseudoJet > &constits,std::vector < fastjet::PseudoJet > &jets);
-    std::vector<jJet> getL1Jets(const std::vector< std::vector<int> > & input, int phisize, int etasize, int vetophisize, int vetoetasize, int seedthresh1, int seedthresh2);
-    std::vector<jJet> getL1Jets(const std::vector< std::vector<int> > & input, int jetsize, int vetowindowsize, int seedthresh1, int seedthresh2); 
-    void compareJetCollections(const std::vector<jJet> & col1, const std::vector<jJet> & col2, std::string folderName);
-    void printOneEvent(const edm::Handle<l1slhc::L1CaloTowerCollection> triggertowers, const std::vector<jJet> & L1jets, const std::vector<fastjet::PseudoJet> & ak4ttjets, const reco::GenJetCollection * ak4genjets, std::vector<fastjet::PseudoJet> & ak4genjetsp);
-    void printOneEvent(const edm::Handle<l1slhc::L1CaloTowerCollection> triggertowers, const std::map <TString,std::vector<jJet> > & L1jets, const std::map<TString,std::vector<fastjet::PseudoJet>> & ak4jets,std::map<TString,const reco::GenJetCollection *> ak4genjets);
-    std::vector<int> closestJetDistance(const std::vector<jJet> & jJets);
-    void SetNPV(int NPV);
-    int GetNPV();
-    void setL1Sizes(std::vector<TString> l1Sizes);
-    void setL1PusVars(std::vector<TString> l1Vars);
-    void setGlobalPusVars(std::vector<TString> globalVars);
-    void setEtaBins(std::map<TString,int> etaBins);
-    void setPtBins(std::map<TString,int> ptBins);
-    void setNintBins(std::map<TString,int> nintBins);
-    void bookPusHists(TString folderName);
-
-  private:
-    bool mPrintMe=false;
-    virtual void beginJob() ;
-    virtual void analyze(const edm::Event&, const edm::EventSetup&);
-    virtual void endJob() ;
-
-    //void Make2DMap(const edm::Handle<l1slhc::L1CaloTowerCollection> triggertowers, const edm::Handle<CaloTowerCollection> calotowers, const int eventNumber);
-
-    //virtual void beginRun(edm::Run const&, edm::EventSetup const&);
-    //virtual void endRun(edm::Run const&, edm::EventSetup const&);
-    //virtual void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
-    //virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
-
-    // ----------member data ---------------------------
-    int mEventNumber;
-    int mNPV;
-    std::vector<pair_info> pairs;
-    TH1D * num_tops_per_event;
-    TH1D * median_energy_per_event;
-
-    std::map<TString, TH1F*> pusHists1d_;
-    std::map<TString, TH2F*> pusHists2d_;
-    std::map<TString, TProfile*> pusProfile_;
-    std::vector<TString> globalPusVars_;
-    std::vector<TString> l1Sizes_;
-    std::vector<TString> l1PusVars_;
-    std::map<TString, int> etaBins_;
-    std::map<TString, int> ptBins_;
-    std::map<TString, int> nintBins_;
-
-    TH1D * genjet_pt;
-    TH2D * ntowers_vs_npv;
-
-    TH2D * r4_vs_npv_eta1_pt3050;
-    TH2D * r4_vs_npv_eta2_pt3050;
-    TH2D * r4_vs_npv_eta3_pt3050;
-    TH2D * r4_vs_npv_eta1_pt80100;
-    TH2D * r4_vs_npv_eta2_pt80100;
-    TH2D * r4_vs_npv_eta3_pt80100;
-
-    TH2D * deltaGenL1_pT3050_eta1_v1;
-    TH2D * deltaGenL1_v2;
-    TH2D * deltaGenL1_v3;
-    TH2D * deltaGenL1_pT3050_eta1_v4;
-    TH2D * deltaGenL1_pT3050_eta2_v1;
-    TH2D * deltaGenL1_pT3050_eta2_v4;
-    TH2D * deltaGenL1_pT3050_eta3_v1;
-    TH2D * deltaGenL1_pT3050_eta3_v4;
-    TH2D * deltaGenL1_ntowers;
-    TH2D * deltaGenL1_R1;
-    TH2D * deltaGenL1_R2;
-    TH2D * deltaGenL1_R3;
-    TH2D * deltaGenL1_R4;
-
-
-    TriggerTowerGeometry g; //to run the constructor -- could also make this static
-
-    std::map<std::string, TH1D * > col1_jet1_eta;
-    std::map<std::string, TH1D * > col1_jet2_eta;
-    std::map<std::string, TH1D * > col1_jet3_eta;
-    std::map<std::string, TH1D * > col1_jet4_eta;
-    std::map<std::string, TH1D * > col2_jet1_eta;
-    std::map<std::string, TH1D * > col2_jet2_eta;
-    std::map<std::string, TH1D * > col2_jet3_eta;
-    std::map<std::string, TH1D * > col2_jet4_eta;
-    std::map<std::string, TH1D * > col1_jet1_pt;
-    std::map<std::string, TH1D * > col1_jet2_pt;
-    std::map<std::string, TH1D * > col1_jet3_pt;
-    std::map<std::string, TH1D * > col1_jet4_pt;
-    std::map<std::string, TH1D * > col2_jet1_pt;
-    std::map<std::string, TH1D * > col2_jet2_pt;
-    std::map<std::string, TH1D * > col2_jet3_pt;
-    std::map<std::string, TH1D * > col2_jet4_pt;
-    std::map<std::string, TH1D * > col1_alljet_pt;
-    std::map<std::string, TH1D * > col2_alljet_pt;
-    std::map<std::string, TH1D * > col1_alljet_eta;
-    std::map<std::string, TH1D * > col2_alljet_eta;
-    std::map<std::string, TH1D * > col2_matched_local_alljet_pt;
-    std::map<std::string, TH1D * > col2_matched_local_alljet_eta;
-    std::map<std::string, TH2D * > col2_matched_local_ptcorr;
-    std::map<std::string, TH2D * > col2_matched_local_jet1_ptcorr;
-    std::map<std::string, TH2D * > col2_matched_local_jet2_ptcorr;
-    std::map<std::string, TH2D * > col2_matched_local_jet3_ptcorr;
-    std::map<std::string, TH2D * > col2_matched_local_jet4_ptcorr;
-    std::map<std::string, TH2D * > col2_matched_local_ptres;
-    std::map<std::string, TH1D * > col2_matched_local_jet1_pt;
-    std::map<std::string, TH1D * > col2_matched_local_jet2_pt;
-    std::map<std::string, TH1D * > col2_matched_local_jet3_pt;
-    std::map<std::string, TH1D * > col2_matched_local_jet4_pt;
-    std::map<std::string, TH1D * > col2_matched_local_jet1_eta;
-    std::map<std::string, TH1D * > col2_matched_local_jet2_eta;
-    std::map<std::string, TH1D * > col2_matched_local_jet3_eta;
-    std::map<std::string, TH1D * > col2_matched_local_jet4_eta;
-
-    std::map<std::string, TH1D * > col2_matched_global_alljet_pt;
-    std::map<std::string, TH1D * > col2_matched_global_alljet_eta;
-    std::map<std::string, TH2D * > col2_matched_global_ptcorr;
-    std::map<std::string, TH2D * > col2_matched_global_jet1_ptcorr;
-    std::map<std::string, TH2D * > col2_matched_global_jet2_ptcorr;
-    std::map<std::string, TH2D * > col2_matched_global_jet3_ptcorr;
-    std::map<std::string, TH2D * > col2_matched_global_jet4_ptcorr;
-    std::map<std::string, TH2D * > col2_matched_global_ptres;
-    std::map<std::string, TH1D * > col2_matched_global_jet1_pt;
-    std::map<std::string, TH1D * > col2_matched_global_jet2_pt;
-    std::map<std::string, TH1D * > col2_matched_global_jet3_pt;
-    std::map<std::string, TH1D * > col2_matched_global_jet4_pt;
-    std::map<std::string, TH1D * > col2_matched_global_jet1_eta;
-    std::map<std::string, TH1D * > col2_matched_global_jet2_eta;
-    std::map<std::string, TH1D * > col2_matched_global_jet3_eta;
-    std::map<std::string, TH1D * > col2_matched_global_jet4_eta;
-
-};
+#include "jCaloTower/CaloTowerAnalyser/interface/CaloTowerAnalyser.h"
 
 void CaloTowerAnalyser::SetNPV(int npv) { mNPV = npv; }
 int CaloTowerAnalyser::GetNPV() { return mNPV; }
@@ -243,12 +52,12 @@ void CaloTowerAnalyser::bookPusHists(TString folderName){
 
   for(std::vector<TString>::const_iterator gVIt=globalPusVars_.begin(); gVIt!=globalPusVars_.end(); gVIt++){
 
-    pusHists1d_[*gVIt] = dir.make<TH1F>(*gVIt,";"+*gVIt,70,-0.5,69.5);
+    pusHists1d_[*gVIt] = dir.make<TH1F>(*gVIt,";"+*gVIt,80,-0.5,79.5);
 
     for(std::vector<TString>::const_iterator gVIt2=gVIt+1; gVIt2!=globalPusVars_.end(); gVIt2++){
 
-      pusHists2d_[*gVIt+"_"+*gVIt2] = dir.make<TH2F>(*gVIt+"_"+*gVIt2,";"+*gVIt+";"+*gVIt2,35,-0.5,69.5,35,-0.5,69.5);
-      pusProfile_[*gVIt+"_"+*gVIt2] = dir.make<TProfile>(*gVIt+"_"+*gVIt2+"_profile",";"+*gVIt+";"+*gVIt2,35,-0.5,69.5,-0.5,69.5);
+      pusHists2d_[*gVIt+"_"+*gVIt2] = dir.make<TH2F>(*gVIt+"_"+*gVIt2,";"+*gVIt+";"+*gVIt2,40,-0.5,79.5,40,-0.5,79.5);
+      pusProfile_[*gVIt+"_"+*gVIt2] = dir.make<TProfile>(*gVIt+"_"+*gVIt2+"_profile",";"+*gVIt+";"+*gVIt2,40,-0.5,79.5,-0.5,79.5);
 
     }
   }
@@ -260,16 +69,16 @@ void CaloTowerAnalyser::bookPusHists(TString folderName){
     //Loop over the different strip permutations
     for(std::vector<TString>::const_iterator l1VIt=l1PusVars_.begin(); l1VIt!=l1PusVars_.end(); l1VIt++){
 
-      pusHists1d_[*l1SIt+"_"+*l1VIt] = subdir.make<TH1F>(*l1SIt+"_"+*l1VIt,"Size "+*l1SIt+" energy "+*l1VIt, 20,-0.5,19.5);
+      pusHists1d_[*l1SIt+"_"+*l1VIt] = subdir.make<TH1F>(*l1SIt+"_"+*l1VIt,"Size "+*l1SIt+" energy "+*l1VIt, 60,-0.5,59.5);
 
       //Loop over the global 2D histograms
       for(std::vector<TString>::const_iterator gVIt=globalPusVars_.begin(); gVIt!=globalPusVars_.end(); gVIt++){
 
         TFileDirectory subsubdir = subdir.mkdir(gVIt->Data());
         pusHists2d_[*gVIt+"_"+*l1SIt+"_"+*l1VIt] = subsubdir.make<TH2F>(*gVIt+"_"+*l1SIt+"_"+*l1VIt,";"+*gVIt+";"+*l1SIt+"_"+*l1VIt,
-            35,-0.5,69.5,10,-0.5,19.5);
+            40,-0.5,79.5,60,-0.5,59.5);
         pusProfile_[*gVIt+"_"+*l1SIt+"_"+*l1VIt] = subsubdir.make<TProfile>(*gVIt+"_"+*l1SIt+"_"+*l1VIt+"_profile",";"+*gVIt+";"+*l1SIt+"_"+*l1VIt,
-            35,-0.5,69.5,-0.5,19.5);
+            40,-0.5,79.5,-0.5,39.5);
 
       }
     }
@@ -289,16 +98,16 @@ void CaloTowerAnalyser::bookPusHists(TString folderName){
         for(std::vector<TString>::const_iterator l1VIt=l1PusVars_.begin(); l1VIt!=l1PusVars_.end(); l1VIt++){
 
           pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_"+*l1VIt] = 
-            ptdir.make<TH1F>(*l1SIt+"_"+*l1VIt,"Size "+*l1SIt+" energy "+*l1VIt, 20,-0.5,19.5);
+            ptdir.make<TH1F>(*l1SIt+"_"+*l1VIt,"Size "+*l1SIt+" energy "+*l1VIt, 60,-0.5,59.5);
 
           //Loop over the global 2D histograms
           for(std::vector<TString>::const_iterator gVIt=globalPusVars_.begin(); gVIt!=globalPusVars_.end(); gVIt++){
 
             TFileDirectory subptdir = ptdir.mkdir(gVIt->Data());
             pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_"+*l1VIt] = 
-              subptdir.make<TH2F>(*gVIt+"_"+*l1SIt+"_"+*l1VIt,";"+*gVIt+";"+*l1SIt+"_"+*l1VIt,35,-0.5,69.5,10,-0.5,19.5);
+              subptdir.make<TH2F>(*gVIt+"_"+*l1SIt+"_"+*l1VIt,";"+*gVIt+";"+*l1SIt+"_"+*l1VIt,40,-0.5,79.5,60,-0.5,59.5);
             pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_"+*l1VIt] = 
-              subptdir.make<TProfile>(*gVIt+"_"+*l1SIt+"_"+*l1VIt+"_profile",";"+*gVIt+";"+*l1SIt+"_"+*l1VIt,35,-0.5,69.5,-0.5,19.5);
+              subptdir.make<TProfile>(*gVIt+"_"+*l1SIt+"_"+*l1VIt+"_profile",";"+*gVIt+";"+*l1SIt+"_"+*l1VIt,40,-0.5,79.5,-0.5,39.5);
 
           }
         }
@@ -312,13 +121,48 @@ void CaloTowerAnalyser::bookPusHists(TString folderName){
   TFileDirectory dir2 = fs->mkdir("ring_comparisons");
 
   for(std::map<TString,int>::const_iterator nintBinIt=nintBins_.begin(); nintBinIt!=nintBins_.end(); nintBinIt++){
-    TFileDirectory nintDir = dir2.mkdir(nintBinIt->first.Data());
-    pusHists2d_[nintBinIt->first+"_ring0_total"] = nintDir.make<TH2F>("ring0_total",";ring0;total",50,0.,100.,50,0.,200.);
-    pusHists2d_[nintBinIt->first+"_ring1_ring0"] = nintDir.make<TH2F>("ring1_ring0",";ring1;ring0",50,0.,100.,50,0.,100.);
-    pusHists2d_[nintBinIt->first+"_ring2_ring1"] = nintDir.make<TH2F>("ring2_ring1",";ring2;ring1",50,0.,100.,50,0.,100.);
-    pusHists2d_[nintBinIt->first+"_ring3_ring2"] = nintDir.make<TH2F>("ring3_ring2",";ring3;ring2",50,0.,100.,50,0.,100.);
-    pusHists2d_[nintBinIt->first+"_ring4_ring3"] = nintDir.make<TH2F>("ring4_ring3",";ring4;ring3",50,0.,100.,50,0.,100.);
-    pusHists2d_[nintBinIt->first+"_ring5_ring4"] = nintDir.make<TH2F>("ring5_ring4",";ring5;ring4",50,0.,100.,50,0.,100.);
+    TFileDirectory nintDir = dir2.mkdir((TString("4isolated/")+nintBinIt->first).Data());
+    pusHists2d_[nintBinIt->first+"_ring0_total_4iso"] = nintDir.make<TH2F>("ring0_total",";ring0 (L1 units) (L1 units);total (L1 units)",100,0.,100.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_ring1_total_4iso"] = nintDir.make<TH2F>("ring1_total",";ring1 (L1 units);total (L1 units)",200,0.,50.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_ring2_total_4iso"] = nintDir.make<TH2F>("ring2_total",";ring2 (L1 units);total (L1 units)",200,0.,50.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_ring3_total_4iso"] = nintDir.make<TH2F>("ring3_total",";ring3 (L1 units);total (L1 units)",200,0.,50.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_ring4_total_4iso"] = nintDir.make<TH2F>("ring4_total",";ring4 (L1 units);total (L1 units)",200,0.,50.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_ring5_total_4iso"] = nintDir.make<TH2F>("ring5_total",";ring5 (L1 units);total (L1 units)",400,0.,50.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_donut_total_4iso"] = nintDir.make<TH2F>("donut_total",";donut (L1 units);total (L1 units)",400,0.,50.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_subtract_total_4iso"] = nintDir.make<TH2F>("subtract_total",";donut (L1 units);total (L1 units)",200,0.,800.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_out1_bottom3_total_4iso"] = nintDir.make<TH2F>("out1_bottom3_total",";donut (L1 units);total (L1 units)",200,0.,800.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_out1_bottom2_total_4iso"] = nintDir.make<TH2F>("out1_bottom2_total",";donut (L1 units);total (L1 units)",200,0.,800.,200,0.,1000.);
+    nintDir = dir2.mkdir((TString("4/")+nintBinIt->first).Data());
+    pusHists2d_[nintBinIt->first+"_ring0_total_4"] = nintDir.make<TH2F>("ring0_total",";ring0 (L1 units);total (L1 units)",100,0.,100.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_ring1_total_4"] = nintDir.make<TH2F>("ring1_total",";ring1 (L1 units);total (L1 units)",200,0.,50.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_ring2_total_4"] = nintDir.make<TH2F>("ring2_total",";ring2 (L1 units);total (L1 units)",200,0.,50.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_ring3_total_4"] = nintDir.make<TH2F>("ring3_total",";ring3 (L1 units);total (L1 units)",200,0.,50.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_ring4_total_4"] = nintDir.make<TH2F>("ring4_total",";ring4 (L1 units);total (L1 units)",200,0.,50.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_ring5_total_4"] = nintDir.make<TH2F>("ring5_total",";ring5 (L1 units);total (L1 units)",400,0.,50.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_donut_total_4"] = nintDir.make<TH2F>("donut_total",";donut (L1 units);total (L1 units)",400,0.,50.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_subtract_total_4"] = nintDir.make<TH2F>("subtract_total",";donut (L1 units);total (L1 units)",200,0.,800.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_out1_bottom3_total_4"] = nintDir.make<TH2F>("out1_bottom3_total",";donut (L1 units);total (L1 units)",200,0.,800.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_out1_bottom2_total_4"] = nintDir.make<TH2F>("out1_bottom2_total",";donut (L1 units);total (L1 units)",200,0.,800.,200,0.,1000.);
+    nintDir = dir2.mkdir((TString("3isolated/")+nintBinIt->first).Data());
+    pusHists2d_[nintBinIt->first+"_ring0_total_3iso"] = nintDir.make<TH2F>("ring0_total",";ring0 (L1 units);total (L1 units)",100,0.,100.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_ring1_total_3iso"] = nintDir.make<TH2F>("ring1_total",";ring1 (L1 units);total (L1 units)",200,0.,50.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_ring2_total_3iso"] = nintDir.make<TH2F>("ring2_total",";ring2 (L1 units);total (L1 units)",200,0.,50.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_ring3_total_3iso"] = nintDir.make<TH2F>("ring3_total",";ring3 (L1 units);total (L1 units)",200,0.,50.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_ring4_total_3iso"] = nintDir.make<TH2F>("ring4_total",";ring4 (L1 units);total (L1 units)",400,0.,50.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_donut_total_3iso"] = nintDir.make<TH2F>("donut_total",";donut (L1 units);total (L1 units)",400,0.,50.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_subtract_total_3iso"] = nintDir.make<TH2F>("subtract_total",";donut (L1 units);total (L1 units)",200,0.,800.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_out1_bottom3_total_3iso"] = nintDir.make<TH2F>("out1_bottom3_total",";donut (L1 units);total (L1 units)",200,0.,800.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_out1_bottom2_total_3iso"] = nintDir.make<TH2F>("out1_bottom2_total",";donut (L1 units);total (L1 units)",200,0.,800.,200,0.,1000.);
+    nintDir = dir2.mkdir((TString("3/")+nintBinIt->first).Data());
+    pusHists2d_[nintBinIt->first+"_ring0_total_3"] = nintDir.make<TH2F>("ring0_total",";ring0 (L1 units);total (L1 units)",100,0.,100.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_ring1_total_3"] = nintDir.make<TH2F>("ring1_total",";ring1 (L1 units);total (L1 units)",200,0.,50.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_ring2_total_3"] = nintDir.make<TH2F>("ring2_total",";ring2 (L1 units);total (L1 units)",200,0.,50.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_ring3_total_3"] = nintDir.make<TH2F>("ring3_total",";ring3 (L1 units);total (L1 units)",200,0.,50.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_ring4_total_3"] = nintDir.make<TH2F>("ring4_total",";ring4 (L1 units);total (L1 units)",400,0.,50.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_donut_total_3"] = nintDir.make<TH2F>("donut_total",";donut (L1 units);total (L1 units)",400,0.,50.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_subtract_total_3"] = nintDir.make<TH2F>("subtract_total",";donut (L1 units);total (L1 units)",200,0.,200.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_out1_bottom3_total_3"] = nintDir.make<TH2F>("out1_bottom3_total",";donut (L1 units);total (L1 units)",200,0.,200.,200,0.,1000.);
+    pusHists2d_[nintBinIt->first+"_out1_bottom2_total_3"] = nintDir.make<TH2F>("out1_bottom2_total",";donut (L1 units);total (L1 units)",200,0.,200.,200,0.,1000.);
   }
 
 }
@@ -564,104 +408,108 @@ void CaloTowerAnalyser::getJets(std::vector < fastjet::PseudoJet > &constits,std
   std::vector<fastjet::PseudoJet> out_jets = sorted_by_pt(thisClustering_->inclusive_jets(5.0));
   for(unsigned int i0 = 0; i0 < out_jets.size(); i0++) jets.push_back(out_jets[i0]);
 
+  delete thisClustering_;
   return;
 }
 
+/*
+   std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<int> > & input, int jetsize, int vetowindowsize, int seedthresh1, int seedthresh2) {
 
-std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<int> > & input, int jetsize, int vetowindowsize, int seedthresh1, int seedthresh2) {
+//seedthresh1 is the seedthreshold on the central tower
+//seedthresh2 is the threshold on all towers a la zero suppression
+//jetsize is the +/- number to span i.e. +/- 1 = 3x3
+//vetowindowsize is the +/- number window to look at to potentially veto the central tower
 
-  //seedthresh1 is the seedthreshold on the central tower
-  //seedthresh2 is the threshold on all towers a la zero suppression
-  //jetsize is the +/- number to span i.e. +/- 1 = 3x3
-  //vetowindowsize is the +/- number window to look at to potentially veto the central tower
-
-  std::vector<jJet> L1_jJets;
-  TriggerTowerGeometry g;
+std::vector<jJet> L1_jJets;
+TriggerTowerGeometry g;
 
 
-  //std::cout << input.size() << ", " << input[0].size() << std::endl;
+//std::cout << input.size() << ", " << input[0].size() << std::endl;
 
-  for ( int i = 0; i < (int)input.size(); i++) {
-    for ( int j = 0; j < (int)input[i].size(); j++) {
-      //std::cout << "new: (" << i << ", " << j << ", " << input[i][j] << ")" << std::endl;
-      int numtowersaboveme=0;
-      int numtowersabovethresh=0;
+for ( int i = 0; i < (int)input.size(); i++) {
+for ( int j = 0; j < (int)input[i].size(); j++) {
+//std::cout << "new: (" << i << ", " << j << ", " << input[i][j] << ")" << std::endl;
+int numtowersaboveme=0;
+int numtowersabovethresh=0;
 
-      std::vector<int> localsums(jetsize+1,0); //to hold the ring sums (+1 for centre)
-      std::vector<int> areas(jetsize+1,0); //to hold the ring areas (i.e. when we get up against the boundaries)
-      std::vector<int> outerstrips(4,0); //to hold the energies in the 4 surrounding outer strips (excluding corners)
+std::vector<int> localsums(jetsize+1,0); //to hold the ring sums (+1 for centre)
+std::vector<int> areas(jetsize+1,0); //to hold the ring areas (i.e. when we get up against the boundaries)
+std::vector<int> outerstrips(4,0); //to hold the energies in the 4 surrounding outer strips (excluding corners)
 
-      for(int k=(i-jetsize); k<=(i+jetsize); k++) {
-        for(int l=(j-jetsize); l<=(j+jetsize); l++) {
-          if(k < 0 || k > 55) continue; //i.e. out of bounds of eta<3
+for(int k=(i-jetsize); k<=(i+jetsize); k++) {
+for(int l=(j-jetsize); l<=(j+jetsize); l++) {
+if(k < 0 || k > 55) continue; //i.e. out of bounds of eta<3
 
-          //make a co-ordinate transform at the phi boundary
-          int newl;
-          if(l < 0) { newl = l+72; } 
-          else if (l > 71) { newl = l-72; } 
-          else { newl = l; }
+//make a co-ordinate transform at the phi boundary
+int newl;
+if(l < 0) { newl = l+72; } 
+else if (l > 71) { newl = l-72; } 
+else { newl = l; }
 
-          if(input[k][newl] > seedthresh2) { numtowersabovethresh++; }
+if(input[k][newl] > seedthresh2) { numtowersabovethresh++; }
 
-          //to decide which ring to assign energy to
-          for( int m=0; m<jetsize+1;m++) { //+1 for centre of jet
-            if((abs(i-k) == m && abs(j-l) <= m) || (abs(i-k) <= m && abs(j-l) == m)) { 
-              //i.e. we are now in ring m
-              localsums[m] += input[k][newl]; 
-              areas[m] += 1;
+//to decide which ring to assign energy to
+for( int m=0; m<jetsize+1;m++) { //+1 for centre of jet
+if((abs(i-k) == m && abs(j-l) <= m) || (abs(i-k) <= m && abs(j-l) == m)) { 
+//i.e. we are now in ring m
+localsums[m] += input[k][newl]; 
+areas[m] += 1;
 
-              if(m == jetsize) { //i.e. we are in the outer ring and want to parameterise PU
-                if( (k-i) == m && abs(j-l) <= (m-1) ) { outerstrips[0] += input[k][newl]; }
-                if( (i-k) == m && abs(j-l) <= (m-1) ) { outerstrips[1] += input[k][newl]; }
-                if( (l-j) == m && abs(i-k) <= (m-1) ) { outerstrips[2] += input[k][newl]; }
-                if( (j-l) == m && abs(i-k) <= (m-1) ) { outerstrips[3] += input[k][newl]; }
-              }
+if(m == jetsize) { //i.e. we are in the outer ring and want to parameterise PU
+if( (k-i) == m && abs(j-l) <= (m-1) ) { outerstrips[0] += input[k][newl]; }
+if( (i-k) == m && abs(j-l) <= (m-1) ) { outerstrips[1] += input[k][newl]; }
+if( (l-j) == m && abs(i-k) <= (m-1) ) { outerstrips[2] += input[k][newl]; }
+if( (j-l) == m && abs(i-k) <= (m-1) ) { outerstrips[3] += input[k][newl]; }
+}
 
-              if(m > 0 && m <= vetowindowsize) { //i.e. don't compare the central tower or towers outside vetowindowsize
+if(m > 0 && m <= vetowindowsize) { //i.e. don't compare the central tower or towers outside vetowindowsize
 
-                if((k+l) > (i+j) ) { if(input[k][newl] > input[i][j]) { numtowersaboveme++; } }
-                else if( ((k+l) == (i+j)) && (k-i) > (l-j)) { if(input[k][newl] > input[i][j]) { numtowersaboveme++; } } //this line is to break the degeneracy along the diagonal treating top left different to bottom right
-                else { if(input[k][newl] >= input[i][j]) { numtowersaboveme++; } }
+if((k+l) > (i+j) ) { if(input[k][newl] > input[i][j]) { numtowersaboveme++; } }
+else if( ((k+l) == (i+j)) && (k-i) > (l-j)) { if(input[k][newl] > input[i][j]) { numtowersaboveme++; } } //this line is to break the degeneracy along the diagonal treating top left different to bottom right
+else { if(input[k][newl] >= input[i][j]) { numtowersaboveme++; } }
 
-              }
-              break; //no point continuining since can only be a member of one ring
-            }
-          }
+}
+break; //no point continuining since can only be a member of one ring
+}
+}
 
-        }
-      }
+}
+}
 
-      //now we have a jet candidate centred at i,j, with the ring energies and areas defined
+//now we have a jet candidate centred at i,j, with the ring energies and areas defined
 
-      //now we have the L1 jet candidate:
-      if(numtowersaboveme == 0 && input[i][j] > seedthresh1) {
-        double totalenergy=0.0;
-        //std::cout << "iEta: " << g.old_iEta(i) << ", iPhi: " << g.old_iPhi(j) << ", r0: " << localsums[0] <<  ", r1: " << localsums[1] << ", r2: " << localsums[2] << ", r3: " << localsums[3] << ", r4: " << localsums[4] << std::endl;
-        for(int ring=0; ring < (int)localsums.size(); ring++) { totalenergy += localsums[ring]; }
-        //this is with PUS:
-        //for(int ring=0; ring < (int)localsums.size()-1; ring++) { totalenergy += localsums[ring]; }
-        //std::sort(outerstrips.begin(),outerstrips.end());
-        //totalenergy = totalenergy - (3.5 * (outerstrips[1] + outerstrips[2]));
+//now we have the L1 jet candidate:
+if(numtowersaboveme == 0 && input[i][j] > seedthresh1) {
+double totalenergy=0.0;
+//std::cout << "iEta: " << g.old_iEta(i) << ", iPhi: " << g.old_iPhi(j) << ", r0: " << localsums[0] <<  ", r1: " << localsums[1] << ", r2: " << localsums[2] << ", r3: " << localsums[3] << ", r4: " << localsums[4] << std::endl;
+for(int ring=0; ring < (int)localsums.size(); ring++) { totalenergy += localsums[ring]; }
+//this is with PUS:
+//for(int ring=0; ring < (int)localsums.size()-1; ring++) { totalenergy += localsums[ring]; }
+//std::sort(outerstrips.begin(),outerstrips.end());
+//totalenergy = totalenergy - (3.5 * (outerstrips[1] + outerstrips[2]));
 
-        //this means we have a viable candidate
-        if(totalenergy > 0.0) {
-          L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips));
-        }
-
-      }
-
-    }
-  }
-
-  //sort by highest pT before ending
-  std::sort(L1_jJets.begin(), L1_jJets.end(), sortbypt);  
-
-  return L1_jJets;
+//this means we have a viable candidate
+if(totalenergy > 0.0) {
+  L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips));
+}
 
 }
 
-std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<int> > & input, int phisize, int etasize, int vetophisize, int vetoetasize, int seedthresh1, int seedthresh2) {
+}
+}
 
+//sort by highest pT before ending
+std::sort(L1_jJets.begin(), L1_jJets.end(), sortbypt);  
+
+return L1_jJets;
+
+}
+*/
+
+//New getL1Jets
+
+
+std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<int> > & input, int jetsize, int vetowindowsize, int seedthresh1, int seedthresh2) {
   //seedthresh1 is the seedthreshold on the central tower
   //seedthresh2 is the threshold on all towers a la zero suppression
   //jetsize is the +/- number to span i.e. +/- 1 = 3x3
@@ -670,21 +518,21 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
   std::vector<jJet> L1_jJets;
   TriggerTowerGeometry g;
 
-
   //std::cout << input.size() << ", " << input[0].size() << std::endl;
 
   for ( int i = 0; i < (int)input.size(); i++) {
     for ( int j = 0; j < (int)input[i].size(); j++) {
+      std::vector<int> jetTower;
       //std::cout << "new: (" << i << ", " << j << ", " << input[i][j] << ")" << std::endl;
       int numtowersaboveme=0;
       int numtowersabovethresh=0;
-      int jetsize=4;
+
       std::vector<int> localsums(jetsize+1,0); //to hold the ring sums (+1 for centre)
       std::vector<int> areas(jetsize+1,0); //to hold the ring areas (i.e. when we get up against the boundaries)
       std::vector<int> outerstrips(4,0); //to hold the energies in the 4 surrounding outer strips (excluding corners)
-
-      for(int k=(i-phisize); k<=(i+phisize); k++) {
-        for(int l=(j-etasize); l<=(j+etasize); l++) {
+      int jetarea = 1;
+      for(int k=(i-jetsize); k<=(i+jetsize); k++) {
+        for(int l=(j-jetsize); l<=(j+jetsize); l++) {
           if(k < 0 || k > 55) continue; //i.e. out of bounds of eta<3
           //std::cout << " k = " << k << ", l = " << l << ", i =" << i << ", j = " << j << std::endl;
 
@@ -693,27 +541,27 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
           if(l < 0) { newl = l+72; } 
           else if (l > 71) { newl = l-72; } 
           else { newl = l; }
-
+          if (l != j && k != i)
+          {
+            jetTower.push_back(input[k][newl]);
+          }
           if(input[k][newl] > seedthresh2) { numtowersabovethresh++; }
 
           //to decide which ring to assign energy to
-
-          jetsize = (phisize > etasize) ? phisize:etasize;
-
-          for( int m=0; m<jetsize+1;m++) { //+1 for centre of jet
+          for( int m=0; m<jetsize+1;m++) { //+1 for centre of jet (n steps is n+1 rings!)
             if((abs(i-k) == m && abs(j-l) <= m) || (abs(i-k) <= m && abs(j-l) == m)) { 
               //i.e. we are now in ring m
-              localsums[m] += input[k][newl]; 
+              if (m <= vetowindowsize) localsums[m] += input[k][newl]; 
               areas[m] += 1;
+              if(m == jetsize) { //i.e. we are in the outer ring and want to parameterise PU
+                if( (k-i) == m && abs(j-l) <= (m-1) ) { outerstrips[0] += input[k][newl]; }
+                if( (i-k) == m && abs(j-l) <= (m-1) ) { outerstrips[1] += input[k][newl]; }
+                if( (l-j) == m && abs(i-k) <= (m-1) ) { outerstrips[2] += input[k][newl]; }
+                if( (j-l) == m && abs(i-k) <= (m-1) ) { outerstrips[3] += input[k][newl]; }
+              }
 
-              //Outer Rings
-              if( (k-i) == phisize && abs(j-l) <= (etasize-1) ) { outerstrips[0] += input[k][newl]; }
-              if( (i-k) == phisize && abs(j-l) <= (etasize-1) ) { outerstrips[1] += input[k][newl]; }
-              if( (l-j) == etasize && abs(i-k) <= (phisize-1) ) { outerstrips[2] += input[k][newl]; }
-              if( (j-l) == etasize && abs(i-k) <= (phisize-1) ) { outerstrips[3] += input[k][newl]; }
-
-              if(m > 0 && abs(l-j) <= vetoetasize && abs(i-k) <= vetophisize) { //i.e. don't compare the central tower or towers outside vetowindowsize
-
+              if(m > 0 && m <= vetowindowsize) { //i.e. don't compare the central tower or towers outside vetowindowsize
+                jetarea++;
                 if((k+l) > (i+j) ) { if(input[k][newl] > input[i][j]) { numtowersaboveme++; } }
                 else if( ((k+l) == (i+j)) && (k-i) > (l-j)) { if(input[k][newl] > input[i][j]) { numtowersaboveme++; } } //this line is to break the degeneracy along the diagonal treating top left different to bottom right
                 else { if(input[k][newl] >= input[i][j]) { numtowersaboveme++; } }
@@ -740,7 +588,7 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
 
         //this means we have a viable candidate
         if(totalenergy > 0.0) {
-          L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips));
+          L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetarea));
         }
 
       }
@@ -754,7 +602,102 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
   return L1_jJets;
 
 }
+/*
+   std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<int> > & input, int phisize, int etasize, int vetophisize, int vetoetasize, int seedthresh1, int seedthresh2) {
 
+//seedthresh1 is the seedthreshold on the central tower
+//seedthresh2 is the threshold on all towers a la zero suppression
+//jetsize is the +/- number to span i.e. +/- 1 = 3x3
+//vetowindowsize is the +/- number window to look at to potentially veto the central tower
+
+std::vector<jJet> L1_jJets;
+TriggerTowerGeometry g;
+
+
+//std::cout << input.size() << ", " << input[0].size() << std::endl;
+
+for ( int i = 0; i < (int)input.size(); i++) {
+for ( int j = 0; j < (int)input[i].size(); j++) {
+//std::cout << "new: (" << i << ", " << j << ", " << input[i][j] << ")" << std::endl;
+int numtowersaboveme=0;
+int numtowersabovethresh=0;
+int jetsize=4;
+std::vector<int> localsums(jetsize+1,0); //to hold the ring sums (+1 for centre)
+std::vector<int> areas(jetsize+1,0); //to hold the ring areas (i.e. when we get up against the boundaries)
+std::vector<int> outerstrips(4,0); //to hold the energies in the 4 surrounding outer strips (excluding corners)
+
+for(int k=(i-phisize); k<=(i+phisize); k++) {
+for(int l=(j-etasize); l<=(j+etasize); l++) {
+if(k < 0 || k > 55) continue; //i.e. out of bounds of eta<3
+//std::cout << " k = " << k << ", l = " << l << ", i =" << i << ", j = " << j << std::endl;
+
+//make a co-ordinate transform at the phi boundary
+int newl;
+if(l < 0) { newl = l+72; } 
+else if (l > 71) { newl = l-72; } 
+else { newl = l; }
+
+if(input[k][newl] > seedthresh2) { numtowersabovethresh++; }
+
+//to decide which ring to assign energy to
+
+jetsize = (phisize > etasize) ? phisize:etasize;
+
+for( int m=0; m<jetsize+1;m++) { //+1 for centre of jet
+if((abs(i-k) == m && abs(j-l) <= m) || (abs(i-k) <= m && abs(j-l) == m)) { 
+//i.e. we are now in ring m
+localsums[m] += input[k][newl]; 
+areas[m] += 1;
+
+//Outer Rings
+if( (k-i) == phisize && abs(j-l) <= (etasize-1) ) { outerstrips[0] += input[k][newl]; }
+if( (i-k) == phisize && abs(j-l) <= (etasize-1) ) { outerstrips[1] += input[k][newl]; }
+if( (l-j) == etasize && abs(i-k) <= (phisize-1) ) { outerstrips[2] += input[k][newl]; }
+if( (j-l) == etasize && abs(i-k) <= (phisize-1) ) { outerstrips[3] += input[k][newl]; }
+
+if(m > 0 && abs(l-j) <= vetoetasize && abs(i-k) <= vetophisize) { //i.e. don't compare the central tower or towers outside vetowindowsize
+
+if((k+l) > (i+j) ) { if(input[k][newl] > input[i][j]) { numtowersaboveme++; } }
+else if( ((k+l) == (i+j)) && (k-i) > (l-j)) { if(input[k][newl] > input[i][j]) { numtowersaboveme++; } } //this line is to break the degeneracy along the diagonal treating top left different to bottom right
+else { if(input[k][newl] >= input[i][j]) { numtowersaboveme++; } }
+
+}
+break; //no point continuining since can only be a member of one ring
+}
+}
+
+}
+}
+
+//now we have a jet candidate centred at i,j, with the ring energies and areas defined
+
+//now we have the L1 jet candidate:
+if(numtowersaboveme == 0 && input[i][j] > seedthresh1) {
+double totalenergy=0.0;
+//std::cout << "iEta: " << g.old_iEta(i) << ", iPhi: " << g.old_iPhi(j) << ", r0: " << localsums[0] <<  ", r1: " << localsums[1] << ", r2: " << localsums[2] << ", r3: " << localsums[3] << ", r4: " << localsums[4] << std::endl;
+for(int ring=0; ring < (int)localsums.size(); ring++) { totalenergy += localsums[ring]; }
+//this is with PUS:
+//for(int ring=0; ring < (int)localsums.size()-1; ring++) { totalenergy += localsums[ring]; }
+//std::sort(outerstrips.begin(),outerstrips.end());
+//totalenergy = totalenergy - (3.5 * (outerstrips[1] + outerstrips[2]));
+
+//this means we have a viable candidate
+if(totalenergy > 0.0) {
+  L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips));
+}
+
+}
+
+}
+}
+
+//sort by highest pT before ending
+std::sort(L1_jJets.begin(), L1_jJets.end(), sortbypt);  
+
+return L1_jJets;
+
+}
+*/
 std::vector<int> CaloTowerAnalyser::closestJetDistance(const std::vector<jJet> & jJets) {
 
   std::vector<int> distances(jJets.size(),-1);
@@ -798,7 +741,7 @@ std::vector<int> CaloTowerAnalyser::closestJetDistance(const std::vector<jJet> &
 //
 
 //
-// constructors and destructor
+// constructorgTs and destructor
 //
 CaloTowerAnalyser::CaloTowerAnalyser(const edm::ParameterSet& iConfig) {
 
@@ -878,13 +821,16 @@ CaloTowerAnalyser::CaloTowerAnalyser(const edm::ParameterSet& iConfig) {
   this->setEtaBins(etaBins);
 
   std::map<TString,int> ptBins;
-  ptBins["pt_0to40"] = 40; 
-  ptBins["pt_40to80"] = 80; 
-  ptBins["pt_80to120"] = 120; 
-  ptBins["pt_120to160"] = 160; 
-  ptBins["pt_160to200"] = 200; 
-  ptBins["pt_200to240"] = 240; 
-  ptBins["pt_above240"] = 999; 
+  ptBins["pt_0to20"] = 20; 
+  ptBins["pt_20to40"] = 40; 
+  ptBins["pt_40to60"] = 60; 
+  ptBins["pt_60to80"] = 80; 
+  ptBins["pt_80to100"] = 100; 
+  ptBins["pt_100to120"] = 120; 
+  ptBins["pt_120to140"] = 140; 
+  ptBins["pt_140to160"] = 160; 
+  ptBins["pt_160to180"] = 180; 
+  ptBins["pt_180to200"] = 200; 
   this->setPtBins(ptBins);
 
   std::map<TString, int> nintBins;
@@ -1105,7 +1051,6 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   std::vector<jJet> L1_4300_jJet = getL1Jets(myarray, 4, 3, 0, 0);
   std::vector<jJet> L1_4350_jJet = getL1Jets(myarray, 4, 3, 5, 0);
   std::vector<jJet> L1_4400_jJet = getL1Jets(myarray, 4, 4, 0, 0);
-  std::vector<jJet> L1_rect_jJet = getL1Jets(myarray, 4, 4,4,4, 0, 0);
   std::vector<jJet> L1_4300donut_jJet;
   std::vector<jJet> L1_4350donut_jJet;
   std::map<TString, std::vector<jJet> > L1_jJet_map;
@@ -1114,17 +1059,71 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
   std::vector<jJet> L1_5450_jJet = getL1Jets(myarray, 5, 4 , 5, 0);
 
-  
-  
+
+
   for(std::vector<jJet>::const_iterator L1_5450=L1_5450_jJet.begin(); L1_5450!=L1_5450_jJet.end(); L1_5450++){
     for(std::map<TString,int>::const_iterator nintIt = nintBins_.begin(); nintIt!=nintBins_.end(); nintIt++){
       if(mNPV<nintIt->second && mNPV>nintIt->second-5){
-        pusHists2d_[nintIt->first+"_ring0_total"]->Fill(L1_5450->ringSums().at(0),L1_5450->pt());
-        pusHists2d_[nintIt->first+"_ring1_ring0"]->Fill(L1_5450->ringSums().at(1),L1_5450->ringSums().at(0));
-        pusHists2d_[nintIt->first+"_ring2_ring1"]->Fill(L1_5450->ringSums().at(2),L1_5450->ringSums().at(1));
-        pusHists2d_[nintIt->first+"_ring3_ring2"]->Fill(L1_5450->ringSums().at(3),L1_5450->ringSums().at(2));
-        pusHists2d_[nintIt->first+"_ring4_ring3"]->Fill(L1_5450->ringSums().at(4),L1_5450->ringSums().at(3));
-        pusHists2d_[nintIt->first+"_ring5_ring4"]->Fill(L1_5450->ringSums().at(5),L1_5450->ringSums().at(4));
+
+        //Check only isolated jets
+        jJet thisjet = *L1_5450;
+        //Get bottom 3 of the outer ring
+        double out1_bottom3 = thisjet.getOuterStrips()[0]+thisjet.getOuterStrips()[1]+thisjet.getOuterStrips()[2];
+        double out1_bottom2 = thisjet.getOuterStrips()[0]+thisjet.getOuterStrips()[1];
+
+        pusHists2d_[nintIt->first+"_ring0_total_4"]->Fill((double)L1_5450->ringSums().at(0)/L1_5450->ringAreas().at(0),L1_5450->pt());
+        pusHists2d_[nintIt->first+"_ring1_total_4"]->Fill((double)L1_5450->ringSums().at(1)/L1_5450->ringAreas().at(1),L1_5450->pt());
+        pusHists2d_[nintIt->first+"_ring2_total_4"]->Fill((double)L1_5450->ringSums().at(2)/L1_5450->ringAreas().at(2),L1_5450->pt());
+        pusHists2d_[nintIt->first+"_ring3_total_4"]->Fill((double)L1_5450->ringSums().at(3)/L1_5450->ringAreas().at(3),L1_5450->pt());
+        pusHists2d_[nintIt->first+"_ring4_total_4"]->Fill((double)L1_5450->ringSums().at(4)/L1_5450->ringAreas().at(4),L1_5450->pt());
+        pusHists2d_[nintIt->first+"_ring5_total_4"]->Fill((double)L1_5450->getOuterSum()/L1_5450->ringAreas().at(5),L1_5450->pt());
+        pusHists2d_[nintIt->first+"_donut_total_4"]->Fill((double)thisjet.PUE()/18.0,L1_5450->pt());
+        pusHists2d_[nintIt->first+"_subtract_total_4"]->Fill((double)thisjet.PUE()*4.5,L1_5450->pt());
+        pusHists2d_[nintIt->first+"_out1_bottom3_total_4"]->Fill((double)out1_bottom3*3.0,L1_5450->pt());
+        pusHists2d_[nintIt->first+"_out1_bottom2_total_4"]->Fill((double)out1_bottom2*4.5,L1_5450->pt());
+        if( !(thisjet.isolatedJet(L1_5450_jJet,81))) continue;
+        pusHists2d_[nintIt->first+"_ring0_total_4iso"]->Fill((double)L1_5450->ringSums().at(0)/L1_5450->ringAreas().at(0),L1_5450->pt());
+        pusHists2d_[nintIt->first+"_ring1_total_4iso"]->Fill((double)L1_5450->ringSums().at(1)/L1_5450->ringAreas().at(1),L1_5450->pt());
+        pusHists2d_[nintIt->first+"_ring2_total_4iso"]->Fill((double)L1_5450->ringSums().at(2)/L1_5450->ringAreas().at(2),L1_5450->pt());
+        pusHists2d_[nintIt->first+"_ring3_total_4iso"]->Fill((double)L1_5450->ringSums().at(3)/L1_5450->ringAreas().at(3),L1_5450->pt());
+        pusHists2d_[nintIt->first+"_ring4_total_4iso"]->Fill((double)L1_5450->ringSums().at(4)/L1_5450->ringAreas().at(4),L1_5450->pt());
+        pusHists2d_[nintIt->first+"_ring5_total_4iso"]->Fill((double)L1_5450->getOuterSum()/L1_5450->ringAreas().at(5),L1_5450->pt());
+        pusHists2d_[nintIt->first+"_donut_total_4iso"]->Fill((double)thisjet.PUE()/18.0,L1_5450->pt());
+        pusHists2d_[nintIt->first+"_subtract_total_4iso"]->Fill((double)thisjet.PUE()*4.5,L1_5450->pt());
+        pusHists2d_[nintIt->first+"_out1_bottom3_total_4iso"]->Fill((double)out1_bottom3*3.0,L1_5450->pt());
+        pusHists2d_[nintIt->first+"_out1_bottom2_total_4iso"]->Fill((double)out1_bottom2*4.5,L1_5450->pt());
+      }
+    }
+  }
+
+  for(std::vector<jJet>::const_iterator L1_5450=L1_4300_jJet.begin(); L1_5450!=L1_4300_jJet.end(); L1_5450++){
+    for(std::map<TString,int>::const_iterator nintIt = nintBins_.begin(); nintIt!=nintBins_.end(); nintIt++){
+      if(mNPV<nintIt->second && mNPV>nintIt->second-5){
+
+        //Check only isolated jets
+        jJet thisjet = *L1_5450;
+        double out1_bottom3 = thisjet.getOuterStrips()[0]+thisjet.getOuterStrips()[1]+thisjet.getOuterStrips()[2];
+        double out1_bottom2 = thisjet.getOuterStrips()[0]+thisjet.getOuterStrips()[1];
+
+        pusHists2d_[nintIt->first+"_ring0_total_3"]->Fill((double)L1_5450->ringSums().at(0)/L1_5450->ringAreas().at(0),L1_5450->pt());
+        pusHists2d_[nintIt->first+"_ring1_total_3"]->Fill((double)L1_5450->ringSums().at(1)/L1_5450->ringAreas().at(1),L1_5450->pt());
+        pusHists2d_[nintIt->first+"_ring2_total_3"]->Fill((double)L1_5450->ringSums().at(2)/L1_5450->ringAreas().at(2),L1_5450->pt());
+        pusHists2d_[nintIt->first+"_ring3_total_3"]->Fill((double)L1_5450->ringSums().at(3)/L1_5450->ringAreas().at(3),L1_5450->pt());
+        pusHists2d_[nintIt->first+"_ring4_total_3"]->Fill((double)L1_5450->getOuterSum()/L1_5450->ringAreas().at(4),L1_5450->pt());
+        pusHists2d_[nintIt->first+"_donut_total_3"]->Fill((double)thisjet.PUE()/14.0,L1_5450->pt());
+        pusHists2d_[nintIt->first+"_subtract_total_3"]->Fill((double)thisjet.PUE()*3.5,L1_5450->pt());
+        pusHists2d_[nintIt->first+"_out1_bottom3_total_3"]->Fill((double)out1_bottom3*2.333,L1_5450->pt());
+        pusHists2d_[nintIt->first+"_out1_bottom2_total_3"]->Fill((double)out1_bottom2*3.5,L1_5450->pt());
+        if( !(thisjet.isolatedJet(L1_5450_jJet,81))) continue;
+        pusHists2d_[nintIt->first+"_ring0_total_3iso"]->Fill((double)L1_5450->ringSums().at(0)/L1_5450->ringAreas().at(0),L1_5450->pt());
+        pusHists2d_[nintIt->first+"_ring1_total_3iso"]->Fill((double)L1_5450->ringSums().at(1)/L1_5450->ringAreas().at(1),L1_5450->pt());
+        pusHists2d_[nintIt->first+"_ring2_total_3iso"]->Fill((double)L1_5450->ringSums().at(2)/L1_5450->ringAreas().at(2),L1_5450->pt());
+        pusHists2d_[nintIt->first+"_ring3_total_3iso"]->Fill((double)L1_5450->ringSums().at(3)/L1_5450->ringAreas().at(3),L1_5450->pt());
+        pusHists2d_[nintIt->first+"_ring4_total_3iso"]->Fill((double)L1_5450->getOuterSum()/L1_5450->ringAreas().at(4),L1_5450->pt());
+        pusHists2d_[nintIt->first+"_donut_total_3iso"]->Fill((double)thisjet.PUE()/14.0,L1_5450->pt());
+        pusHists2d_[nintIt->first+"_subtract_total_3iso"]->Fill((double)thisjet.PUE()*3.5,L1_5450->pt());
+        pusHists2d_[nintIt->first+"_out1_bottom3_total_3iso"]->Fill((double)out1_bottom3*2.333,L1_5450->pt());
+        pusHists2d_[nintIt->first+"_out1_bottom2_total_3iso"]->Fill((double)out1_bottom2*3.5,L1_5450->pt());
       }
     }
   }
@@ -1132,8 +1131,8 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 #ifdef PUS_HISTS
   //Fill the map with the sizes
   for(std::vector<TString>::const_iterator l1SIt=l1Sizes_.begin(); l1SIt!=l1Sizes_.end(); l1SIt++){
-    L1_jJet_map[*l1SIt+"_out1"] = getL1Jets(myarray, atoi(l1SIt->Data())+1,atoi(l1SIt->Data()),0,0);
-    L1_jJet_map[*l1SIt+"_out2"] = getL1Jets(myarray, atoi(l1SIt->Data())+2,atoi(l1SIt->Data()),0,0);
+    L1_jJet_map[*l1SIt+"_out1"] = getL1Jets(myarray, atoi(l1SIt->Data())+1,atoi(l1SIt->Data()),5,0);
+    L1_jJet_map[*l1SIt+"_out2"] = getL1Jets(myarray, atoi(l1SIt->Data())+2,atoi(l1SIt->Data()),5,0);
   }
 
 
@@ -1153,7 +1152,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   }
 
   //Only do it for well separated jets?
-  bool isolatedOnly = true;
+  bool isolatedOnly = false;
   double dR2Max=49.0;
 
   //Fill the all jets hists
@@ -1173,7 +1172,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
           continue; 
         for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
 
-          if(L1_jJet_map[*l1SIt+"_out1"][i].pt() > ptBinIt->second || L1_jJet_map[*l1SIt+"_out1"][i].pt() < ptBinIt->second-40)
+          if(L1_jJet_map[*l1SIt+"_out1"][i].pt() > ptBinIt->second || L1_jJet_map[*l1SIt+"_out1"][i].pt() < ptBinIt->second-20)
             continue; 
 
           pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip1"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0]);
@@ -1203,7 +1202,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
           continue; 
         for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
 
-          if(L1_jJet_map[*l1SIt+"_out2"][i].pt() > ptBinIt->second || L1_jJet_map[*l1SIt+"_out2"][i].pt() < ptBinIt->second-40)
+          if(L1_jJet_map[*l1SIt+"_out2"][i].pt() > ptBinIt->second || L1_jJet_map[*l1SIt+"_out2"][i].pt() < ptBinIt->second-20)
             continue; 
 
           pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip5"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0]);
@@ -1243,7 +1242,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
             continue; 
           for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
 
-            if(L1_jJet_map[*l1SIt+"_out1"][i].pt() > ptBinIt->second || L1_jJet_map[*l1SIt+"_out1"][i].pt() < ptBinIt->second-40)
+            if(L1_jJet_map[*l1SIt+"_out1"][i].pt() > ptBinIt->second || L1_jJet_map[*l1SIt+"_out1"][i].pt() < ptBinIt->second-20)
               continue; 
 
             pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip1"]->Fill(
@@ -1294,7 +1293,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
             continue; 
           for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
 
-            if(L1_jJet_map[*l1SIt+"_out1"][i].pt() > ptBinIt->second || L1_jJet_map[*l1SIt+"_out1"][i].pt() < ptBinIt->second-40)
+            if(L1_jJet_map[*l1SIt+"_out1"][i].pt() > ptBinIt->second || L1_jJet_map[*l1SIt+"_out1"][i].pt() < ptBinIt->second-20)
               continue; 
 
             pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip5"]->Fill(

@@ -1,5 +1,0 @@
-import ROOT as r
-
-file = r.TFile("histograms-ttbar_13TeV_PU40_25ns_test_skimmed_v2.root", "READ")
-
-hist = file.Get("")

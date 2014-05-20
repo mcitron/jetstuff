@@ -73,6 +73,26 @@ std::vector<pair_info> make_pairs(const std::vector<jJet> & gen_vec, const std::
 
 }
 
+std::vector<pair_info> make_gct_pairs(L1GctJetCandCollection & gct_vec, const std::vector<jJet> & gen_vec) {
+
+  std::vector<pair_info> pinfo;
+  TriggerTowerGeometry g;
+
+  for(unsigned int i=0; i<gct_vec.size(); i++) {
+    for(unsigned int j=0; j<gen_vec.size(); j++) {
+      if( gct_vec.at(i).bx() == 0) {
+
+        int dEta = gct_vec.at(i).regionId().ieta() - g.gct_iEta(gen_vec.at(j).iEta()); 
+        int dPhi = gct_vec.at(i).regionId().iphi() - g.gct_iPhi(gen_vec.at(j).iPhi()); 
+        int deltaR2 = dEta*dEta+dPhi*dPhi;
+        pinfo.push_back(pair_info(i,j, deltaR2));
+      }
+    }
+  }
+  return pinfo;
+}
+
+
 //std::string get_flavour(int gen_index) {
 //  //return "cheese and onion"; //obviously, this bit of code looks up the gen index and returns corresponding flavour
 //  //temporary - it just returns index as string:
@@ -136,45 +156,45 @@ std::vector<int> analyse_pairs_local(std::vector<pair_info> & pairs, int reco_si
 }
 
 /*
-int main(void) {
+   int main(void) {
 
-  TLorentzVector gen_a(1.0, 2.0, 3.0, 4.0);
-  TLorentzVector gen_b(5.0, 6.0, 7.0, 8.0);
-  TLorentzVector gen_c(9.0, 10.0, 11.0, 12.0);
+   TLorentzVector gen_a(1.0, 2.0, 3.0, 4.0);
+   TLorentzVector gen_b(5.0, 6.0, 7.0, 8.0);
+   TLorentzVector gen_c(9.0, 10.0, 11.0, 12.0);
 
-  std::vector<TLorentzVector> gen_vec;
-  gen_vec.push_back(gen_a);
-  gen_vec.push_back(gen_b);
-  gen_vec.push_back(gen_c);
+   std::vector<TLorentzVector> gen_vec;
+   gen_vec.push_back(gen_a);
+   gen_vec.push_back(gen_b);
+   gen_vec.push_back(gen_c);
 
-  TLorentzVector reco_a(1.1, 2.1, 3.1, 4.0);
-  TLorentzVector reco_b(5.1, 6.1, 7.1, 8.0);
-  TLorentzVector reco_c(9.1, 10.1, 11.1, 12.0);
-  TLorentzVector reco_d(9.0, 10.0, 11.0, 12.0);
+   TLorentzVector reco_a(1.1, 2.1, 3.1, 4.0);
+   TLorentzVector reco_b(5.1, 6.1, 7.1, 8.0);
+   TLorentzVector reco_c(9.1, 10.1, 11.1, 12.0);
+   TLorentzVector reco_d(9.0, 10.0, 11.0, 12.0);
 
-  std::vector<TLorentzVector> reco_vec;
-  reco_vec.push_back(reco_a);
-  reco_vec.push_back(reco_b);
-  reco_vec.push_back(reco_c);
-  reco_vec.push_back(reco_d);
+   std::vector<TLorentzVector> reco_vec;
+   reco_vec.push_back(reco_a);
+   reco_vec.push_back(reco_b);
+   reco_vec.push_back(reco_c);
+   reco_vec.push_back(reco_d);
 
-  std::vector<pair_info> pairs = make_pairs(gen_vec, reco_vec);
+   std::vector<pair_info> pairs = make_pairs(gen_vec, reco_vec);
 
-  std::sort(pairs.begin(), pairs.end(), sortDR);
+   std::sort(pairs.begin(), pairs.end(), sortDR);
 
-  for(unsigned int i=0; i<pairs.size(); i++) {
-    pairs[i].Print();
-  }
+   for(unsigned int i=0; i<pairs.size(); i++) {
+   pairs[i].Print();
+   }
 
-  std::vector<std::string> reco_matched_index = analyse_pairs(pairs, reco_vec.size(), 0.5);
+   std::vector<std::string> reco_matched_index = analyse_pairs(pairs, reco_vec.size(), 0.5);
 
-  for(unsigned int i=0; i<reco_matched_index.size(); i++) {
-    std::cout << "reco jet with index " << i << " is matched to flavour: " << reco_matched_index[i] << std::endl;
-  }
+   for(unsigned int i=0; i<reco_matched_index.size(); i++) {
+   std::cout << "reco jet with index " << i << " is matched to flavour: " << reco_matched_index[i] << std::endl;
+   }
 
 
-  return 0;
+   return 0;
 
-}
-*/
+   }
+   */
 #endif
