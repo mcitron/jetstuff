@@ -42,7 +42,7 @@ double calibFit( Double_t *v, Double_t *par ){
 // recalibrateGraph( f, "/vols/cms04/mb1512/Batch/2014-02-03_SingleMu_12Dec_11x11/", CMSSW, 0, 200, "/JetHist/Calibration/Calibration_CalibPrePUS_ak5PUS/EtaBinned/", "Eta_-2.500_to_-2.172/Recalib/Calibration_CalibPrePUS_ak5PUS_JetResponse_vs_L1PT_Eta_-2.500_to_-2.172_prof")
 
 
-
+/*
 void recalibrateGraph(TFile *file, TString directory, TString &outputLowPt, TString &outputHighPt, TString &outputNVTXResponse,
 		      double calibFitMin    = 0, 
 		      double calibFitMiddle = 45,
@@ -171,7 +171,7 @@ void recalibrateGraph(TFile *file, TString directory, TString &outputLowPt, TStr
   }
 
 }
-
+*/
 
 // TFile *f = new TFile("/home/hep/mb1512/public_html/plots/07_02_14/Calibration_PrePUS_ak5PUS.root","OPEN");
 // TString outputStr; 
@@ -491,7 +491,7 @@ int calibrateFile(TString ROOTFile,  double calibFitMin = 0, double calibFitMax 
 
 // recalibrateFile( "/vols/cms04/mb1512/Batch/2014-02-03_SingleMu_12Dec_11x11/SingleMu_12Dec_11x11.root" );
 // recalibrateFile( "/vols/cms04/mb1512/Batch/2014-02-07_SingleMu_12Dec_11x11/SingleMu_12Dec_11x11.root", "Calibration_CalibPUS_ak5PUS" )
-
+/*
 
 int recalibrateFile( TString ROOTFile, TString jetCollection = "Calibration_CalibPrePUS_ak5PUS", double transitionPt = 45, bool NVTXCorrection = false ){
 
@@ -559,7 +559,6 @@ int recalibrateFile( TString ROOTFile, TString jetCollection = "Calibration_Cali
 
 
 
-
   // Write low-pT LUT  
   std::ofstream iWriteLowPt (directory + jetCollection + "LowPt.LUT", std::ofstream::out);
   iWriteLowPt << outputLowPt;
@@ -589,6 +588,7 @@ int recalibrateFile( TString ROOTFile, TString jetCollection = "Calibration_Cali
   return 0;
 }
 
+*/
 
 
 

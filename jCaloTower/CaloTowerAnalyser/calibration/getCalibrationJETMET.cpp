@@ -6,6 +6,9 @@
 // Changed the type of error plotted from RMS to error on fit
 //
 // Line 1452 bodged it to ignor the irrelevant hists
+// 
+// Tentative change L330, appears not to seg fault so far ...
+//
 
 #include <TFile.h>
 #include <TF1.h>
@@ -52,16 +55,16 @@ WILL ENABLE PU-PU COMPARISONS!!! AND REDUCE WAITING TIMES BETWEEN PROCESSING PLO
 
 /// default fit with gaussian in niter iteration of mean 
 void fit_gaussian(TH1D*& hrsp,
-                  const double nsigma,
-                  const double fitMin,
-                  const int niter);
+    const double nsigma,
+    const double fitMin,
+    const int niter);
 
 void adjust_fitrange(TH1* h,double& min,double& max);
 
-template <class T> 
+  template <class T> 
 bool from_string(T& t, 
-                 const std::string& s, 
-                 std::ios_base& (*f)(std::ios_base&)) 
+    const std::string& s, 
+    std::ios_base& (*f)(std::ios_base&)) 
 { 
   std::istringstream iss(s); 
   return !(iss >> f >> t).fail();
@@ -75,9 +78,6 @@ bool from_string(T& t,
 
 //
 
-//#define TPROFILE
-//#define ANALYSE_TH1
-#define ANALYSE_TH2
 
 // Switch on whether to fit the L1 pt vs inverse response curve
 //#define FITTING
@@ -101,14 +101,14 @@ double CrystalBall(double* x, double* par){
   else {
     A = pow((n/alpha),n)*exp->Eval((-1)*alpha*alpha/2);
     B = n/alpha - alpha;}
-  double f;
-  if ((xcur-mu)/sigma > (-1)*alpha)
-    f = N*exp->Eval((-1)*(xcur-mu)*(xcur-mu)/
-		    (2*sigma*sigma));
-  else
-    f = N*A*pow((B- (xcur-mu)/sigma),(-1*n));
-  delete exp;
-  return f;
+    double f;
+    if ((xcur-mu)/sigma > (-1)*alpha)
+      f = N*exp->Eval((-1)*(xcur-mu)*(xcur-mu)/
+          (2*sigma*sigma));
+    else
+      f = N*A*pow((B- (xcur-mu)/sigma),(-1*n));
+    delete exp;
+    return f;
 }
 
 
@@ -116,12 +116,12 @@ double CrystalBall(double* x, double* par){
 
 // Structure for containing calibration data from fits
 struct calibData{
-  
+
   calibData(int _iEta, std::vector<double> _p):iEta(_iEta), p(_p){}
 
   int iEta;                // iEta bin
   std::vector<double> p;   // polynomial value, index = order
-  
+
 };
 
 
@@ -130,7 +130,7 @@ struct calibData{
 
 // Print histograms
 #define PRINT_HIST
- 
+
 
 #ifdef VERBOSE
 #    define PRINT(outputStr) std::cout << "\n************************************************************\n" << "Making: " << (outputStr) << "\n" << "************************************************************\n\n";
@@ -167,54 +167,7 @@ double ptStep = 5;
 //=======================
 
 
-// Mk2
-//##############################
-
-//TString filename = "/home/hep/mb1512/JetAnalyser/CMSSW_6_0_1_PostLS1v2_patch4/src/SingleMu_05Oct_Mk2_SMALL.root";
-//TString filename = "/vols/cms04/mb1512/Batch/2013-10-24_SingleMu_05Oct/SingleMu_05Oct.root";
-//TString filename = "/vols/cms04/mb1512/Batch/2013-10-28_SingleMu_18Oct_9x9/SingleMu_18Oct_9x9.root";
-// TString filename = "/vols/cms04/mb1512/Batch/2013-10-28_SingleMu_18Oct_11x11/SingleMu_18Oct_11x11.root";
-// TString filename = "/vols/cms04/mb1512/Batch/2013-10-28_SingleMu_18Oct_13x13/SingleMu_18Oct_13x13.root";
-// TString filename = "/vols/cms04/mb1512/Batch/2013-10-28_SingleMu_18Oct_15x15/SingleMu_18Oct_15x15.root";
-
-// NEW FILES
-//TString filename = "/vols/cms04/mb1512/Batch/2013-11-04_SingleMu_18Oct_11x11/SingleMu_18Oct_11x11.root";
-//TString filename = "/vols/cms04/mb1512/Batch/2013-11-08_SingleMu_18Oct_11x11_rev_4/SingleMu_18Oct_11x11.root";
-//TString filename = "/vols/cms04/mb1512/Batch/2013-11-14_SingleMu_18Oct_11x11/SingleMu_18Oct_11x11.root";
-
-// dR = 0.3, lead jet matching
-//TString filename = "/vols/cms04/mb1512/Batch/2013-11-19_SingleMu_18Oct_11x11_rev_1/SingleMu_18Oct_11x11.root";
-// dR = 0.3, 2 jet matching
-//TString filename = "/vols/cms04/mb1512/Batch/2013-11-19_SingleMu_18Oct_11x11_rev_2/SingleMu_18Oct_11x11.root";
-// dR = 0.3, all jet matching
-//TString filename = "/vols/cms04/mb1512/Batch/2013-11-19_SingleMu_18Oct_11x11_rev_6/SingleMu_18Oct_11x11.root";
-
-// dR = 0.3, NVTX binned
-//TString filename = "/vols/cms04/mb1512/Batch/2013-11-20_SingleMu_18Oct_11x11_rev_1/SingleMu_18Oct_11x11.root";
-//TString filename = "/vols/cms04/mb1512/Batch/2014-01-24_SingleMu_12Dec_11x11/SingleMu_12Dec_11x11.root";
-//TString filename = "/vols/cms04/mb1512/Batch/2014-01-25_SingleMu_12Dec_11x11_rev_1/SingleMu_12Dec_11x11.root";
-//TString filename = "/vols/cms04/mb1512/Batch/2014-02-03_SingleMu_12Dec_11x11_rev_1/SingleMu_12Dec_11x11.root";
-//TString filename = "/vols/cms04/mb1512/Batch/2014-02-06_SingleMu_12Dec_11x11_rev_4/SingleMu_12Dec_11x11.root";
-
-// Full-TT granularity
-//TString filename = "/vols/cms04/mb1512/Batch/2014-02-12_SingleMu_12Dec_11x11/SingleMu_12Dec_11x11.root";
-
-// 5 GeV GCT seed region
-//TString filename = "/vols/cms04/mb1512/Batch/2014-02-13_SingleMu_12Dec_11x11_rev_1/SingleMu_12Dec_11x11.root";
-// pT -> pT/2 fix
-//
-//TString filename = "/vols/cms04/mb1512/Batch/2014-02-17_SingleMu_12Dec_11x11/SingleMu_12Dec_11x11.root";
-// Uncalib GCT jets
-//TString filename = "/vols/cms04/mb1512/Batch/2014-02-23_SingleMu_20Feb_11x11_rev_3/SingleMu_20Feb_11x11.root";
-// Threshold fixed jets
-//TString filename = "/vols/cms04/mb1512/Batch/2014-02-27_SingleMu_26Feb_11x11/SingleMu_26Feb_11x11.root";
-
-//TString filename = "/vols/cms04/mb1512/Batch/2014-03-03_SingleMu_26Feb_11x11/SingleMu_26Feb_11x11.root";
-
-
-// Phase 2
-TString filename = "/vols/cms02/ace09/ntuples/trigger/jets/upgd13d/CalibrationMay014/OutputJetsQcd_ak4.root";
-//TString filename = "/vols/cms02/ace09/ntuples/trigger/jets/upgd13d/CalibrationMar014/OutputJetsQcdDr0p5Pt5PUS.root";
+TString filename = "calibration_test_output.root";
 
 
 // Directory inside ROOT file
@@ -222,7 +175,7 @@ TString filename = "/vols/cms02/ace09/ntuples/trigger/jets/upgd13d/CalibrationMa
 TString ROOTdir  = "";
 // Directory to store plots
 //  TString plotDirectory = "plots/Mk1Release/Presentation/8x8_PreFix/";
-TString plotDirectory = "/vols/cms02/ace09/trigger/jets/upgrade_140pu/CMSSW_6_2_2/src/AnalyseUpgradeJets/CalibrateQcd/16May014final_20to200bin10";
+TString plotDirectory = "test";
 
 
 
@@ -242,7 +195,7 @@ std::vector < std::pair <TString, TString> > getROOTDirs(TFile* f, TString rootD
 Bool_t map1DKeyExists(std::map <TString,TH1*> hist1D, TString histogram){
   /*  std::map <TString,TH1*>::const_iterator it = hist1D.find(histogram);
       return it! = hist1D.end();
-  */
+      */
   return !(hist1D.find(histogram) == hist1D.end());
 }
 
@@ -250,11 +203,6 @@ Bool_t map1DKeyExists(std::map <TString,TH1*> hist1D, TString histogram){
 Bool_t dirExists(TString dir);
 void makeFullDir(TString baseDir, TString dir);
 void makeDirectory(TString& directoryName);
-
-
-
-
-
 
 
 
@@ -281,7 +229,7 @@ int getCalibration(){
 
   // list of histogram names in ROOT file with their corresponding directory structure
   std::vector < std::pair <TString, TString> > fileHistPair;
- 
+
   // storage containers for histograms of various dimensions and their storage directory
   std::map <TString,TH1*> histogram1D;
   std::map <TString,TH2*> histogram2D;
@@ -306,7 +254,7 @@ int getCalibration(){
     std::cout << "\nERROR: File '" << filename << "' does not exist\n\n";
     exit(-1);
   }
-  
+
 
 
 
@@ -326,9 +274,6 @@ int getCalibration(){
     // *                                                            TH2                                                            *
     // *****************************************************************************************************************************
 
-#ifdef ANALYSE_TH2
-
-
     //=========================
     // 2D Histograms
     //=========================
@@ -336,52 +281,21 @@ int getCalibration(){
       // get list of histograms in file
       fileHistPair = getROOTobjects(f, ROOTdir, "TH2");
 
-    std::cout << "Got here\n";
 
     // Subdirectories to run calibrations over
     std::vector<TString> subDirs;
-//     subDirs.push_back( "/Calibration_PrePUS_ak5PUS_NVTXLt15/" );
-//     subDirs.push_back( "/Calibration_PrePUS_ak5PUS_NVTXLt25/" );
-//     subDirs.push_back( "/Calibration_PrePUS_ak5PUS_NVTXLt50/" );
 
     // ak5PUSRaw vs ak5PUS
-    //    subDirs.push_back( "/Calibration_ak5PUSRaw_ak5PUS/" );
 
-    subDirs.push_back( "/Calibration_PrePUS_ak5PUS_3Jets/" );
-    subDirs.push_back( "/Calibration_PUS_ak5PUS_3Jets/" );
-    subDirs.push_back( "/Calibration_LPUS_ak5PUS_3Jets/" );
-    subDirs.push_back( "/Calibration_PrePUS_ak5PUS_AllJets/" );
-    subDirs.push_back( "/Calibration_PUS_ak5PUS_AllJets/" );
-    subDirs.push_back( "/Calibration_LPUS_ak5PUS_AllJets/" );
-
-    //    subDirs.push_back( "/Calibration_PrePUS_ak5PUS_EtaLt3/" );
-    //  subDirs.push_back( "/Calibration_PUS_ak5PUS/" );
-    //  subDirs.push_back( "/Calibration_LPUS_ak5PUS/" );
+    subDirs.push_back( "/5400_donut_gen/" );
+    //subDirs.push_back( "/Calibration_LPUS_ak5PUS_AllJets/" );
 
     //	   subDirs.push_back( "/Calibration_UncalibCurr_ak5PUS/" );     
 
 
     std::map <TString, TString> typeLabel;
-    typeLabel[ "/Calibration_ak5PUSRaw_ak5PUS/" ] = "ak5PUSRaw";
-
-    typeLabel[ "/Calibration_PrePUS_ak5PUS_NVTXLt15/" ] = "PrePUS_NVTXLt15";
-    typeLabel[ "/Calibration_PrePUS_ak5PUS_NVTXLt25/" ] = "PrePUS_NVTXLt25";
-    typeLabel[ "/Calibration_PrePUS_ak5PUS_NVTXLt50/" ] = "PrePUS_NVTXLt50";
-
-    typeLabel["/Calibration_PrePUS_ak5PUS/"]        = "PrePUS";
-    typeLabel["/Calibration_PrePUS_ak5PUS_EtaLt3/"] = "PrePUSLt3";
-    typeLabel["/Calibration_PUS_ak5PUS/"]           = "PUS";
-    typeLabel["/Calibration_LPUS_ak5PUS/"]          = "LPUS";
-
-    typeLabel["/Calibration_UncalibCurr_ak5PUS/"]   = "UncalibGCT";
-
-
-    typeLabel[ "/Calibration_PrePUS_ak5PUS_3Jets/" ] = "PrePUS_3Jets";
-    typeLabel[ "/Calibration_PUS_ak5PUS_3Jets/" ] = "PUS_3Jets";
-    typeLabel[ "/Calibration_LPUS_ak5PUS_3Jets/" ] = "LPUS_3Jets";
-    typeLabel[ "/Calibration_PrePUS_ak5PUS_AllJets/" ] = "PrePUS_AllJets";
-    typeLabel[ "/Calibration_PUS_ak5PUS_AllJets/" ] = "PUS_AllJets";
-    typeLabel[ "/Calibration_LPUS_ak5PUS_AllJets/" ] = "LPUS_AllJets";
+    typeLabel[ "/5400_donut_gen/" ] = "5400_donut_4Jets";
+    //typeLabel[ "/Calibration_LPUS_ak5PUS_AllJets/" ] = "LPUS_AllJets";
 
 
     // Check labels are defined for each sample analysed
@@ -391,16 +305,17 @@ int getCalibration(){
       TString subDir = subDirs[ iSub ];
       std::map<TString, TString>::iterator labelIt = typeLabel.find( subDir );
       if ( labelIt == typeLabel.end() ){
-	std::cout << "ERROR: No label was defined for subdir '" << subDir << "'\n\n"; 
-	exit(1);
+        std::cout << "ERROR: No label was defined for subdir '" << subDir << "'\n\n"; 
+        exit(1);
       }
-      
+
     }
 
 
     // eta binning, key = lowerBin, value = binning range string. Used to obtain an eta ordered list of etabins
     std::map< double, TString > etaBins;
 
+    std::cout << "Got here 1\n";
     for ( unsigned int iSub = 0; iSub < subDirs.size(); ++iSub ){
 
       // Get the current subdirectory to process
@@ -409,69 +324,72 @@ int getCalibration(){
 
       for (unsigned int i = 0;i < fileHistPair.size(); i++){
 
-	// Extract the directory and name of the histogram
-	filepathRaw      = fileHistPair[i].first;
-	histogramNameRaw = fileHistPair[i].second;
+        // Extract the directory and name of the histogram
+        filepathRaw      = fileHistPair[i].first;
+        histogramNameRaw = fileHistPair[i].second;
 
-	// pdf compatible filenames
-	histogramName    = histogramNameRaw;
-	filepath         = filepathRaw;
+        // pdf compatible filenames
+        // TENATATIVELY CHANGE THIS, APPEARS TO STILL WORK
+        histogramName    = typeLabel[subDirs[iSub]]+histogramNameRaw;
+        //
+        filepath         = filepathRaw;
 
-	// Find the directory with the calibration plots, currently e.g. : /JetHist/Calibration/Calibration_PrePUS_akPUS/iEtaBinned/iEta_-28to-25
-	if (filepath.Contains("Calibration_") != 0){
-	  // Only load the EtaBinned distributions
-    if (filepath.Contains("EtaBinned") != 0){
-      //	  if (filepath.Contains("iEtaBinned") != 0){
+        // Find the directory with the calibration plots, currently e.g. : /JetHist/Calibration/Calibration_PrePUS_akPUS/iEtaBinned/iEta_-28to-25
+        if (filepath.Contains("calibration") != 0){
+          // Only load the EtaBinned distributions
+          //if (filepath.Contains("EtaBinned") != 0)
+          //	  if (filepath.Contains("iEtaBinned") != 0)
 
-      // Restrict to current subdirectory
-      if ( filepath.Contains( curSubDir ) != 0 ){
-        // TEMPORARY TO SPEED UP DEVELOPMENT RESTRICT TO RELEVENT COLLECTIONS
-        //	if ( (filepath.Contains("_PrePUS_") != 0) || (filepath.Contains("_PUS_") != 0) || (filepath.Contains("_LPUS_") != 0) ){
-        // Do not load NVTX binned distributions
-        if (filepath.Contains("NVTXBinned") == 0){
-
-
-          // Restrict to calibration plots
-          if ( ( histogramName.Contains("JetResponse_vs_OffPT") != 0 ) || ( histogramName.Contains("L1PT_vs_OffPT") != 0 ) ) {
-
-            histogramName.ReplaceAll("(","{").ReplaceAll(")","}"); // Replace brackets to allow pdf printing
-            filepath.ReplaceAll("(","{").ReplaceAll(")","}");
-
-            //	      std::cout << "NEW = " << filepath << "\t" << histogramName << "\n";
-
-            // store histogram and its storage directory
-            histogram2D[ histogramName ]        = (TH2*)f->Get(filepathRaw + "/" + histogramNameRaw)->Clone();
-            histogramDirectory[ histogramName ] = filepath;
-
-            // Ensure a directory is created to store the histogram
-            makeFullDir( plotDirectory, filepath );
-
-            // change name to avoid memory conflicts
-            histogram2D[ histogramName ] ->SetName(histogramName);
+          // Restrict to current subdirectory
+          if ( filepath.Contains( curSubDir ) != 0 ){
+            // TEMPORARY TO SPEED UP DEVELOPMENT RESTRICT TO RELEVENT COLLECTIONS
+            //	if ( (filepath.Contains("_PrePUS_") != 0) || (filepath.Contains("_PUS_") != 0) || (filepath.Contains("_LPUS_") != 0) )
+            // Do not load NVTX binned distributions
+            //if (filepath.Contains("NVTXBinned") == 0)
 
 
+              // Restrict to calibration plots
+              if ( ( histogramName.Contains("ratio_iEta") != 0 ) || ( histogramName.Contains("corr_iEta") != 0 ) ) {
 
-            // Get Eta label
-            TString EtaStr = histogramName;{
-              while ( EtaStr.Contains("Eta") )
-                EtaStr = EtaStr.Remove( 0, EtaStr.Index("Eta") + 4);
-            }
+                histogramName.ReplaceAll("(","{").ReplaceAll(")","}"); // Replace brackets to allow pdf printing
+                filepath.ReplaceAll("(","{").ReplaceAll(")","}");
 
-            TString etaLowStr  = EtaStr;
-            etaLowStr = etaLowStr.Remove( etaLowStr.Index("_to_") );
-            // 		  TString etaHighStr = EtaStr;
-            // 		  etaHighStr = etaHighStr.Remove( 0, etaHighStr.Index("_to_") + 4);  
+                //	      std::cout << "NEW = " << filepath << "\t" << histogramName << "\n";
 
-            double etaLow  = etaLowStr.Atof();
-            //		  double etaHigh = etaHighStr.Atof();
-            etaBins[ etaLow ] = EtaStr;
+                // store histogram and its storage directory
+                histogram2D[ histogramName ]        = (TH2*)f->Get(filepathRaw + "/" + histogramNameRaw)->Clone();
+                histogramDirectory[ histogramName ] = filepath;
+
+                // Ensure a directory is created to store the histogram
+                makeFullDir( plotDirectory, filepath );
+
+                // change name to avoid memory conflicts
+                histogram2D[ histogramName ] ->SetName(histogramName);
 
 
+                std::cout << "Got here 2\n";
+
+                // Get Eta label
+                TString EtaStr = histogramName;{
+                  while ( EtaStr.Contains("iEta") )
+                    EtaStr = EtaStr.Remove( 0, EtaStr.Index("iEta") + 5);
+                }
+
+                TString etaLowStr  = EtaStr;
+                etaLowStr = etaLowStr.Remove( etaLowStr.Index("_to_") );
+                // 		  TString etaHighStr = EtaStr;
+                // 		  etaHighStr = etaHighStr.Remove( 0, etaHighStr.Index("_to_") + 4);  
+
+                double etaLow  = etaLowStr.Atof();
+                //		  double etaHigh = etaHighStr.Atof();
+                etaBins[ etaLow ] = EtaStr;
+
+
+              }
+            //}
           }
         }
-      }
-      }
-    }
+        //}
     }
 
 
@@ -519,10 +437,10 @@ int getCalibration(){
     int ptBinning = 10;
 
     // Range over which to make profiles
-    double ptMin = 20; 
+    double ptMin = 10; 
 
     //double ptMax = 120;
-    double ptMax = 200;
+    double ptMax = 30;
 
     //Rebinning options
     bool doRebin = true;
@@ -531,7 +449,7 @@ int getCalibration(){
 
     //Option to replace fits with large errors with histograms
     bool replaceBadPoints = false;
-    bool removeBadPoints = true;
+    bool removeBadPoints = false;
 
     //The allowed difference between the mean of the fit
     //and the hist mean
@@ -604,17 +522,17 @@ int getCalibration(){
 
       hist2D->Draw("COLZ");                   
       canv->SaveAs(plotDirectory + filepath + histName + ".png");   // write histogram to file
-      canv->SaveAs(plotDirectory + filepath + histName + ".pdf");   // write histogram to file
+      //canv->SaveAs(plotDirectory + filepath + histName + ".pdf");   // write histogram to file
 
       // Store the name of the collection being calibrated, used to store the calibration data
       TString histBaseName = histName;
 
-      if (histBaseName.Contains("JetResponse_vs_OffPT") != 0){
-        histBaseName = histBaseName.Remove( histBaseName.Index( "_JetResponse_vs_OffPT" ) );
+      if (histBaseName.Contains("ratio_iEta") != 0){
+        histBaseName = histBaseName.Remove( histBaseName.Index( "_ratio" ) );
         //      std::cout << "RES " << histBaseName << "\n";
       }
-      else if(histBaseName.Contains("L1PT_vs_OffPT") != 0 ){
-        histBaseName = histBaseName.Remove( histBaseName.Index( "_L1PT_vs_OffPT" ) );
+      else if(histBaseName.Contains("corr_iEta") != 0 ){
+        histBaseName = histBaseName.Remove( histBaseName.Index( "_corr" ) );
         //      std::cout << "PT " << histBaseName << "\n";
       }
       else{
@@ -641,18 +559,6 @@ int getCalibration(){
 
         std::cout << "Made collection '" << histBaseName << "'\n";
       }
-
-
-      //DEBUGGING
-      //DEBUGGING
-      //DEBUGGING
-      //     if (iEta != -28){
-      //       continue;
-      //     }
-      //DEBUGGING
-      //DEBUGGING
-      //DEBUGGING
-
 
       // ****************************************************************************************************
       // *                                          Jet calibration                                         *
@@ -688,10 +594,10 @@ int getCalibration(){
         TString newHistName = "#eta #in " + EtaStrLabel + ", " + "p_{T} #in [" + ptLowStr + ", " + ptHighStr + "]";
 
 
-        if ( histName.Contains("JetResponse_vs_OffPT") != 0 ){
+        if ( histName.Contains("ratio_iEta") != 0 ){
           newHistName = label + " Response - " + newHistName;
         }
-        else if ( histName.Contains("L1PT_vs_OffPT") != 0 ) {
+        else if ( histName.Contains("corr_iEta") != 0 ) {
           newHistName = label + " L1 P_{T} - " + newHistName;
         }
 
@@ -706,7 +612,7 @@ int getCalibration(){
         // ********************************************************************************
 
         bool drawStats = false;
-        if ( histName.Contains("JetResponse_vs_OffPT") != 0 ){
+        if ( histName.Contains("ratio_iEta") != 0 ){
 
           //	    yProject->Rebin(5);
           if(!drawStats) yProject->SetStats(0);
@@ -734,7 +640,7 @@ int getCalibration(){
             fit_gaussian( yProject, nSigma, fitMin, nIter );
 
 
-          yProject->GetXaxis()->SetRangeUser(0.,2.5);
+            yProject->GetXaxis()->SetRangeUser(0.,2.5);
 
             TF1* gausResFit = (TF1*) yProject->GetListOfFunctions()->Last();
 
@@ -754,7 +660,7 @@ int getCalibration(){
               gausResFit->Draw("SAME");
             }
             canv->SaveAs(plotDirectory + filepath + histName + newSaveName + "FitGaus.png");   // write histogram to file
-        //    canv->SaveAs(plotDirectory + filepath + histName + newSaveName + "FitGaus.pdf");   // write histogram to file
+            //    canv->SaveAs(plotDirectory + filepath + histName + newSaveName + "FitGaus.pdf");   // write histogram to file
 
 
             if ( gausResFit) {
@@ -809,17 +715,17 @@ int getCalibration(){
         // ********************************************************************************
         // *                              Jet PT calibration                              *
         // ********************************************************************************
-      
-        if ( (histName.Contains("L1PT_vs_OffPT") != 0) ){
+
+        if ( (histName.Contains("corr_iEta") != 0) ){
 
           //	    yProject->Rebin(4);
           yProject->Draw();
 
           TPaveStats *fitStat;
-          
+
           if(!drawStats) yProject->SetStats(0);
 
-//          yProject->GetXaxis()->SetRangeUser(0.,200.);
+          //          yProject->GetXaxis()->SetRangeUser(0.,200.);
 
           // ****************************************
           // *             Fit gaussian             *
@@ -838,10 +744,10 @@ int getCalibration(){
 
             if(doRebin) yProject->Rebin(ptRebin);
 
-            
+
             fit_gaussian( yProject, nSigma, fitMin, nIter );
-            
-          yProject->GetXaxis()->SetRangeUser(0.,210.);
+
+            yProject->GetXaxis()->SetRangeUser(0.,210.);
 
             TF1* gausPtFit = (TF1*) yProject->GetListOfFunctions()->Last();
 
@@ -942,7 +848,7 @@ int getCalibration(){
       TString outputCMSSW = "\t" + collName + "LUT = cms.vdouble(\n";
 
       // Iterate over iEta bins
-      //	for (int iEtaIndex = 0; iEtaIndex < 56; ++iEtaIndex){
+      //	for (int iEtaIndex = 0; iEtaIndex < 56; ++iEtaIndex)
       for (uint etaIndex = 0; etaIndex < etaBinsOrdered.size(); ++etaIndex){
 
         TString EtaStr = etaBinsOrdered[ etaIndex ];
@@ -1000,7 +906,7 @@ int getCalibration(){
 
         calibGraph->Draw("AP*");
         canv->SaveAs(plotDirectory + calibFilePath + "calibGraph_iEta_" + EtaStr + ".png");   // write histogram to file    
-        canv->SaveAs(plotDirectory + calibFilePath + "calibGraph_iEta_" + EtaStr + ".pdf");   // write histogram to file    
+        //canv->SaveAs(plotDirectory + calibFilePath + "calibGraph_iEta_" + EtaStr + ".pdf");   // write histogram to file    
 
         TString EtaStrROOT = EtaStr;
         EtaStrROOT.ReplaceAll("-","minus");
@@ -1008,176 +914,6 @@ int getCalibration(){
         // Save to the ROOT file
         calibGraph->Write( "Eta_" + EtaStrROOT );
 
-
-
-        // ********************************************************************************
-        //                                     FITTING                                    *
-        // ********************************************************************************
-
-#ifdef FITTING
-
-        double calibFitMin = 20;
-        double calibFitMax = 230;
-
-        // Fit the calibration curve over a restricted range
-
-
-
-
-        // ********************************************************************************
-        // FROM: jet_l3_correction_x.cc
-
-        // response 
-        TF1* fitrsp;
-        fitrsp->SetLineColor(kRed);
-        fitrsp->SetLineWidth(1);
-
-        fitrsp = new TF1("fitrsp","[0]-[1]/(pow(log10(x),2)+[2])-[3]*exp((-[4]*(log10(x)-[5])*(log10(x)-[5]))+([6]*(log10(x)-[5])))",
-            1.0,calibGraph->GetX()[calibGraph->GetN()-1]);
-
-        fitrsp->SetParameter(0,0.96);
-        fitrsp->SetParameter(1,0.033);
-        fitrsp->SetParameter(2,-0.7);
-        fitrsp->SetParameter(3,0.02);
-        fitrsp->SetParameter(4,1.02);
-        fitrsp->SetParameter(5,2.7);
-        fitrsp->SetParameter(6,0.016);
-
-        calibGraph->Fit(fitrsp,"QR");
-
-        //statsbox wizardry
-        TPaveStats *fitStat;
-        gPad->Update();
-        fitStat = (TPaveStats*)calibGraph->FindObject("stats");
-        fitStat->SetTextColor(kRed);
-        fitStat->Draw();
-
-        // ********************************************************************************
-
-        // ********************************************************************************
-        // FROM: jet_l3_correction_x.cc
-
-        // 	  // L3Absolute correction 
-        // 	  string fitcor_as_str;
-
-        // 	  fitcor_as_str = "[0]+[1]/(pow(log10(x),2)+[2])+[3]*exp((-[4]*(log10(x)-[5])*(log10(x)-[5]))+([6]*(log10(x)-[5])))";
-
-
-        // 	  TF1* fitcor = new TF1("fitcor",fitcor_as_str.c_str(),
-        // 				2.0,gcor->GetX()[gcor->GetN()-1]);
-
-        // 	  (alg.find("pf")!=string::npos) {
-        // 	    fitcor->SetParameter(0,1.04);
-        // 	    fitcor->SetParameter(1,.033);
-        // 	    fitcor->SetParameter(2,-0.7);
-        // 	    fitcor->SetParameter(3,0.02);
-        // 	    fitcor->SetParameter(4,1.02);
-        // 	    fitcor->SetParameter(5,2.7);
-        // 	    //  fitrsp->SetParameter(6,0.016);  // ? BUG ?
-
-        // 	    gcor->Fit(fitcor,"QR");
-
-        // ********************************************************************************
-
-
-        // 	  TF1 *calibrationFit = new TF1("calibrationFit", calibFit, calibFitMin, calibFitMax, 6); 
-        // 	  calibrationFit->SetLineColor(kRed);
-        // 	  calibrationFit->SetLineWidth(1);
-
-        // 	  // Set initial parameter values
-        // 	  calibrationFit->SetParameter(0, 0.78);                                                   
-        // 	  calibrationFit->SetParameter(1, 4.33);                                                   
-        // 	  calibrationFit->SetParameter(2, 2.67);                                                   
-        // 	  calibrationFit->SetParameter(3, 0.57);                                                   
-        // 	  calibrationFit->SetParameter(4, 0.88);                                                   
-        // 	  calibrationFit->SetParameter(5, 0.41);                                                   
-
-        // 	  calibGraph->Fit( calibrationFit, "MR");
-
-        // 	  //statsbox wizardry
-        // 	  TPaveStats *fitStat;
-        // 	  gPad->Update();
-        // 	  fitStat = (TPaveStats*)calibGraph->FindObject("stats");
-        // 	  fitStat->SetTextColor(kRed);
-        // 	  //	fitStat->SetX1NDC(.27); fitStat->SetX2NDC(.58); fitStat->SetY1NDC(.54); fitStat->SetY2NDC(.93);
-        // 	  fitStat->Draw();
-
-
-        //     // Fit the calibration curve over the entire range
-        //     TF1 *calibrationFitFull = new TF1("calibrationFit",calibFit,5,250,6); 
-        //     calibrationFitFull->SetLineStyle(7);
-        //     calibrationFitFull->SetLineWidth(1);
-        //     // Set initial parameter values
-        //       calibrationFitFull->SetParameter(0, 0.78);                                                   
-        //       calibrationFitFull->SetParameter(1, 4.33);                                                   
-        //       calibrationFitFull->SetParameter(2, 2.67);                                                   
-        //       calibrationFitFull->SetParameter(3, 0.57);                                                   
-        //       calibrationFitFull->SetParameter(4, 0.88);                                                   
-        //       calibrationFitFull->SetParameter(5, 0.41);                                                   
-
-        //     calibGraph->Fit( calibrationFitFull, "+MR");
-
-
-
-        canv->SaveAs(plotDirectory + calibFilePath + "calibGraph_Eta_" + EtaStr + "_FIT.png");   // write histogram to file 
-        canv->SaveAs(plotDirectory + calibFilePath + "calibGraph_Eta_" + EtaStr + "_FIT.pdf");   // write histogram to file 
-
-
-
-
-        // Save to the ROOT file
-        calibGraph->Write( "Eta_" + EtaStrROOT );
-
-
-        // Caculate the fit residuals
-        for (int iProf = 0; iProf < totalProfs; ++iProf){
-
-
-          double x = xArr[ iProf ];
-          double y = yArr[ iProf ];
-
-          double fitY = calibrationFit->Eval(x);
-
-          xResArr[iProf] = x;
-          yResArr[iProf] = fitY - y;
-
-        }
-
-
-        // Plot the residual of the fit
-        TGraph* calibRes = new TGraph( totalProfs, xResArr, yResArr );
-        calibRes->SetTitle("#eta #in " + EtaStrLabel + ";<L1 p_{T}> (GeV);Residual <L1 p_{T}/GEN p_{T}>^{-1}");
-        calibRes->SetMarkerStyle(8);
-        calibRes->SetMarkerSize(0.5);
-        calibRes->Draw("AP*");
-
-        canv->SaveAs(plotDirectory + calibFilePath + "calibGraph_Eta_" + EtaStr + "_FIT_Res.png");   // write histogram to file 
-        canv->SaveAs(plotDirectory + calibFilePath + "calibGraph_Eta_" + EtaStr + "_FIT_Res.pdf");   // write histogram to file 
-        std::cout << "\n\nPLINT: " << plotDirectory + calibFilePath + "calibGraph_Eta_" + EtaStr + "_FIT_Res.png" << "\n\n";
-
-        calibRes->Write( "Eta_" + EtaStrROOT + "_Res" );
-
-
-
-        // Extract calibration parameters
-        TString p0 = Form("%f", calibrationFit->GetParameter( 0 ));
-        TString p1 = Form("%f", calibrationFit->GetParameter( 1 ));
-        TString p2 = Form("%f", calibrationFit->GetParameter( 2 ));
-        TString p3 = Form("%f", calibrationFit->GetParameter( 3 ));
-        TString p4 = Form("%f", calibrationFit->GetParameter( 4 ));
-        TString p5 = Form("%f", calibrationFit->GetParameter( 5 ));
-
-        // Output fit parameters
-        std::cout << "\tp0 = " << p0 << "\n"
-          << "\tp1 = " << p1 << "\n"
-          << "\tp2 = " << p2 << "\n"
-          << "\tp3 = " << p3 << "\n"
-          << "\tp4 = " << p4 << "\n"
-          << "\tp5 = " << p5 << "\n\n\n";
-
-        outputCMSSW += "\t\t" + p0 + ",\t" + p1 + ",\t" + p2 + ",\t" + p3 + ",\t" + p4 + ",\t" + p5 + ",\n";
-
-#endif
 
       }
 
@@ -1197,80 +933,14 @@ int getCalibration(){
       // Close the ROOT file
       graphFile->Close();
 
-      }
-
-      //#endif
-
-      // Delete the previous contents of the container
-      histogram2D.clear();
-
     }
-
-#endif
-
-
-
-
-
-
 
 
     // Delete the previous contents of the container
-    histogramDirectory.clear();
-
-
-    } // Directory loop
-
-
-
-
-
-
-
-    // **************************************************************************************************
-    // *                                          Provenance                                            *
-    // **************************************************************************************************
-
-
-    // To test different text positions run root in interactive mode with the code:
-    // TCanvas canv;
-    // canv.SetGrid();
-    // canv.DrawFrame(0,0,1,1);
-    //
-    // Print statistics of the program running
-    TCanvas statCanv;
-    TLatex latex;
-    Float_t curY = 0.95; // current Y coordinate of text
-    latex.SetTextSize(0.04);
-    latex.DrawLatex(0.05, curY, "Input file:");
-    latex.SetTextSize(0.025);
-    curY -= 0.02;;
-    latex.DrawLatex(0.05, curY, filename);
-
-
-    // save and close .eps
-    statCanv.SaveAs( plotDirectory + "Provenance.png" );
-    statCanv.SaveAs( plotDirectory + "Provenance.pdf" );
-
-
-
-    // Make webpage
-    chdir( plotDirectory.Data() );
-    system( "/home/hep/mb1512/.scripts/makeHTML.py" );
-
-
-    std::cout << "\n\n\nOutput histograms to webpage: \n\n\t"
-      << plotDirectory.ReplaceAll("/home/hep/", "http://www.hep.ph.ic.ac.uk/~").ReplaceAll("/public_html","") 
-      << "\n\n\n";//mb1512/public_html/plots/";
-
-    f->Close();
-    return 0;
+    histogram2D.clear();
 
   }
 
-  // --------------------------------------------------------------------------------------------------------------------------------------------
-  // --------------------------------------------------------------------------------------------------------------------------------------------
-  // --------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
@@ -1279,42 +949,11 @@ int getCalibration(){
 
 
 
-  // // Stores all histograms in memory which are of a given TObject type
-
-  // void loadHistograms(TFile* f, TString rootDir, TString histType, std::vector < pair <TString, TString> > fileHistPair,
-  // 		    std::map <TString,TH1*> histMap){
+  // Delete the previous contents of the container
+  histogramDirectory.clear();
 
 
-  //   // get list of histograms in file of specified type
-  //   fileHistPair = getROOTobjects(f, rootDir, histType);
-
-  //   for (unsigned int i = 0;i < fileHistPair.size(); i++){
-
-  //     // Extract the directory and name of the histogram
-  //     filepath         = fileHistPair[i].first;
-  //     histogramNameRaw = fileHistPair[i].second;
-
-  //     // create a .pdf compatible filename
-  //     histogramName    = histogramNameRaw;
-  //     histogramName.ReplaceAll("(","{").ReplaceAll(")","}"); // Replace brackets to allow pdf printing
-  //     filepath.ReplaceAll("(","{").ReplaceAll(")","}");
-
-  //     std::cout << "NEW = " << filepath << "\t" << histogramName << "\n";
-
-
-  //     // store histogram and its storage directory
-  //     histogramMap[ histogramName ]       = (TH1*)f->Get(filepath + "/" + histogramNameRaw)->Clone();
-  //     histogramDirectory[ histogramName ] = filepath;
-
-  //     // Ensure a directory is created to store the histogram
-  //     makeFullDir( plotDirectory, filepath );
-
-  //     // change name to avoid memory conflicts
-  //     histogramMap[ histogramName ] ->SetName(histogramName);
-
-  //   }
-
-  // }
+} // Directory loop
 
 
 
@@ -1322,6 +961,50 @@ int getCalibration(){
 
 
 
+// **************************************************************************************************
+// *                                          Provenance                                            *
+// **************************************************************************************************
+
+
+// To test different text positions run root in interactive mode with the code:
+// TCanvas canv;
+// canv.SetGrid();
+// canv.DrawFrame(0,0,1,1);
+//
+// Print statistics of the program running
+TCanvas statCanv;
+TLatex latex;
+Float_t curY = 0.95; // current Y coordinate of text
+latex.SetTextSize(0.04);
+latex.DrawLatex(0.05, curY, "Input file:");
+latex.SetTextSize(0.025);
+curY -= 0.02;;
+latex.DrawLatex(0.05, curY, filename);
+
+
+// save and close .eps
+statCanv.SaveAs( plotDirectory + "Provenance.png" );
+//statCanv.SaveAs( plotDirectory + "Provenance.pdf" );
+
+
+
+// Make webpage
+chdir( plotDirectory.Data() );
+system( "/home/hep/mb1512/.scripts/makeHTML.py" );
+
+
+std::cout << "\n\n\nOutput histograms to webpage: \n\n\t"
+<< plotDirectory.ReplaceAll("/home/hep/", "http://www.hep.ph.ic.ac.uk/~").ReplaceAll("/public_html","") 
+<< "\n\n\n";//mb1512/public_html/plots/";
+
+f->Close();
+return 0;
+
+}
+
+// --------------------------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
@@ -1329,418 +1012,469 @@ int getCalibration(){
 
 
 
-  //##############################################
-  //## TFile functions
-  //##############################################
 
-  //Returns a boolean value of whether the object in the specified directory exists
-  //Checks first whether directory exists to avoid Segfaults
-  Bool_t objectExists(TFile* file,  TString directory, TString objectName){
-    //Key to determine whether specified objects exist
-    TKey *key;
+// // Stores all histograms in memory which are of a given TObject type
 
-    if (directory != ""){
+// void loadHistograms(TFile* f, TString rootDir, TString histType, std::vector < pair <TString, TString> > fileHistPair,
+// 		    std::map <TString,TH1*> histMap){
 
-      //Check if the directory has more than one level
-      if (directory.Contains("/")){
-        std::vector <TString> dirLevel = splitString(directory,"/");
-        TString curDir = "";
 
-        //Loop through all the levels of the directory
-        for (unsigned int i = 0;i < dirLevel.size();i++){
-          if (curDir == "")
-            //Check first level exists
-            key = file->FindKey(dirLevel[i]);
-          else{
-            //Check higher levels exist
-            key = file->GetDirectory(curDir)->FindKey(dirLevel[i]);
-          }
+//   // get list of histograms in file of specified type
+//   fileHistPair = getROOTobjects(f, rootDir, histType);
 
-          //Check if the directory was not found
-          if (key == 0)	
-            return false;
+//   for (unsigned int i = 0;i < fileHistPair.size(); i++){
 
-          curDir += dirLevel[i] + "/";
+//     // Extract the directory and name of the histogram
+//     filepath         = fileHistPair[i].first;
+//     histogramNameRaw = fileHistPair[i].second;
+
+//     // create a .pdf compatible filename
+//     histogramName    = histogramNameRaw;
+//     histogramName.ReplaceAll("(","{").ReplaceAll(")","}"); // Replace brackets to allow pdf printing
+//     filepath.ReplaceAll("(","{").ReplaceAll(")","}");
+
+//     std::cout << "NEW = " << filepath << "\t" << histogramName << "\n";
+
+
+//     // store histogram and its storage directory
+//     histogramMap[ histogramName ]       = (TH1*)f->Get(filepath + "/" + histogramNameRaw)->Clone();
+//     histogramDirectory[ histogramName ] = filepath;
+
+//     // Ensure a directory is created to store the histogram
+//     makeFullDir( plotDirectory, filepath );
+
+//     // change name to avoid memory conflicts
+//     histogramMap[ histogramName ] ->SetName(histogramName);
+
+//   }
+
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//##############################################
+//## TFile functions
+//##############################################
+
+//Returns a boolean value of whether the object in the specified directory exists
+//Checks first whether directory exists to avoid Segfaults
+Bool_t objectExists(TFile* file,  TString directory, TString objectName){
+  //Key to determine whether specified objects exist
+  TKey *key;
+
+  if (directory != ""){
+
+    //Check if the directory has more than one level
+    if (directory.Contains("/")){
+      std::vector <TString> dirLevel = splitString(directory,"/");
+      TString curDir = "";
+
+      //Loop through all the levels of the directory
+      for (unsigned int i = 0;i < dirLevel.size();i++){
+        if (curDir == "")
+          //Check first level exists
+          key = file->FindKey(dirLevel[i]);
+        else{
+          //Check higher levels exist
+          key = file->GetDirectory(curDir)->FindKey(dirLevel[i]);
         }
+
+        //Check if the directory was not found
+        if (key == 0)	
+          return false;
+
+        curDir += dirLevel[i] + "/";
+      }
+    }
+    else{
+      //Check directory exists for a single level directory
+      key = file->FindKey(directory);
+    }
+  }
+
+
+  //Directory exists so now attempt to find the object
+  key = file->GetDirectory(directory)->FindKey(objectName);
+
+  //Return false if the object was not found
+  return (key != 0);
+}
+//##############################################
+
+
+std::vector <TString> splitString(TString inputStr, TString splitChar){
+
+  //Vector to store the split substrings
+  std::vector <TString> splitArr;
+
+  //Initialise values so that it is detectable if the split character is not present
+  Int_t index(-1), tempIndex(-1);
+
+  //Find the first index of the split character, returns -1 if char not found
+  tempIndex = inputStr.Index(splitChar,0);	
+
+  TString tempStr, inputCopy;
+
+  //Keep looping while the character is found
+  while(tempIndex != -1){
+
+    //KEEP THE SUBSRING LEFT OF THE STRIP CHARACTER
+    inputCopy = inputStr; //Make a fresh copy of the input string
+    inputCopy.Remove(tempIndex,inputCopy.Length());
+    //if (index != 0)
+    //  index +=1;
+    inputCopy.Remove(0,index+1);
+
+    //Store if the substring isn't empty
+    if (inputCopy != "")
+      splitArr.push_back(inputCopy);
+
+    index = tempIndex;
+    //Search for next instance of the character from index tempIndex+1 onwards
+    tempIndex = inputStr.Index(splitChar,tempIndex+1);
+
+  }
+
+  //Check that the split character was found
+  if (index == -1){
+    std::cout << "\nError the character: \'" << splitChar 
+      << "\' was not found in the string: \"" << inputStr << "\"\n\n";
+    exit(1);
+  }
+
+  //Recover the last substring which is right of the final character
+
+  inputCopy = inputStr;
+  tempStr = inputCopy.Remove(0,index+1);
+
+  if (tempStr != "")
+    splitArr.push_back(tempStr);
+
+
+  return splitArr;
+}
+
+
+
+// Returns a list of the specified objectType in a given rootDir
+// "TDirectoryFile"
+// [ntuplePath, objectName]
+std::vector < std::pair <TString, TString> > getROOTobjects(TFile* f, TString rootDir, TString objectType){
+
+  std::vector < std::pair <TString, TString> > objectList;
+
+  //std::cout << "Got here, getROOTobjects\n";
+
+  TIter nextkey(f->GetDirectory(rootDir)->GetListOfKeys());
+  TKey *key;
+  TString objName, objClassName;
+  TString ntuplePath;
+
+  while ((key=(TKey*)nextkey())) {  //Loop while the current key is valid
+
+    TObject *obj = key->ReadObj(); //Point to the object with the current key
+
+    objName      = key->GetName();
+
+    //Modified to cut down on number of directories
+    if(objName.Contains("Recalib") || objName.Contains("Delta") || objName.Contains("_Calib")) continue;
+    //std::cout << objName.Data() << std::endl;
+    //std::cout << objectList.size() << std::endl;
+
+    objClassName = obj->ClassName();
+
+    //    if ( objClassName == objectType )
+    if ( objClassName.Contains(objectType) ){
+
+      ntuplePath = rootDir;
+      //Modified to only get the relevant histograms
+      //if(objName.Contains("L1PT_vs_OffPT") || objName.Contains("JetResponse_vs_OffPT") ) objectList.push_back( std::make_pair(rootDir,objName) );
+      objectList.push_back( std::make_pair(rootDir,objName) );
+      //      std::cout << objName << "\t" << objClassName << "\n";
+
+    }
+    else if ( objClassName == "TDirectoryFile"){
+
+
+      //       std::cout << "----------------------------------------------------------------------------------\n\n";
+      //       std::cout << objName << "\t" << objClassName << "\n\n";
+
+      // Object is a directory so ammend the new ntuple path
+      ntuplePath = rootDir + "/" + objName;
+      // Look for the specified object in this new ntuple path
+      std::vector < std::pair <TString, TString> > subDirObjectList = getROOTobjects(f, ntuplePath, objectType);
+
+      if (subDirObjectList.size() == 0){
+        //	std::cout << "No objects of type " << objectType << " found in directory: " << ntuplePath << "\n";
       }
       else{
-        //Check directory exists for a single level directory
-        key = file->FindKey(directory);
+
+        // Add the found objects to the stored list
+        objectList.insert(objectList.end(), subDirObjectList.begin(), subDirObjectList.end());
+
       }
-    }
 
-
-    //Directory exists so now attempt to find the object
-    key = file->GetDirectory(directory)->FindKey(objectName);
-
-    //Return false if the object was not found
-    return (key != 0);
-  }
-  //##############################################
-
-
-  std::vector <TString> splitString(TString inputStr, TString splitChar){
-
-    //Vector to store the split substrings
-    std::vector <TString> splitArr;
-
-    //Initialise values so that it is detectable if the split character is not present
-    Int_t index(-1), tempIndex(-1);
-
-    //Find the first index of the split character, returns -1 if char not found
-    tempIndex = inputStr.Index(splitChar,0);	
-
-    TString tempStr, inputCopy;
-
-    //Keep looping while the character is found
-    while(tempIndex != -1){
-
-      //KEEP THE SUBSRING LEFT OF THE STRIP CHARACTER
-      inputCopy = inputStr; //Make a fresh copy of the input string
-      inputCopy.Remove(tempIndex,inputCopy.Length());
-      //if (index != 0)
-      //  index +=1;
-      inputCopy.Remove(0,index+1);
-
-      //Store if the substring isn't empty
-      if (inputCopy != "")
-        splitArr.push_back(inputCopy);
-
-      index = tempIndex;
-      //Search for next instance of the character from index tempIndex+1 onwards
-      tempIndex = inputStr.Index(splitChar,tempIndex+1);
 
     }
 
-    //Check that the split character was found
-    if (index == -1){
-      std::cout << "\nError the character: \'" << splitChar 
-        << "\' was not found in the string: \"" << inputStr << "\"\n\n";
-      exit(1);
-    }
-
-    //Recover the last substring which is right of the final character
-
-    inputCopy = inputStr;
-    tempStr = inputCopy.Remove(0,index+1);
-
-    if (tempStr != "")
-      splitArr.push_back(tempStr);
-
-
-    return splitArr;
   }
 
 
 
-  // Returns a list of the specified objectType in a given rootDir
-  // "TDirectoryFile"
-  // [ntuplePath, objectName]
-  std::vector < std::pair <TString, TString> > getROOTobjects(TFile* f, TString rootDir, TString objectType){
-
-    std::vector < std::pair <TString, TString> > objectList;
-
-    std::cout << "Got here, getROOTobjects\n";
-
-    TIter nextkey(f->GetDirectory(rootDir)->GetListOfKeys());
-    TKey *key;
-    TString objName, objClassName;
-    TString ntuplePath;
-
-    while ((key=(TKey*)nextkey())) {  //Loop while the current key is valid
-
-      TObject *obj = key->ReadObj(); //Point to the object with the current key
-
-      objName      = key->GetName();
-
-      //Modified to cut down on number of directories
-      if(objName.Contains("Recalib") || objName.Contains("Delta") || objName.Contains("_Calib")) continue;
-      //std::cout << objName.Data() << std::endl;
-      //std::cout << objectList.size() << std::endl;
-
-      objClassName = obj->ClassName();
-
-      //    if ( objClassName == objectType ){
-      if ( objClassName.Contains(objectType) ){
-
-        ntuplePath = rootDir;
-        //Modified to only get the relevant histograms
-        //if(objName.Contains("L1PT_vs_OffPT") || objName.Contains("JetResponse_vs_OffPT") ) objectList.push_back( std::make_pair(rootDir,objName) );
-        objectList.push_back( std::make_pair(rootDir,objName) );
-        //      std::cout << objName << "\t" << objClassName << "\n";
-
-      }
-      else if ( objClassName == "TDirectoryFile"){
+  return objectList;
+}
 
 
-        //       std::cout << "----------------------------------------------------------------------------------\n\n";
-        //       std::cout << objName << "\t" << objClassName << "\n\n";
 
-        // Object is a directory so ammend the new ntuple path
-        ntuplePath = rootDir + "/" + objName;
-        // Look for the specified object in this new ntuple path
-        std::vector < std::pair <TString, TString> > subDirObjectList = getROOTobjects(f, ntuplePath, objectType);
+std::vector < std::pair <TString, TString> > getROOTDirs(TFile* f, TString rootDir){
 
-        if (subDirObjectList.size() == 0){
-          //	std::cout << "No objects of type " << objectType << " found in directory: " << ntuplePath << "\n";
-        }
-        else{
+  std::vector < std::pair <TString, TString> > objectList;
 
-          // Add the found objects to the stored list
-          objectList.insert(objectList.end(), subDirObjectList.begin(), subDirObjectList.end());
+  TIter nextkey(f->GetDirectory(rootDir)->GetListOfKeys());
+  TKey *key;
+  TString objName, objClassName;
+  TString ntuplePath;
 
-        }
+  TString objectType = "TDirectoryFile";
 
+
+  while ((key=(TKey*)nextkey())) {  //Loop while the current key is valid
+
+    TObject *obj = key->ReadObj(); //Point to the object with the current key
+
+    objName      = key->GetName();
+    objClassName = obj->ClassName();
+
+
+    if ( objClassName.Contains(objectType) ){
+
+      ntuplePath = rootDir;
+      objectList.push_back( std::make_pair(rootDir,objName) );
+      std::cout << objName << "\t" << objClassName << "\n";
+
+      // Object is a directory so ammend the new ntuple path                                                                                                   
+      ntuplePath = rootDir + "/" + objName;
+      // Look for the specified object in this new ntuple path
+      std::vector < std::pair <TString, TString> > subDirObjectList = getROOTDirs(f, ntuplePath);
+
+      if ( !(subDirObjectList.empty()) ){
+
+        // Add the found objects to the stored list 
+        objectList.insert(objectList.end(), subDirObjectList.begin(), subDirObjectList.end());
 
       }
 
     }
 
-
-
-    return objectList;
-    }
+  }
 
 
 
-    std::vector < std::pair <TString, TString> > getROOTDirs(TFile* f, TString rootDir){
-
-      std::vector < std::pair <TString, TString> > objectList;
-
-      TIter nextkey(f->GetDirectory(rootDir)->GetListOfKeys());
-      TKey *key;
-      TString objName, objClassName;
-      TString ntuplePath;
-
-      TString objectType = "TDirectoryFile";
-
-
-      while ((key=(TKey*)nextkey())) {  //Loop while the current key is valid
-
-        TObject *obj = key->ReadObj(); //Point to the object with the current key
-
-        objName      = key->GetName();
-        objClassName = obj->ClassName();
-
-
-        if ( objClassName.Contains(objectType) ){
-
-          ntuplePath = rootDir;
-          objectList.push_back( std::make_pair(rootDir,objName) );
-          std::cout << objName << "\t" << objClassName << "\n";
-
-          // Object is a directory so ammend the new ntuple path                                                                                                   
-          ntuplePath = rootDir + "/" + objName;
-          // Look for the specified object in this new ntuple path
-          std::vector < std::pair <TString, TString> > subDirObjectList = getROOTDirs(f, ntuplePath);
-
-          if ( !(subDirObjectList.empty()) ){
-
-            // Add the found objects to the stored list 
-            objectList.insert(objectList.end(), subDirObjectList.begin(), subDirObjectList.end());
-
-          }
-
-        }
-
-      }
-
-
-
-      return objectList;
-    }
+  return objectList;
+}
 
 
 
 
 
-    //##############################################
-    //## Directory functions
-    //##############################################
+//##############################################
+//## Directory functions
+//##############################################
 
-    // Returns a boolean value of whether the directory exists
-    Bool_t dirExists(TString dir){
-      //Check if directory already exists
-      struct stat sb; 
+// Returns a boolean value of whether the directory exists
+Bool_t dirExists(TString dir){
+  //Check if directory already exists
+  struct stat sb; 
 
-      if (stat(dir, &sb) == 0) // stat == 0 <=> Directory exists
-        return true;
-      else
-        return false;
-    }
-
-
-    // Makes the entire file structure required to create the uppermost directory
-    void makeFullDir(TString baseDir, TString dir){
+  if (stat(dir, &sb) == 0) // stat == 0 <=> Directory exists
+    return true;
+  else
+    return false;
+}
 
 
-      if ( !(dir.Contains("/")) ){
-        dir += "/";
-      }
-
-      // Generate list of all the subdirectories
-      std::vector <TString> subDirs = splitString(dir,"/");
-
-      TString subDir = "";
-
-      // Check each directory exists to the uppermost directory
-      for (unsigned int iSplit = 0; iSplit < subDirs.size(); iSplit++){
+// Makes the entire file structure required to create the uppermost directory
+void makeFullDir(TString baseDir, TString dir){
 
 
-        TString curDir = subDirs[iSplit];
-        subDir += curDir + "/";
+  if ( !(dir.Contains("/")) ){
+    dir += "/";
+  }
 
-        TString filePath = baseDir + subDir;
+  // Generate list of all the subdirectories
+  std::vector <TString> subDirs = splitString(dir,"/");
 
-        //      std::cout << "LAME    " << filePath << "\n";
+  TString subDir = "";
 
-
-        if ( !dirExists(filePath)){
-          //Make the directory with the corresponding RW permissions
-          mkdir( filePath.Data(),S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-          //      std::cout << "Made directory: " << filePath << "\n";
-        }
-
-      }
+  // Check each directory exists to the uppermost directory
+  for (unsigned int iSplit = 0; iSplit < subDirs.size(); iSplit++){
 
 
-    }
+    TString curDir = subDirs[iSplit];
+    subDir += curDir + "/";
 
-    // Takes a directory name and makes a unique directory with a revision number.
-    // Modifies the input directory so that it matches this new directory name.
-    void makeDirectory(TString& directoryName){
+    TString filePath = baseDir + subDir;
+
+    //      std::cout << "LAME    " << filePath << "\n";
 
 
-      // Get current date to use for a folder name
-      time_t rawTime;
-      struct tm* timeInfo;
-      char curDate[80];
-
-      time(&rawTime);
-      timeInfo = localtime(&rawTime);
-      strftime(curDate,80,"%d_%m_%y",timeInfo);  // Extract date in format : dd_mm_yyyy
-
-      //Store the directory name with date
-      directoryName.Append(curDate);
-
-      //Check if directory already exists, if so add a 'revision' prefix
-      if (dirExists(directoryName)){
-        Int_t num = 1;
-        TString tempStr = "";
-
-        do{
-
-          tempStr = directoryName + "_rev";
-          tempStr += num;
-
-          num++;
-        }while(dirExists(tempStr)); //Loop while the pathname already exists
-
-        //Store the directory filename
-        directoryName = tempStr;
-      }
-
-      directoryName += "/";
-
+    if ( !dirExists(filePath)){
       //Make the directory with the corresponding RW permissions
-      mkdir(directoryName.Data(),S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-
+      mkdir( filePath.Data(),S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+      //      std::cout << "Made directory: " << filePath << "\n";
     }
 
+  }
+
+
+}
+
+// Takes a directory name and makes a unique directory with a revision number.
+// Modifies the input directory so that it matches this new directory name.
+void makeDirectory(TString& directoryName){
+
+
+  // Get current date to use for a folder name
+  time_t rawTime;
+  struct tm* timeInfo;
+  char curDate[80];
+
+  time(&rawTime);
+  timeInfo = localtime(&rawTime);
+  strftime(curDate,80,"%d_%m_%y",timeInfo);  // Extract date in format : dd_mm_yyyy
+
+  //Store the directory name with date
+  directoryName.Append(curDate);
+
+  //Check if directory already exists, if so add a 'revision' prefix
+  if (dirExists(directoryName)){
+    Int_t num = 1;
+    TString tempStr = "";
+
+    do{
+
+      tempStr = directoryName + "_rev";
+      tempStr += num;
+
+      num++;
+    }while(dirExists(tempStr)); //Loop while the pathname already exists
+
+    //Store the directory filename
+    directoryName = tempStr;
+  }
+
+  directoryName += "/";
+
+  //Make the directory with the corresponding RW permissions
+  mkdir(directoryName.Data(),S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+
+}
 
 
 
-    //______________________________________________________________________________ 
-    //
-    // JETMET additions
-    //______________________________________________________________________________                                                                              
-    void fit_gaussian( TH1D*& hrsp, const double nsigma, const double fitMin, const int niter){ 
 
-      if (0==hrsp) {
-        cout<<"ERROR: Empty pointer to fit_gaussian()"<<endl;return;
-      }
+//______________________________________________________________________________ 
+//
+// JETMET additions
+//______________________________________________________________________________                                                                              
+void fit_gaussian( TH1D*& hrsp, const double nsigma, const double fitMin, const int niter){ 
 
-      string histname = hrsp->GetName();
-      double mean     = hrsp->GetMean();
-      double rms      = hrsp->GetRMS();
-      double ptRefMax(1.0),rspMax(0.0);
+  if (0==hrsp) {
+    cout<<"ERROR: Empty pointer to fit_gaussian()"<<endl;return;
+  }
 
-      double norm  = hrsp->GetMaximumStored();
-      double peak  = mean;
-      double sigma = rms;
+  string histname = hrsp->GetName();
+  double mean     = hrsp->GetMean();
+  double rms      = hrsp->GetRMS();
+  double ptRefMax(1.0),rspMax(0.0);
 
-      std::cout << "\n\nInitial fit: Norm = " << norm << "\tPeak = " << peak << "\tSigma = " << sigma << "\n"; 
+  double norm  = hrsp->GetMaximumStored();
+  double peak  = mean;
+  double sigma = rms;
 
-      //   int pos1     = histname.find("RefPt");
-      //   int pos2     = histname.find("to",pos1);
-      //   string ss    = histname.substr(pos1+5,pos2);
-      //   if (from_string(ptRefMax,ss,std::dec)) {
-      //     if (histname.find("RelRsp")==0)
-      //       rspMax = jtptmin/ptRefMax;
-      //     if (histname.find("AbsRsp")==0)
-      //       rspMax = jtptmin-ptRefMax;
-      //   }
+  std::cout << "\n\nInitial fit: Norm = " << norm << "\tPeak = " << peak << "\tSigma = " << sigma << "\n"; 
 
-
-      // Fit range
-      double xmin  = hrsp->GetXaxis()->GetXmin();
-      double xmax  = hrsp->GetXaxis()->GetXmax();
-      TF1* fitfnc(0); int fitstatus(-1);
-
-      // Perform the specified number of fitting iterations
-      for (int iiter=0;iiter<niter;iiter++) {
-
-        vector<double> vv;
-        vv.push_back( fitMin );
-        vv.push_back(xmin);
-        vv.push_back(peak-nsigma*sigma);
-        // Modify fit range
-        double fitrange_min = *std::max_element(vv.begin(),vv.end());
-        double fitrange_max = std::min(xmax,peak+nsigma*sigma);
-
-        std::cout << "Fit range: " << fitrange_min << " " << fitrange_max << std::endl;
-        adjust_fitrange( hrsp, fitrange_min, fitrange_max );
+  //   int pos1     = histname.find("RefPt");
+  //   int pos2     = histname.find("to",pos1);
+  //   string ss    = histname.substr(pos1+5,pos2);
+  //   if (from_string(ptRefMax,ss,std::dec)) {
+  //     if (histname.find("RelRsp")==0)
+  //       rspMax = jtptmin/ptRefMax;
+  //     if (histname.find("AbsRsp")==0)
+  //       rspMax = jtptmin-ptRefMax;
+  //   }
 
 
+  // Fit range
+  double xmin  = hrsp->GetXaxis()->GetXmin();
+  double xmax  = hrsp->GetXaxis()->GetXmax();
+  TF1* fitfnc(0); int fitstatus(-1);
 
-        // Create new function fitting over specified range
-        fitfnc = new TF1("fgaus","gaus",fitrange_min,fitrange_max);
-        fitfnc->SetParNames("N","#mu","#sigma");
-        fitfnc->SetParameter(0,norm);
-        fitfnc->SetParameter(1,peak);
-        fitfnc->SetParameter(2,sigma);
-        fitstatus = hrsp->Fit(fitfnc,"RQ0");
-        delete fitfnc;
-        fitfnc = hrsp->GetFunction("fgaus");
-        //fitfnc->ResetBit(TF1::kNotDraw); 
-        if (fitfnc) {
-          norm  = fitfnc->GetParameter(0);
-          peak  = fitfnc->GetParameter(1);
-          sigma = fitfnc->GetParameter(2);
-          std::cout << "Fit iteration = " << iiter << "\tNorm = " << norm << "\tPeak = " << peak << "\tSigma = " << sigma << "\n"; 
-        }
-      }
-      if(hrsp->GetFunction("fgaus")==0)
-      {
-        cout << "No function recorded in histogram " << hrsp->GetName() << endl;
-      }
-      if (0!=fitstatus){
-        cout<<"fit_gaussian() to "<<hrsp->GetName()
-          <<" failed. Fitstatus: "<<fitstatus
-          <<" - FNC deleted."<<endl;
-        hrsp->GetListOfFunctions()->Delete();
-      }
+  // Perform the specified number of fitting iterations
+  for (int iiter=0;iiter<niter;iiter++) {
+
+    vector<double> vv;
+    vv.push_back( fitMin );
+    vv.push_back(xmin);
+    vv.push_back(peak-nsigma*sigma);
+    // Modify fit range
+    double fitrange_min = *std::max_element(vv.begin(),vv.end());
+    double fitrange_max = std::min(xmax,peak+nsigma*sigma);
+
+    std::cout << "Fit range: " << fitrange_min << " " << fitrange_max << std::endl;
+    adjust_fitrange( hrsp, fitrange_min, fitrange_max );
+
+
+
+    // Create new function fitting over specified range
+    fitfnc = new TF1("fgaus","gaus",fitrange_min,fitrange_max);
+    fitfnc->SetParNames("N","#mu","#sigma");
+    fitfnc->SetParameter(0,norm);
+    fitfnc->SetParameter(1,peak);
+    fitfnc->SetParameter(2,sigma);
+    fitstatus = hrsp->Fit(fitfnc,"RQ0");
+    delete fitfnc;
+    fitfnc = hrsp->GetFunction("fgaus");
+    //fitfnc->ResetBit(TF1::kNotDraw); 
+    if (fitfnc) {
+      norm  = fitfnc->GetParameter(0);
+      peak  = fitfnc->GetParameter(1);
+      sigma = fitfnc->GetParameter(2);
+      std::cout << "Fit iteration = " << iiter << "\tNorm = " << norm << "\tPeak = " << peak << "\tSigma = " << sigma << "\n"; 
     }
+  }
+  if(hrsp->GetFunction("fgaus")==0)
+  {
+    cout << "No function recorded in histogram " << hrsp->GetName() << endl;
+  }
+  if (0!=fitstatus){
+    cout<<"fit_gaussian() to "<<hrsp->GetName()
+      <<" failed. Fitstatus: "<<fitstatus
+      <<" - FNC deleted."<<endl;
+    hrsp->GetListOfFunctions()->Delete();
+  }
+}
 
-    //______________________________________________________________________________ 
+//______________________________________________________________________________ 
 
-    void adjust_fitrange(TH1* h,double& min,double& max)
-    {
-      int imin=1; while (h->GetBinLowEdge(imin)<min) imin++;
-      int imax=1; while (h->GetBinLowEdge(imax)<max) imax++;
-      while ((imax-imin)<8) {
-        if (imin>1) {imin--; min = h->GetBinCenter(imin); }
-        if (imax<h->GetNbinsX()-1) { imax++; max=h->GetBinCenter(imax); }
-      }
-    }
+void adjust_fitrange(TH1* h,double& min,double& max)
+{
+  int imin=1; while (h->GetBinLowEdge(imin)<min) imin++;
+  int imax=1; while (h->GetBinLowEdge(imax)<max) imax++;
+  while ((imax-imin)<8) {
+    if (imin>1) {imin--; min = h->GetBinCenter(imin); }
+    if (imax<h->GetNbinsX()-1) { imax++; max=h->GetBinCenter(imax); }
+  }
+}
 
