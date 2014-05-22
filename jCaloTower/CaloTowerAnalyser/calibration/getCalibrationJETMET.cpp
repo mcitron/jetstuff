@@ -167,7 +167,7 @@ double ptStep = 5;
 //=======================
 
 
-TString filename = "calibration_test_output.root";
+TString filename = "qcd_output.root";
 
 
 // Directory inside ROOT file
@@ -175,7 +175,7 @@ TString filename = "calibration_test_output.root";
 TString ROOTdir  = "";
 // Directory to store plots
 //  TString plotDirectory = "plots/Mk1Release/Presentation/8x8_PreFix/";
-TString plotDirectory = "test";
+TString plotDirectory = "qcd_10to120";
 
 
 
@@ -288,6 +288,8 @@ int getCalibration(){
     // ak5PUSRaw vs ak5PUS
 
     subDirs.push_back( "/5400_donut_gen/" );
+    subDirs.push_back( "/5400_global_gen/" );
+    subDirs.push_back( "/5400_nopus_gen/" );
     //subDirs.push_back( "/Calibration_LPUS_ak5PUS_AllJets/" );
 
     //	   subDirs.push_back( "/Calibration_UncalibCurr_ak5PUS/" );     
@@ -295,6 +297,8 @@ int getCalibration(){
 
     std::map <TString, TString> typeLabel;
     typeLabel[ "/5400_donut_gen/" ] = "5400_donut_4Jets";
+    typeLabel[ "/5400_global_gen/" ] = "5400_global_4Jets";
+    typeLabel[ "/5400_nopus_gen/" ] = "5400_nopus_4Jets";
     //typeLabel[ "/Calibration_LPUS_ak5PUS_AllJets/" ] = "LPUS_AllJets";
 
 
@@ -440,16 +444,16 @@ int getCalibration(){
     double ptMin = 10; 
 
     //double ptMax = 120;
-    double ptMax = 30;
+    double ptMax = 120;
 
     //Rebinning options
     bool doRebin = true;
-    int responseRebin=10;
+    int responseRebin=2;
     int ptRebin=10;
 
     //Option to replace fits with large errors with histograms
     bool replaceBadPoints = false;
-    bool removeBadPoints = false;
+    bool removeBadPoints = true;
 
     //The allowed difference between the mean of the fit
     //and the hist mean

@@ -33,6 +33,7 @@ public:
   double eatGlobe(double median); //the energy after global PUsubtraction
   int area() const;
   int getOuterSum() const;
+  void setPt(double newPt);
 private:
   double mpt;
   int mieta;
@@ -66,6 +67,7 @@ std::vector<int> jJet::ringSums() const { return mringsums; }
 std::vector<int> jJet::ringAreas() const { return mringareas; }
 std::vector<int> jJet::getOuterStrips() const { return mouterstrips; }
 std::vector<int> jJet::getTowers() const { return mtowers; }
+void jJet::setPt(double newpt){ mpt=newpt;}
 
 int jJet::getOuterSum() const 
 { 

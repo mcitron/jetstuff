@@ -698,6 +698,72 @@ return L1_jJets;
 
 }
 */
+
+std::vector<jJet> CaloTowerAnalyser::calibrateL1Jets(const std::vector<jJet>& inJets, const std::vector<double>& lut, double ptMin, double ptMax){
+
+  std::vector<jJet> outJets;
+
+  for(auto iJet = inJets.begin(); iJet!=inJets.end(); iJet++){
+
+    //If the pt of the jet is outside of the calibration range, add the jet to the calibrated jets and do nothing
+    if(iJet->pt()<ptMin || iJet->pt()>ptMax){
+      outJets.push_back(*iJet);
+    }else{
+
+      double p[6]; //These are the parameters of the fit
+      double v[1]; //This is the pt value
+
+      //Load the lut based on the correct eta bin
+      if(iJet->iEta()>=-28 && iJet->iEta()<-17){
+        p[0]=lut[0];
+        p[1]=lut[1];
+        p[2]=lut[2];
+        p[3]=lut[3];
+        p[4]=lut[4];
+        p[5]=lut[5];
+      }else if(iJet->iEta()>=-17 && iJet->iEta()<-6){
+        p[0]=lut[6];
+        p[1]=lut[7];
+        p[2]=lut[8];
+        p[3]=lut[9];
+        p[4]=lut[10];
+        p[5]=lut[11];
+      }else if(iJet->iEta()>=-6 && iJet->iEta()<=6){
+        p[0]=lut[12];
+        p[1]=lut[13];
+        p[2]=lut[14];
+        p[3]=lut[15];
+        p[4]=lut[16];
+        p[5]=lut[17];
+      }else if(iJet->iEta()>6 && iJet->iEta()<=17){
+        p[0]=lut[18];
+        p[1]=lut[19];
+        p[2]=lut[20];
+        p[3]=lut[21];
+        p[4]=lut[22];
+        p[5]=lut[23];
+      }else if(iJet->iEta()>17 && iJet->iEta()<=28){
+        p[0]=lut[24];
+        p[1]=lut[25];
+        p[2]=lut[26];
+        p[3]=lut[27];
+        p[4]=lut[28];
+        p[5]=lut[29];
+      }
+      v[0]=iJet->pt();
+      double correction=1.0/calibFit(v,p);
+
+      jJet newJet=*iJet;
+      newJet.setPt(correction*iJet->pt());
+
+      outJets.push_back(newJet);
+
+    }
+
+  }
+  return outJets;
+}
+
 std::vector<int> CaloTowerAnalyser::closestJetDistance(const std::vector<jJet> & jJets) {
 
   std::vector<int> distances(jJets.size(),-1);

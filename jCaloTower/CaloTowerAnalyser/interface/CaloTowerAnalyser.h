@@ -57,6 +57,7 @@
 
 #include "jCaloTower/CaloTowerAnalyser/interface/jad_jet_class.hh"
 #include "jCaloTower/CaloTowerAnalyser/interface/matching_algo.hh"
+#include "jCaloTower/CaloTowerAnalyser/interface/calibration_params.hh"
 
 #include "fastjet/GhostedAreaSpec.hh"
 #include "fastjet/ClusterSequenceArea.hh"
@@ -97,6 +98,7 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     std::vector<int> closestJetDistance(const std::vector<jJet> & jJets);
     void SetNPV(int NPV);
     int GetNPV();
+    std::vector<jJet> calibrateL1Jets(const std::vector<jJet>& inJets, const std::vector<double>& lut, double ptMin, double ptMax);
     void setL1Sizes(std::vector<TString> l1Sizes);
     void setL1PusVars(std::vector<TString> l1Vars);
     void setGlobalPusVars(std::vector<TString> globalVars);
