@@ -1125,7 +1125,14 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
   std::vector<jJet> L1_5450_jJet = getL1Jets(myarray, 5, 4 , 5, 0);
 
+  //Compute calibrated jets
+  
+  std::vector<double> nopusLut = getLut("nopus");
+  std::vector<jJet> calib_5450_jJet = calibrateL1Jets(L1_5450_jJet, nopusLut, 0.,9900.);
 
+  compareJetCollections(L1_5450_jJet,calib_5450_jJet,"noncalib_calib");
+  compareJetCollections(calib_5450_jJet,ak4genjetsp_jJet,"calib_gen");
+  compareJetCollections(L1_5450_jJet,ak4genjetsp_jJet,"noncalib_gen");
 
   for(std::vector<jJet>::const_iterator L1_5450=L1_5450_jJet.begin(); L1_5450!=L1_5450_jJet.end(); L1_5450++){
     for(std::map<TString,int>::const_iterator nintIt = nintBins_.begin(); nintIt!=nintBins_.end(); nintIt++){

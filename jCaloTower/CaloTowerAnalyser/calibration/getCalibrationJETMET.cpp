@@ -167,7 +167,7 @@ double ptStep = 5;
 //=======================
 
 
-TString filename = "qcd_output.root";
+TString filename = "qcd_full_output.root";
 
 
 // Directory inside ROOT file
@@ -175,7 +175,7 @@ TString filename = "qcd_output.root";
 TString ROOTdir  = "";
 // Directory to store plots
 //  TString plotDirectory = "plots/Mk1Release/Presentation/8x8_PreFix/";
-TString plotDirectory = "qcd_10to120";
+TString plotDirectory = "qcd_full_10to300";
 
 
 
@@ -290,6 +290,9 @@ int getCalibration(){
     subDirs.push_back( "/5400_donut_gen/" );
     subDirs.push_back( "/5400_global_gen/" );
     subDirs.push_back( "/5400_nopus_gen/" );
+    subDirs.push_back( "/5450_donut_gen/" );
+    subDirs.push_back( "/5450_global_gen/" );
+    subDirs.push_back( "/5450_nopus_gen/" );
     //subDirs.push_back( "/Calibration_LPUS_ak5PUS_AllJets/" );
 
     //	   subDirs.push_back( "/Calibration_UncalibCurr_ak5PUS/" );     
@@ -299,6 +302,9 @@ int getCalibration(){
     typeLabel[ "/5400_donut_gen/" ] = "5400_donut_4Jets";
     typeLabel[ "/5400_global_gen/" ] = "5400_global_4Jets";
     typeLabel[ "/5400_nopus_gen/" ] = "5400_nopus_4Jets";
+    typeLabel[ "/5450_donut_gen/" ] = "5450_donut_4Jets";
+    typeLabel[ "/5450_global_gen/" ] = "5450_global_4Jets";
+    typeLabel[ "/5450_nopus_gen/" ] = "5450_nopus_4Jets";
     //typeLabel[ "/Calibration_LPUS_ak5PUS_AllJets/" ] = "LPUS_AllJets";
 
 
@@ -444,7 +450,7 @@ int getCalibration(){
     double ptMin = 10; 
 
     //double ptMax = 120;
-    double ptMax = 120;
+    double ptMax = 300;
 
     //Rebinning options
     bool doRebin = true;
