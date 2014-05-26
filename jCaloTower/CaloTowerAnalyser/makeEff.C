@@ -1,17 +1,20 @@
 void makeEff()
 {
 
-   TFile * f = TFile::Open("./batch/ttbar5/ttbar_out.root");
+   TFile * f = TFile::Open("./batch/qcd_test/qcd_calib.root");
 // TFile * f = TFile::Open("./global_PUS_TEST.root");
 
    std::vector<TString> PUSregime;
    PUSregime.push_back("5400_nopus");
+   PUSregime.push_back("5400_calib_nopus");
    PUSregime.push_back("5450_nopus");
    //PUSregime.push_back("4300_nopus");
    PUSregime.push_back("5400_donut");
+   PUSregime.push_back("5400_calib_donut");
    PUSregime.push_back("5450_donut");
   // PUSregime.push_back("4300_donut");
    PUSregime.push_back("5400_global");
+   PUSregime.push_back("5400_calib_global");
    //PUSregime.push_back("4300_global");
    PUSregime.push_back("gct");
    std::vector<TString> algo;

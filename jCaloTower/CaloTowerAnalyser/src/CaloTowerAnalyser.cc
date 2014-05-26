@@ -52,6 +52,8 @@ Implementation:
 
 #include "jCaloTower/CaloTowerAnalyser/interface/jad_jet_class.hh"
 #include "jCaloTower/CaloTowerAnalyser/interface/matching_algo.hh"
+#include "jCaloTower/CaloTowerAnalyser/interface/mask.hh"
+#include "jCaloTower/CaloTowerAnalyser/interface/calibration_params.hh"
 
 #include "fastjet/GhostedAreaSpec.hh"
 #include "fastjet/ClusterSequenceArea.hh"
@@ -84,11 +86,12 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
       static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
       void getJets(std::vector < fastjet::PseudoJet > &constits,std::vector < fastjet::PseudoJet > &jets);
-      std::vector<jJet> getL1Jets(const std::vector< std::vector<int> > & input, int phisize, int etasize, int vetophisize, int vetoetasize, int seedthresh1, int seedthresh2);
       std::vector<jJet> getL1Jets(const std::vector< std::vector<int> > & input, int jetsize, int vetowindowsize, int seedthresh1, int seedthresh2); 
+      std::vector<jJet> getL1JetsMask(const std::vector< std::vector<int> > & input, std::vector<std::vector <int> > mask, std::vector<std::vector <int > > donut_mask, int seedthresh1, int seedthresh2);
       void compareJetCollections(const std::vector<jJet> & col1, const std::vector<jJet> & col2, std::string folderName, bool isgct);
       void printOneEvent(const edm::Handle<l1slhc::L1CaloTowerCollection> triggertowers, const std::vector<jJet> & L1jets, const std::vector<fastjet::PseudoJet> & ak4ttjets, const reco::GenJetCollection * ak4genjets, std::vector<fastjet::PseudoJet> & ak4genjetsp);
       void printOneEvent(const edm::Handle<l1slhc::L1CaloTowerCollection> triggertowers, const std::map <TString,std::vector<jJet> > & L1jets, const std::map<TString,std::vector<fastjet::PseudoJet>> & ak4jets,std::map<TString,const reco::GenJetCollection *> ak4genjets);
+    std::vector<jJet> calibrateL1Jets(const std::vector<jJet>& inJets, const std::vector<double>& lut, double ptMin, double ptMax);
       std::vector<int> closestJetDistance(const std::vector<jJet> & jJets);
       void SetNPV(int NPV);
       int GetNPV();
@@ -258,7 +261,11 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
       std::map<TString,TH2D*> col1_jet2_pt_NPV;
       std::map<TString,TH2D*> col1_jet3_pt_NPV;
       std::map<TString,TH2D*> col1_jet4_pt_NPV;
-
+      //Calibration
+      std::map<TString,TH2D*> col2_calib_ratio;
+      std::map<TString,TProfile*> col2_calib_ratio_profile;
+      std::map<TString,TH2D*> col2_calib_corr;
+      std::map<TString,TProfile*> col2_calib_corr_profile;
 };
 
 void CaloTowerAnalyser::SetNPV(int npv) { mNPV = npv; }
@@ -297,6 +304,70 @@ void CaloTowerAnalyser::bookPusHists(TString folderName){
       }  
    }
 }
+std::vector<jJet> CaloTowerAnalyser::calibrateL1Jets(const std::vector<jJet>& inJets, const std::vector<double>& lut, double ptMin, double ptMax){
+
+  std::vector<jJet> outJets;
+
+  for(auto iJet = inJets.begin(); iJet!=inJets.end(); iJet++){
+
+    //If the pt of the jet is outside of the calibration range, add the jet to the calibrated jets and do nothing
+    if(iJet->pt()<ptMin || iJet->pt()>ptMax){
+      outJets.push_back(*iJet);
+    }else{
+
+      double p[6]; //These are the parameters of the fit
+      double v[1]; //This is the pt value
+
+      //Load the lut based on the correct eta bin
+      if(iJet->iEta()>=-28 && iJet->iEta()<-17){
+        p[0]=lut[0];
+        p[1]=lut[1];
+        p[2]=lut[2];
+        p[3]=lut[3];
+        p[4]=lut[4];
+        p[5]=lut[5];
+      }else if(iJet->iEta()>=-17 && iJet->iEta()<-6){
+        p[0]=lut[6];
+        p[1]=lut[7];
+        p[2]=lut[8];
+        p[3]=lut[9];
+        p[4]=lut[10];
+        p[5]=lut[11];
+      }else if(iJet->iEta()>=-6 && iJet->iEta()<=6){
+        p[0]=lut[12];
+        p[1]=lut[13];
+        p[2]=lut[14];
+        p[3]=lut[15];
+        p[4]=lut[16];
+        p[5]=lut[17];
+      }else if(iJet->iEta()>6 && iJet->iEta()<=17){
+        p[0]=lut[18];
+        p[1]=lut[19];
+        p[2]=lut[20];
+        p[3]=lut[21];
+        p[4]=lut[22];
+        p[5]=lut[23];
+      }else if(iJet->iEta()>17 && iJet->iEta()<=28){
+        p[0]=lut[24];
+        p[1]=lut[25];
+        p[2]=lut[26];
+        p[3]=lut[27];
+        p[4]=lut[28];
+        p[5]=lut[29];
+      }
+      v[0]=iJet->pt();
+      double correction=1.0*calibFit(v,p);
+
+      jJet newJet=*iJet;
+      newJet.setPt(correction*iJet->pt());
+
+      outJets.push_back(newJet);
+
+    }
+
+  }
+  return outJets;
+}
 void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, const std::vector<jJet> & col2, std::string folderName, bool isgct) {
    std::map<TString,int> ptBins_;
    ptBins_["pt_0to20"] = 20;
@@ -312,6 +383,16 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
    etaBins_["eta_-14to0"] = 0;
    etaBins_["eta_0to14"] = 14;
    etaBins_["eta_14to28"] = 28;
+
+   std::map<TString,std::pair<int,int>> etaCalibBins_;
+   etaCalibBins_["iEta_-28_to_-22"] = std::make_pair(-28,-21);
+   etaCalibBins_["iEta_-21_to_-15"] = std::make_pair(-21,-14);
+   etaCalibBins_["iEta_-14_to_-08"] = std::make_pair(-14,-7);
+   etaCalibBins_["iEta_-07_to_-1"] = std::make_pair(-7,0);
+   etaCalibBins_["iEta_01_to_07"] = std::make_pair(0,8);
+   etaCalibBins_["iEta_08_to_14"] = std::make_pair(8,15);
+   etaCalibBins_["iEta_15_to_21"] = std::make_pair(15,22);
+   etaCalibBins_["iEta_21_to_28"] = std::make_pair(22,29);
 
    std::map<TString,int> ptCut;
    ptCut["pt20"] = 20;
@@ -377,7 +458,7 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
    if(col2_matched_algo2_alljet_eta.count(folderName) == 0) { col2_matched_algo2_alljet_eta[folderName] = dir.make<TH1D>("col2_matched_algo2_alljet_eta",";eta all jets matched;",57, -0.5, 56.5); }
    if(col2_matched_algo2_ptcorr.count(folderName) == 0) { col2_matched_algo2_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo2_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
 
-   if(col2_matched_algo2_ptres_profile.count(folderName) == 0) { col2_matched_algo1_ptres_profile[folderName] = dir.make<TProfile>("col2_matched_algo1_ptres_profile", ";col2 p_{T}; (col1 - col2) / col2 p_{T}", 1000, -0.5, 999.5); }
+   if(col2_matched_algo2_ptres_profile.count(folderName) == 0) { col2_matched_algo2_ptres_profile[folderName] = dir.make<TProfile>("col2_matched_algo2_ptres_profile", ";col2 p_{T}; (col1 - col2) / col2 p_{T}", 1000, -0.5, 999.5); }
    if(col2_matched_algo2_ptres.count(folderName) == 0) { col2_matched_algo2_ptres[folderName] = dir.make<TH2D>("col2_matched_algo2_ptres", ";col2 p_{T}; (col1 - col2) / col2 p_{T}", 1000, -0.5, 999.5, 200, -10.05, 10.95); }
 
    if(col2_matched_algo2_ptratio.count(folderName) == 0) { col2_matched_algo2_ptratio[folderName] = dir.make<TH2D>("col2_matched_algo2_ptratio", ";col2 p_{T}; (col1) / col2 p_{T}", 1000, -0.5, 999.5, 200, -10.05, 10.95); }
@@ -394,11 +475,27 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
    if(col2_matched_algo2_jet3_ptcorr.count(folderName) == 0) { col2_matched_algo2_jet3_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo2_jet3_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
    if(col2_matched_algo2_jet4_ptcorr.count(folderName) == 0) { col2_matched_algo2_jet4_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo2_jet4_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
    if(col2_saved_algo2.count(folderName) == 0) { col2_saved_algo2[folderName] = dir.make<TH2D>("col2_saved_algo2",";col2 p_{T};Max Matched p_{T};", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
+
+   //Calibration Plots
+
    //New plots
    //Loop over Pt bins
    if(pMade.count(folderName) ==0)
    {
-      for(std::map<TString,int>::const_iterator ptCutIt=ptCut.begin(); ptCutIt != ptCut.end(); ptCutIt++)
+      TFileDirectory calibdir=dir.mkdir("calibration");
+
+      //for(std::map<TString,std::pair<int,int> >::const_iterator etaBinIt=etaCalibBins_.begin(); etaBinIt!=etaCalibBins_.end(); etaBinIt++){
+      for(auto etaBinIt=etaCalibBins_.begin(); etaBinIt!=etaCalibBins_.end(); etaBinIt++){
+
+	 col2_calib_ratio[TString(folderName)+etaBinIt->first]=calibdir.make<TH2D>("col2_calib_ratio_"+etaBinIt->first,";col2 p_{T};col1 p_{T}/col2 p_{T}",1000,-0.5,999.5,200,-10.05,10.95);
+	 col2_calib_ratio_profile[TString(folderName)+etaBinIt->first]=calibdir.make<TProfile>("col2_calib_ratio_profile_"+etaBinIt->first,";col2 p_{T};col1 p_{T}/col2 p_{T}",1000,-0.5,999.5);
+
+	 col2_calib_corr[TString(folderName)+etaBinIt->first]=calibdir.make<TH2D>("col2_calib_corr_"+etaBinIt->first,";col2 p_{T};col1 p_{T}",1000,-0.5,999.5,1000,-0.5,999.5);
+	 col2_calib_corr_profile[TString(folderName)+etaBinIt->first]=calibdir.make<TProfile>("col2_calib_corr_profile_"+etaBinIt->first,";col2 p_{T};col1 p_{T}",1000,-0.5,999.5);
+
+      }
+      for(auto ptCutIt=ptCut.begin(); ptCutIt != ptCut.end(); ptCutIt++)
+      //for(std::map<TString,std::pair<int,int> >::const_iterator ptCutIt=ptCut.begin(); ptCutIt != ptCut.end(); ptCutIt++)
       {
 	 std::cout << TString(folderName)+ptCutIt->first << std::endl;
 	 col2_matched_algo1_alljet_cut[TString(folderName)+ptCutIt->first]=dir.make<TH1D>("col2_matched_algo1_alljet_cut_"+ptCutIt->first,";p_{T};",1000,-0.5,999.5);
@@ -432,7 +529,7 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
 	 }
       }
    }
-  
+
    for(unsigned int i=0; i<col1.size(); i++) {
       col1_alljet_pt[folderName]->Fill(col1[i].pt());
       col1_alljet_pt_NPV[folderName]->Fill(mNPV,col1[i].pt());
@@ -484,6 +581,18 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
 	    col2_matched_algo1_ptres_profile[folderName]->Fill(col2[i].pt(), (col1[col2_matched_index[i]].pt() / col2[i].pt()) - 1.0 );
 	    col2_matched_algo1_ptratio[folderName]->Fill(col2[i].pt(), (col1[col2_matched_index[i]].pt() / col2[i].pt()));
 	 }
+	 //CALIB plots
+	 if(i < 4)
+	    for(auto etaBinIt=etaCalibBins_.begin(); etaBinIt!=etaCalibBins_.end(); etaBinIt++){
+	       if (col2[i].iEta() >= etaBinIt->second.first && col2[i].iEta() < etaBinIt->second.second)
+	       {
+		  col2_calib_ratio[TString(folderName)+etaBinIt->first]->Fill(col2[i].pt(),col1[col2_matched_index[i]].pt()/col2[i].pt());
+		  col2_calib_ratio_profile[TString(folderName)+etaBinIt->first]->Fill(col2[i].pt(),col1[col2_matched_index[i]].pt()/col2[i].pt());
+		  col2_calib_corr[TString(folderName)+etaBinIt->first]->Fill(col2[i].pt(),col1[col2_matched_index[i]].pt());
+		  col2_calib_corr_profile[TString(folderName)+etaBinIt->first]->Fill(col2[i].pt(),col1[col2_matched_index[i]].pt());
+	       }
+	    }
+
 	 if(i == 0) { col2_matched_algo1_jet1_pt[folderName]->Fill(col2[i].pt()); col2_matched_algo1_jet1_eta[folderName]->Fill(g.new_iEta(col2[i].iEta())); 
 	    col2_matched_algo1_jet1_ptcorr[folderName]->Fill(col1[col2_matched_index[i]].pt(), col2[i].pt()); 
 
@@ -521,7 +630,6 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
 		  }
 	       }
 	    }
-
 	    //Turn On Plots
 	    for(std::map<TString,int>::const_iterator ptCutIt=ptCut.begin(); ptCutIt!=ptCut.end(); ptCutIt++)
 	    {
@@ -534,6 +642,7 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
 
 	 }
 
+	 //Turn On Plots
 
 	 if(i == 2) { col2_matched_algo1_jet3_pt[folderName]->Fill(col2[i].pt()); col2_matched_algo1_jet3_eta[folderName]->Fill(g.new_iEta(col2[i].iEta())); col2_matched_algo1_jet3_ptcorr[folderName]->Fill(col1[col2_matched_index[i]].pt(), col2[i].pt());
 
@@ -586,9 +695,11 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
       } 
    }
    //ALGO 2
-  //pairs = (isgct) ? make_gct_pairs(col2,col1) : make_pairs(col2, col1);
-//std::cout << non0 << "\t";
-  col2_matched_index = analyse_pairs_global(pairs, col2.size(), 33);
+   //pairs = (isgct) ? make_gct_pairs(col2,col1) : make_pairs(col2, col1);
+   //std::cout << non0 << "\t";
+   //Turn On Plots
+   col2_matched_index = analyse_pairs_global(pairs, col2.size(), 33);
+
    for(unsigned int i=0; i<col2_matched_index.size(); i++) {
       //std::cout << "ak4genjetp with index " << i << " is matched to ak4ttjet with index " << ak4tt_matched_index[i] << std::endl;
       if(col2_matched_index[i] != -1) {
@@ -608,21 +719,23 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
 
       } 
       //if (col1[col2_matched_index[i]].pt()/col2[i].pt() > 900. && folderName =="5400_donut_gen" ) {this->mPrintMe = true; std::cout << mPrintMe << std::endl;}
-
-      else
-      {
-	 if (col2[i].pt()>200. && folderName=="5400_nopus_gen") {
-	    int max=0;
-	    for (unsigned int j =0; j <col1.size();j++)
-	    {
-	       if (max < col1[j].pt()) max = col1[j].pt();
-	    }
-	    col2_saved_algo2[folderName]->Fill(col2[i].pt(),max);
-	    if (max < col2[i].pt()) this->mPrintMe=true; std::cout << "PRINT "<<col2[i].pt() <<std::endl; 
-	    //	    break;
-	 }
-      } 
+      //Turn On Plots
+      /*      else
+	      {
+	      if (col2[i].pt()>200.) {
+	      int max=0;
+	      for (unsigned int j =0; j <col1.size();j++)
+	      {
+	      if (max < col1[j].pt()) max = col1[j].pt();
+	      }
+	      col2_saved_algo2[folderName]->Fill(col2[i].pt(),max);
+	      if (max < col2[i].pt()) this->mPrintMe=true; std::cout << "PRINT "<<col2[i].pt() <<std::endl; 
+      //	    break;
+      }
+      }
+       */ 
    }
+
    return;
 
 }
@@ -763,18 +876,24 @@ double CaloTowerAnalyser::getMedian(const std::vector<jJet> & jets)
 
 }
 ///MASK VERSION
-/*
-std::vector<jJet> CaloTowerAnalyser::getL1JetsMask(const std::vector< std::vector<int> > & input, int jetsize, int mask, int seedthresh1, int seedthresh2) {
+
+std::vector<jJet> CaloTowerAnalyser::getL1JetsMask(const std::vector< std::vector<int> > & input, std::vector<std::vector< int > > mask, std::vector<std::vector< int > > mask_donut, int seedthresh1, int seedthresh2) {
    //seedthresh1 is the seedthreshold on the central tower
    //seedthresh2 is the threshold on all towers a la zero suppression
    //jetsize is the +/- number to span i.e. +/- 1 = 3x3
-   //vetowindowsize is the +/- number window to look at to potentially veto the central tower
-
+   /////vetowindowsize is the +/- number window to look at to potentially veto the central tower
+   /////THIS MUST CHANGE
    std::vector<jJet> L1_jJets;
    TriggerTowerGeometry g;
+   int etasize=(mask.size()-1)/2;
+   int phisize=(mask.at(0).size()-1)/2;
+   int nringsveto =etasize;
 
+   int etasizedonut=(mask_donut.size()-1)/2;
+   int phisizedonut=(mask_donut.at(0).size()-1)/2;
+   int nstripsdonut =4;
+   /////////////////
    //std::cout << input.size() << ", " << input[0].size() << std::endl;
-
    for ( int i = 0; i < (int)input.size(); i++) {
       for ( int j = 0; j < (int)input[i].size(); j++) {
 	 std::vector<int> jetTower;
@@ -782,82 +901,113 @@ std::vector<jJet> CaloTowerAnalyser::getL1JetsMask(const std::vector< std::vecto
 	 int numtowersaboveme=0;
 	 int numtowersabovethresh=0;
 
-	 std::vector<int> localsums(jetsize+1,0); //to hold the ring sums (+1 for centre)
-	 std::vector<int> areas(jetsize+1,0); //to hold the ring areas (i.e. when we get up against the boundaries)
-	 std::vector<int> outerstrips(4,0); //to hold the energies in the 4 surrounding outer strips (excluding corners)
+	 std::vector<int> localsums(nringsveto+1,0); //to hold the ring sums (+1 for centre)
+	 std::vector<int> areas(nringsveto+1,0); //to hold the ring areas (i.e. when we get up against the boundaries)
+	 std::vector<int> outerstrips(nstripsdonut,0); //to hold the energies in the 4 surrounding outer strips (excluding corners)
+	 areas[0]=1;
 	 int jetarea = 1;
-	 for(int k=(i-jetsize); k<=(i+jetsize); k++) {
-	    for(int l=(j-jetsize); l<=(j+jetsize); l++) {
+	 int pusarea=0;
+	 for(int l=(j-phisizedonut); l<=(j+phisizedonut); l++) {
+	    for(int k=(i-etasizedonut); k<=(i+etasizedonut); k++) {
 	       if(k < 0 || k > 55) continue; //i.e. out of bounds of eta<3
 	       //std::cout << " k = " << k << ", l = " << l << ", i =" << i << ", j = " << j << std::endl;
+	       unsigned int dk = k-i+etasizedonut;
+	       unsigned int dl = l-j+phisizedonut;
 
-	       //make a co-ordinate transform at the phi boundary
-	       int newl;
+
+		  //	       std::cout << dk << std::endl;
+		  //	       std::cout << dl << std::endl;
+		  //make a co-ordinate transform at the phi boundary
+		  int newl;
 	       if(l < 0) { newl = l+72; } 
 	       else if (l > 71) { newl = l-72; } 
 	       else { newl = l; }
+
 	       if (l != j && k != i)
 	       {
 		  jetTower.push_back(input[k][newl]);
 	       }
 	       if(input[k][newl] > seedthresh2) { numtowersabovethresh++; }
+	       if(dl < mask_donut.size() && dk < mask_donut.at(0).size())
+	       {
+		  if(mask_donut[dl][dk] != 0)
+		  {
+		     outerstrips[mask_donut[dl][dk]-1]+=input[k][newl];
+		     pusarea++;
+	//	     std::cout << mask_donut[dl][dk];
+		  }
+	       }
 
-	       //to decide which ring to assign energy to
-	       for( int m=0; m<jetsize+1;m++) { //+1 for centre of jet (n steps is n+1 rings!)
-		  if((abs(i-k) == m && abs(j-l) <= m) || (abs(i-k) <= m && abs(j-l) == m)) { 
-		     //i.e. we are now in ring m
-		     if (m <= vetowindowsize) localsums[m] += input[k][newl]; 
-		     areas[m] += 1;
-		     if(m == jetsize) { //i.e. we are in the outer ring and want to parameterise PU
-			if( (k-i) == m && abs(j-l) <= (m-1) ) { outerstrips[0] += input[k][newl]; }
-			if( (i-k) == m && abs(j-l) <= (m-1) ) { outerstrips[1] += input[k][newl]; }
-			if( (l-j) == m && abs(i-k) <= (m-1) ) { outerstrips[2] += input[k][newl]; }
-			if( (j-l) == m && abs(i-k) <= (m-1) ) { outerstrips[3] += input[k][newl]; }
+	    }
+	    //std::cout << std::endl;
+	 }
+	    //std::cout << std::endl;
+	 for(int l=(j-phisize); l<=(j+phisize); l++) {
+	    for(int k=(i-etasize); k<=(i+etasize); k++) {
+	       unsigned int dk = k-i+etasize;
+	       unsigned int dl = l-j+phisize;
+	       if(k < 0 || k > 55) continue; //i.e. out of bounds of eta<3
+	       //std::cout << " k = " << k << ", l = " << l << ", i =" << i << ", j = " << j << std::endl;
+	       //	       std::cout << dk << std::endl;
+	       //	       std::cout << dl << std::endl;
+	       //make a co-ordinate transform at the phi boundary
+	       int newl;
+	       if(l < 0) { newl = l+72; } 
+	       else if (l > 71) { newl = l-72; } 
+	       else { newl = l; }
+
+	       if (l != j && k != i)
+	       {
+		  jetTower.push_back(input[k][newl]);
+	       }
+	       if(input[k][newl] > seedthresh2) { numtowersabovethresh++; }
+	       if(dl < mask.size() && dk < mask.at(0).size())
+	       {
+		  if (mask[dl][dk] == 2){if(input[k][newl]>input[i][j]) {numtowersaboveme++;}}
+		  else if (mask[dl][dk] == 1){if(input[k][newl]>=input[i][j]) {numtowersaboveme++;}}
+		  /*
+		     if((k+l) > (i+j) ) { if(input[k][newl] > input[i][j]) { numtowersaboveme++; } }
+		     else if( ((k+l) == (i+j)) && (k-i) > (l-j)) { if(input[k][newl] > input[i][j]) { numtowersaboveme++; } } //this line is to break the degeneracy along the diagonal treating top left different to bottom right
+		     else { if(input[k][newl] >= input[i][j]) { numtowersaboveme++; } }
+		   */
+		  for( int m=0; m<nringsveto+1;m++) { //+1 for centre of jet (n steps is n+1 rings!)
+		     if((abs(i-k) == m && abs(j-l) <= m) || (abs(i-k) <= m && abs(j-l) == m)) { 
+			//i.e. we are now in ring m
+			localsums[m] += input[k][newl]; 
+			if (mask[dl][dk] != 0) {areas[m] += 1; jetarea++;}
+			break; //no point continuining since can only be a member of one ring
 		     }
-
-		     if(m > 0 && m <= vetowindowsize) { //i.e. don't compare the central tower or towers outside vetowindowsize
-			jetarea++;
-			if((k+l) > (i+j) ) { if(input[k][newl] > input[i][j]) { numtowersaboveme++; } }
-			else if( ((k+l) == (i+j)) && (k-i) > (l-j)) { if(input[k][newl] > input[i][j]) { numtowersaboveme++; } } //this line is to break the degeneracy along the diagonal treating top left different to bottom right
-			else { if(input[k][newl] >= input[i][j]) { numtowersaboveme++; } }
-
-		     }
-		     break; //no point continuining since can only be a member of one ring
 		  }
 	       }
 
 	    }
 	 }
-
 	 //now we have a jet candidate centred at i,j, with the ring energies and areas defined
-
 	 //now we have the L1 jet candidate:
 	 if(numtowersaboveme == 0 && input[i][j] > seedthresh1) {
 	    double totalenergy=0.0;
 	    //std::cout << "iEta: " << g.old_iEta(i) << ", iPhi: " << g.old_iPhi(j) << ", r0: " << localsums[0] <<  ", r1: " << localsums[1] << ", r2: " << localsums[2] << ", r3: " << localsums[3] << ", r4: " << localsums[4] << std::endl;
 	    for(int ring=0; ring < (int)localsums.size(); ring++) { totalenergy += localsums[ring]; }
 	    //this is with PUS:
-	    //for(int ring=0; ring < (int)localsums.size()-1; ring++) { totalenergy += localsums[ring]; }
-	    //std::sort(outerstrips.begin(),outerstrips.end());
-	    //totalenergy = totalenergy - (3.5 * (outerstrips[1] + outerstrips[2]));
-
-	    //this means we have a viable candidate
 	    if(totalenergy > 0.0) {
-	       L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetTower,jetarea));
+//TEMP
+	       areas.at(areas.size()-1)=pusarea;
+
+//TEMP
+	       L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetTower,jetarea,pusarea));
 	    }
 
 	 }
 
       }
    }
-
    //sort by highest pT before ending
    std::sort(L1_jJets.begin(), L1_jJets.end(), sortbypt);  
 
    return L1_jJets;
 
 }
-*/
+
 std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<int> > & input, int jetsize, int vetowindowsize, int seedthresh1, int seedthresh2) {
    //seedthresh1 is the seedthreshold on the central tower
    //seedthresh2 is the threshold on all towers a la zero suppression
@@ -880,6 +1030,7 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
 	 std::vector<int> areas(jetsize+1,0); //to hold the ring areas (i.e. when we get up against the boundaries)
 	 std::vector<int> outerstrips(4,0); //to hold the energies in the 4 surrounding outer strips (excluding corners)
 	 int jetarea = 1;
+	 int pusarea = 0;
 	 for(int k=(i-jetsize); k<=(i+jetsize); k++) {
 	    for(int l=(j-jetsize); l<=(j+jetsize); l++) {
 	       if(k < 0 || k > 55) continue; //i.e. out of bounds of eta<3
@@ -901,12 +1052,12 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
 		  if((abs(i-k) == m && abs(j-l) <= m) || (abs(i-k) <= m && abs(j-l) == m)) { 
 		     //i.e. we are now in ring m
 		     if (m <= vetowindowsize) localsums[m] += input[k][newl]; 
-		     areas[m] += 1;
+		     areas[m]+=1;
 		     if(m == jetsize) { //i.e. we are in the outer ring and want to parameterise PU
-			if( (k-i) == m && abs(j-l) <= (m-1) ) { outerstrips[0] += input[k][newl]; }
-			if( (i-k) == m && abs(j-l) <= (m-1) ) { outerstrips[1] += input[k][newl]; }
-			if( (l-j) == m && abs(i-k) <= (m-1) ) { outerstrips[2] += input[k][newl]; }
-			if( (j-l) == m && abs(i-k) <= (m-1) ) { outerstrips[3] += input[k][newl]; }
+			if( (k-i) == m && abs(j-l) <= (m-1) ) { outerstrips[0] += input[k][newl];pusarea++; }
+			if( (i-k) == m && abs(j-l) <= (m-1) ) { outerstrips[1] += input[k][newl];pusarea++; }
+			if( (l-j) == m && abs(i-k) <= (m-1) ) { outerstrips[2] += input[k][newl];pusarea++; }
+			if( (j-l) == m && abs(i-k) <= (m-1) ) { outerstrips[3] += input[k][newl];pusarea++; }
 		     }
 
 		     if(m > 0 && m <= vetowindowsize) { //i.e. don't compare the central tower or towers outside vetowindowsize
@@ -937,7 +1088,7 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
 
 	    //this means we have a viable candidate
 	    if(totalenergy > 0.0) {
-	       L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetTower,jetarea));
+	       L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetTower,jetarea,pusarea));
 	    }
 
 	 }
@@ -1123,7 +1274,8 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
    // Get GCT jets (uncalib) collection
    edm::Handle<L1GctJetCandCollection> GctUncalibCenJets;
-   edm::InputTag gctUncalibCenJets("valGctDigis","cenJets","jadtest");
+   edm::InputTag gctUncalibCenJets("valGctDigis","cenJets","skimrun");
+   //edm::InputTag gctUncalibCenJets("valGctDigis","cenJets","jadtest");
    iEvent.getByLabel(gctUncalibCenJets, GctUncalibCenJets);
    std::vector<jJet> gct_jJet;
    for(unsigned int i=0; i<GctUncalibCenJets->size(); i++) {
@@ -1151,7 +1303,8 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
    // Get gen jet collection
    edm::Handle<reco::GenJetCollection> hGenJetProduct;
-   edm::InputTag genjetselector("ak4GenJets","","jadtest");
+   edm::InputTag genjetselector("ak4GenJets","","skimrun");
+   // edm::InputTag genjetselector("ak4GenJets","","jadtest");
    //iEvent.getByLabel("ak4GenJets", hGenJetProduct);
    iEvent.getByLabel(genjetselector, hGenJetProduct);
    const reco::GenJetCollection * genJetCol = 0;
@@ -1327,15 +1480,20 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
    std::vector<jJet> L1_5450_jJet = getL1Jets(myarray, 5, 4, 5, 0);
    std::vector<jJet> L1_6550_jJet = getL1Jets(myarray, 6, 5, 5, 0);
    std::vector<jJet> L1_4300_jJet = getL1Jets(myarray, 4, 3, 0, 0);
-   //std::vector<jJet> L1_4400_jJet = getL1Jets(myarray, 4, 4, 0, 0);
-   //std::vector<jJet> L1_4300donut_jJet;
-   //std::vector<jJet> L1_4350donut_jJet;
+
+   //std::vector<std::vector<int> > mask=mask_square_9by9();
+   //std::vector<std::vector<int> > mask_donut=mask_donut_11by11();
+
+   //std::vector<jJet> L1_5400_jJet_mask = getL1JetsMask(myarray, mask, mask_donut, 0, 0);
+   //std::vector<jJet> L1_5400donut_jJet_mask; 
+   std::vector<jJet> L1_4300donut_jJet;
+   std::vector<jJet> L1_4350donut_jJet;
    std::vector<jJet> L1_5400donut_jJet;
    std::vector<jJet> L1_5400global_jJet;
    std::vector<jJet> L1_5450donut_jJet;
    std::vector<jJet> L1_5450global_jJet;
 
-   std::vector<jJet> L1_4300donut_jJet;
+   //std::vector<jJet> L1_4300donut_jJet;
    std::vector<jJet> L1_4300global_jJet;
 
 
@@ -1359,6 +1517,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
    std::map <TString,const reco::GenJetCollection * > genMap;
 
    jJetMap["L1_5400"] = L1_5400_jJet;
+   //jJetMap["L1_5400_mask"] = L1_5400_jJet_mask;
 
    ak4Map["ak4tt"] = ak4ttjets; 
    ak4Map["ak4gen"] = ak4genjetsp; 
@@ -1381,6 +1540,13 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
       }
    }
+/*   for(unsigned int i=0; i<L1_5400_jJet_mask.size(); i++) {
+      double newenergydonut5400=L1_5400_jJet_mask[i].eatDonut();
+
+      if(newenergydonut5400 >= 0.0) { 
+	 L1_5400donut_jJet_mask.push_back(jJet(newenergydonut5400, L1_5400_jJet_mask[i].iEta(), L1_5400_jJet_mask[i].iPhi()));
+      }
+   }*/
    for(unsigned int i=0; i<L1_4300_jJet.size(); i++) {
       double newenergydonut4300=L1_4300_jJet[i].eatDonut();
       double newenergyglobal4300=L1_4300_jJet[i].eatGlobe(median_jet_4300);
@@ -1409,29 +1575,40 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
       }
    }
+   //Calibration
+   std::vector<jJet> calibrated_L1_5400_jJet = calibrateL1Jets(L1_5400_jJet,getLut(jetType::nopus),0,9999);
+   std::vector<jJet> calibrated_L1_5400global_jJet = calibrateL1Jets(L1_5400global_jJet,getLut(jetType::global),0,9999);
+   std::vector<jJet> calibrated_L1_5400donut_jJet = calibrateL1Jets(L1_5400donut_jJet,getLut(jetType::donut),0,9999);
+   //this->mPrintMe = false;
+   
+      this->compareJetCollections(L1_5400donut_jJet, ak4genjetsp_jJet,"5400_donut_gen",false);
+      this->compareJetCollections(L1_5400_jJet, ak4genjetsp_jJet,"5400_nopus_gen",false);
+      this->compareJetCollections(L1_5400global_jJet, ak4genjetsp_jJet, "5400_global_gen",false);
 
-   this->mPrintMe = false;
+      this->compareJetCollections(calibrated_L1_5400donut_jJet, ak4genjetsp_jJet,"5400_calib_donut_gen",false);
+      this->compareJetCollections(calibrated_L1_5400_jJet, ak4genjetsp_jJet,"5400_calib_nopus_gen",false);
+      this->compareJetCollections(calibrated_L1_5400global_jJet, ak4genjetsp_jJet, "5400_calib_global_gen",false);
 
-   this->compareJetCollections(L1_5400donut_jJet, ak4genjetsp_jJet,"5400_donut_gen",false);
-   this->compareJetCollections(L1_5400_jJet, ak4genjetsp_jJet,"5400_nopus_gen",false);
-   this->compareJetCollections(L1_5400global_jJet, ak4genjetsp_jJet, "5400_global_gen",false);
+      this->compareJetCollections(calibrated_L1_5400donut_jJet, L1_5400donut_jJet,"5400_donut_calib_uncalib",false);
+      this->compareJetCollections(calibrated_L1_5400_jJet, ak4genjetsp_jJet,"5400_nopus_calib_uncalib",false);
+      this->compareJetCollections(calibrated_L1_5400global_jJet, ak4genjetsp_jJet, "5400_global_calib_uncalib",false);
+/*
+      this->compareJetCollections(L1_4300donut_jJet, ak4genjetsp_jJet,"4300_donut_gen",false);
+      this->compareJetCollections(L1_4300_jJet, ak4genjetsp_jJet,"4300_nopus_gen",false);
+      this->compareJetCollections(L1_4300global_jJet, ak4genjetsp_jJet, "4300_global_gen",false);
 
-   this->compareJetCollections(L1_4300donut_jJet, ak4genjetsp_jJet,"4300_donut_gen",false);
-   this->compareJetCollections(L1_4300_jJet, ak4genjetsp_jJet,"4300_nopus_gen",false);
-   this->compareJetCollections(L1_4300global_jJet, ak4genjetsp_jJet, "4300_global_gen",false);
+      this->compareJetCollections(L1_5450donut_jJet, ak4genjetsp_jJet,"5450_donut_gen",false);
+      this->compareJetCollections(L1_5450_jJet, ak4genjetsp_jJet,"5450_nopus_gen",false);
+      this->compareJetCollections(L1_5450global_jJet, ak4genjetsp_jJet, "5450_global_gen",false);
 
-   this->compareJetCollections(L1_5450donut_jJet, ak4genjetsp_jJet,"5450_donut_gen",false);
-   this->compareJetCollections(L1_5450_jJet, ak4genjetsp_jJet,"5450_nopus_gen",false);
-   this->compareJetCollections(L1_5450global_jJet, ak4genjetsp_jJet, "5450_global_gen",false);
+      this->compareJetCollections(L1_6550_jJet, ak4genjetsp_jJet,"6550_nopus_gen",false);
 
-   this->compareJetCollections(L1_6550_jJet, ak4genjetsp_jJet,"6550_nopus_gen",false);
-
-   this->compareJetCollections(top_jJet, ak4genjetsp_jJet, "top_gen",false);
-   this->compareJetCollections(top_jJet, ak4tt_jJet, "top_tt_gen",false);
+      this->compareJetCollections(top_jJet, ak4genjetsp_jJet, "top_gen",false);
+      this->compareJetCollections(top_jJet, ak4tt_jJet, "top_tt_gen",false);
 
 
-   this->compareJetCollections(gct_jJet, ak4genjetsp_jJet, "gct_gen",true);
-
+      this->compareJetCollections(gct_jJet, ak4genjetsp_jJet, "gct_gen",true);
+  */  
    double mean_top_pt=0.;
    for (auto iTop = top_jJet.begin();iTop != top_jJet.end(); iTop++)
    {
@@ -1458,7 +1635,9 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
    //std::cout << mPrintMe << std::endl;
    jJetMap["L1_5400_Donut"] = L1_5400donut_jJet;
+///   jJetMap["L1_5400_Donut_mask"] = L1_5400donut_jJet_mask;
    jJetMap["L1_4300_Donut"] = L1_4300donut_jJet;
+ //  mPrintMe=true;
    if(this->mPrintMe)
    {
       std::cout << "Event Printed" << std::endl;
@@ -1466,6 +1645,8 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       printOneEvent(triggertowers, jJetMap,ak4Map,genMap);
    }
    this->mPrintMe = false;
+   //CALIBRATE!!!
+
 
 
    int maxtower; 
