@@ -1,0 +1,40 @@
+void generate_matching_efficiencies() {
+
+  TFile * file = new TFile("histograms-ttbar_13TeV_PU40_25ns_test_skimmed_v2_5GeVseed_test.root","READ");
+
+  TH1D * hist1 = (TH1D*)((TH1D*)file->Get("demo/global_histograms/genjet_pt_nomunu")->Clone());
+  TH1D * hist2 = (TH1D*)((TH1D*)file->Get("demo/global_histograms/genjet_pt_nomunu_match_L1")->Clone());
+  TH1D * hist3 = (TH1D*)((TH1D*)file->Get("demo/global_histograms/genjet_pt_nomunu_match_ak4tt")->Clone());
+
+  hist1->Sumw2();
+  hist2->Sumw2();
+  hist3->Sumw2();
+  hist1->Rebin(10);
+  hist2->Rebin(10);
+  hist3->Rebin(10);
+  hist2->Divide(hist1);
+  hist3->Divide(hist1);
+
+  TH1D * hist4 = (TH1D*)((TH1D*)file->Get("demo/global_histograms/genjet_eta_nomunu")->Clone());
+  TH1D * hist5 = (TH1D*)((TH1D*)file->Get("demo/global_histograms/genjet_eta_nomunu_match_L1")->Clone());
+  TH1D * hist6 = (TH1D*)((TH1D*)file->Get("demo/global_histograms/genjet_eta_nomunu_match_ak4tt")->Clone());
+
+  hist4->Sumw2();
+  hist5->Sumw2();
+  hist6->Sumw2();
+
+  hist5->Divide(hist4);
+  hist6->Divide(hist4);
+
+  TFile * ofile = new TFile("output-file-matching.root","RECREATE");
+  //hist1->Draw();
+  ofile->cd();
+  hist2->Write();
+  hist3->Write();
+  hist5->Write();
+  hist6->Write();
+  ofile->Close();
+
+  return;
+
+}
