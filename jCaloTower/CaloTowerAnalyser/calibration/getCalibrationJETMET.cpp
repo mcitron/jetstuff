@@ -167,7 +167,7 @@ double ptStep = 5;
 //=======================
 
 
-TString filename = "qcd_full_output.root";
+TString filename = "qcd_full_10eta.root";
 
 
 // Directory inside ROOT file
@@ -175,7 +175,11 @@ TString filename = "qcd_full_output.root";
 TString ROOTdir  = "";
 // Directory to store plots
 //  TString plotDirectory = "plots/Mk1Release/Presentation/8x8_PreFix/";
-TString plotDirectory = "qcd_full_10to300";
+int nEtaBins=8;
+double setPtBin=10;
+double setPtMin=10;
+double setPtMax=300;
+TString plotDirectory = "qcd_8eta_10to300";
 
 
 
@@ -236,6 +240,9 @@ int getCalibration(){
   std::map <TString,TProfile*> histogramProf;
   std::map <TString,TString>   histogramDirectory;
 
+  //Make new file for Chi2
+  TFile* chi2File = new TFile(plotDirectory+"Chi2Fits.root","RECREATE");
+
   // temporary name of filepath and histogram
   TString filepath, filepathRaw, histogramName, histogramNameRaw;
 
@@ -290,9 +297,9 @@ int getCalibration(){
     subDirs.push_back( "/5400_donut_gen/" );
     subDirs.push_back( "/5400_global_gen/" );
     subDirs.push_back( "/5400_nopus_gen/" );
-    subDirs.push_back( "/5450_donut_gen/" );
+ /*   subDirs.push_back( "/5450_donut_gen/" );
     subDirs.push_back( "/5450_global_gen/" );
-    subDirs.push_back( "/5450_nopus_gen/" );
+    subDirs.push_back( "/5450_nopus_gen/" );*/
     //subDirs.push_back( "/Calibration_LPUS_ak5PUS_AllJets/" );
 
     //	   subDirs.push_back( "/Calibration_UncalibCurr_ak5PUS/" );     
@@ -302,9 +309,9 @@ int getCalibration(){
     typeLabel[ "/5400_donut_gen/" ] = "5400_donut_4Jets";
     typeLabel[ "/5400_global_gen/" ] = "5400_global_4Jets";
     typeLabel[ "/5400_nopus_gen/" ] = "5400_nopus_4Jets";
-    typeLabel[ "/5450_donut_gen/" ] = "5450_donut_4Jets";
+/*    typeLabel[ "/5450_donut_gen/" ] = "5450_donut_4Jets";
     typeLabel[ "/5450_global_gen/" ] = "5450_global_4Jets";
-    typeLabel[ "/5450_nopus_gen/" ] = "5450_nopus_4Jets";
+    typeLabel[ "/5450_nopus_gen/" ] = "5450_nopus_4Jets";*/
     //typeLabel[ "/Calibration_LPUS_ak5PUS_AllJets/" ] = "LPUS_AllJets";
 
 
@@ -331,6 +338,8 @@ int getCalibration(){
       // Get the current subdirectory to process
       TString curSubDir = subDirs[iSub];
 
+      TH2D* responseChi2 = new TH2D(typeLabel[subDirs[iSub]]+"responseChi2","Chi2 for the response fits",int((setPtMax-setPtMin)/setPtBin),setPtMin,setPtMax,nEtaBins,0.,nEtaBins);
+      TH2D* ptChi2 = new TH2D(typeLabel[subDirs[iSub]]+"ptChi2","Chi2 for the pt correlation fits",int((setPtMax-setPtMin)/setPtBin),setPtMin,setPtMax,nEtaBins,0.,nEtaBins);
 
       for (unsigned int i = 0;i < fileHistPair.size(); i++){
 
@@ -358,612 +367,620 @@ int getCalibration(){
             //if (filepath.Contains("NVTXBinned") == 0)
 
 
-              // Restrict to calibration plots
-              if ( ( histogramName.Contains("ratio_iEta") != 0 ) || ( histogramName.Contains("corr_iEta") != 0 ) ) {
+            // Restrict to calibration plots
+            if ( ( histogramName.Contains("ratio_iEta") != 0 ) || ( histogramName.Contains("corr_iEta") != 0 ) ) {
 
-                histogramName.ReplaceAll("(","{").ReplaceAll(")","}"); // Replace brackets to allow pdf printing
-                filepath.ReplaceAll("(","{").ReplaceAll(")","}");
+              histogramName.ReplaceAll("(","{").ReplaceAll(")","}"); // Replace brackets to allow pdf printing
+              filepath.ReplaceAll("(","{").ReplaceAll(")","}");
 
-                //	      std::cout << "NEW = " << filepath << "\t" << histogramName << "\n";
+              //	      std::cout << "NEW = " << filepath << "\t" << histogramName << "\n";
 
-                // store histogram and its storage directory
-                histogram2D[ histogramName ]        = (TH2*)f->Get(filepathRaw + "/" + histogramNameRaw)->Clone();
-                histogramDirectory[ histogramName ] = filepath;
+              // store histogram and its storage directory
+              histogram2D[ histogramName ]        = (TH2*)f->Get(filepathRaw + "/" + histogramNameRaw)->Clone();
+              histogramDirectory[ histogramName ] = filepath;
 
-                // Ensure a directory is created to store the histogram
-                makeFullDir( plotDirectory, filepath );
+              // Ensure a directory is created to store the histogram
+              makeFullDir( plotDirectory, filepath );
 
-                // change name to avoid memory conflicts
-                histogram2D[ histogramName ] ->SetName(histogramName);
-
-
-                std::cout << "Got here 2\n";
-
-                // Get Eta label
-                TString EtaStr = histogramName;{
-                  while ( EtaStr.Contains("iEta") )
-                    EtaStr = EtaStr.Remove( 0, EtaStr.Index("iEta") + 5);
-                }
-
-                TString etaLowStr  = EtaStr;
-                etaLowStr = etaLowStr.Remove( etaLowStr.Index("_to_") );
-                // 		  TString etaHighStr = EtaStr;
-                // 		  etaHighStr = etaHighStr.Remove( 0, etaHighStr.Index("_to_") + 4);  
-
-                double etaLow  = etaLowStr.Atof();
-                //		  double etaHigh = etaHighStr.Atof();
-                etaBins[ etaLow ] = EtaStr;
+              // change name to avoid memory conflicts
+              histogram2D[ histogramName ] ->SetName(histogramName);
 
 
+              std::cout << "Got here 2\n";
+
+              // Get Eta label
+              TString EtaStr = histogramName;{
+                while ( EtaStr.Contains("iEta") )
+                  EtaStr = EtaStr.Remove( 0, EtaStr.Index("iEta") + 5);
               }
-            //}
-          }
-        }
-        //}
-    }
 
+              TString etaLowStr  = EtaStr;
+              etaLowStr = etaLowStr.Remove( etaLowStr.Index("_to_") );
+              // 		  TString etaHighStr = EtaStr;
+              // 		  etaHighStr = etaHighStr.Remove( 0, etaHighStr.Index("_to_") + 4);  
 
-    // Store an ordered vector of bins
-    std::vector<TString> etaBinsOrdered;
-    map<double, TString>::const_iterator itrBin;
-    for (itrBin = etaBins.begin(); itrBin != etaBins.end(); ++itrBin){
+              double etaLow  = etaLowStr.Atof();
+              //		  double etaHigh = etaHighStr.Atof();
+              etaBins[ etaLow ] = EtaStr;
 
-      //	double etaLow  = itrBin->first;    // Extract bin lower eta
-      TString etaBin = itrBin->second; 
 
-      etaBinsOrdered.push_back( etaBin );
-
-    }
-
-
-
-    // ************************************************************************************
-    // *                               Plotting histograms                                *
-    // ************************************************************************************
-    PRINT("Plotting 2D Histograms")
-      // Enable the fit box
-      gStyle->SetOptFit(111111);
-
-    //=========================
-    // 2D Histograms
-    //=========================
-    SUBPRINT("2D Histograms")
-      // iterate through all histograms in the map
-      map<TString, TH2*>::const_iterator itr2D;
-
-
-
-
-
-
-
-
-
-    // **************************************************
-    // *             Calibration parameters             *
-    // **************************************************
-
-    // pT width of bins
-    int ptBinning = 10;
-
-    // Range over which to make profiles
-    double ptMin = 10; 
-
-    //double ptMax = 120;
-    double ptMax = 300;
-
-    //Rebinning options
-    bool doRebin = true;
-    int responseRebin=2;
-    int ptRebin=10;
-
-    //Option to replace fits with large errors with histograms
-    bool replaceBadPoints = false;
-    bool removeBadPoints = true;
-
-    //The allowed difference between the mean of the fit
-    //and the hist mean
-    double allowedFitDifference = 0.2;//0.1;
-    double allowedPtErr = ptBinning*2.0;//*1.5;
-    double allowedReciprocalResponseErr = 0.2;//0.1;
-
-
-    // **************************************************
-
-
-    // Determine the number of profile plots to produce (should probably round up?)
-    int totalProfs = int(( ptMax - ptMin )/ptBinning);
-
-
-    //DEBUGGING    
-    //DEBUGGING
-    //DEBUGGING
-    //      totalProfs = 3;
-    //DEBUGGING
-    //DEBUGGING
-    //DEBUGGING
-
-
-    // Points stored for the calibration fit, indices = [iEta][ptBin]
-    std::map<TString, std::vector< std::vector< std::pair<double,double> > > > collectioniEtaPTBinnedPoint;
-    std::map<TString, std::vector< std::vector< std::pair<double,double> > > > collectioniEtaPTBinnedPointError;
-
-
-
-    //       //   // Points stored for the calibration fit, indices = [iEta][ptBin]
-    //       //   std::vector< std::vector< std::pair<double,double> > > iEtaPTBinnedPoint;
-    //       //   // Resize to fit the required data
-    //       //   iEtaPTBinnedPoint.resize( 56, std::vector< std::pair<double,double> >( totalProfs ) );
-
-    //       // Store whether to avoid processing the specified iEta
-    //       std::vector<bool> iEtaVeto(56, false);
-
-
-    for(itr2D = histogram2D.begin(); itr2D != histogram2D.end(); ++itr2D){
-
-      TString histName = itr2D->first;    // Extract histogram name
-      TH2*    hist2D   = itr2D->second;   // Extract histogram
-      filepath = histogramDirectory[ histName ] + "/"; // Extract directory
-      TCanvas* canv = new TCanvas();
-
-
-
-
-      // Get the current eta bin
-      int etaIndex;
-      TString EtaStr;
-      for ( uint iEtaBin = 0; iEtaBin < etaBinsOrdered.size(); ++iEtaBin ){
-
-        TString tempEtaBin = etaBinsOrdered[ iEtaBin ];
-        if ( histName.Contains( tempEtaBin ) != 0 ){
-          EtaStr = tempEtaBin;
-          etaIndex = iEtaBin;
-
-          std::cout << EtaStr << "\t" << histName << "\n";
-          break;
-        }
-
-      }
-      TString EtaStrLabel = EtaStr;
-      EtaStrLabel.ReplaceAll("_to_", ", ");
-      EtaStrLabel = "[" + EtaStrLabel + "]";
-
-
-
-      hist2D->Draw("COLZ");                   
-      canv->SaveAs(plotDirectory + filepath + histName + ".png");   // write histogram to file
-      //canv->SaveAs(plotDirectory + filepath + histName + ".pdf");   // write histogram to file
-
-      // Store the name of the collection being calibrated, used to store the calibration data
-      TString histBaseName = histName;
-
-      if (histBaseName.Contains("ratio_iEta") != 0){
-        histBaseName = histBaseName.Remove( histBaseName.Index( "_ratio" ) );
-        //      std::cout << "RES " << histBaseName << "\n";
-      }
-      else if(histBaseName.Contains("corr_iEta") != 0 ){
-        histBaseName = histBaseName.Remove( histBaseName.Index( "_corr" ) );
-        //      std::cout << "PT " << histBaseName << "\n";
-      }
-      else{
-        std::cout << "ERROR: Could not extract the collection type from '" << histName << "'\n";
-        exit(1);
-      }
-
-      // Check whether storage exists for the current collection
-      map<TString, std::vector< std::vector< std::pair<double,double> > > >::iterator it = collectioniEtaPTBinnedPoint.find( histBaseName );
-      if ( it == collectioniEtaPTBinnedPoint.end() ) { 
-        // Doesn't exist, make new storage
-
-        // Points stored for the calibration fit, indices = [iEta][ptBin] 
-        std::vector< std::vector< std::pair<double,double> > > iEtaPTBinnedPoint;
-        std::vector< std::vector< std::pair<double,double> > > iEtaPTBinnedPointError;
-
-        int size = etaBinsOrdered.size();
-
-        // Resize to fit the required data 
-        iEtaPTBinnedPoint.resize( size, std::vector< std::pair<double,double> >( totalProfs ) );
-        collectioniEtaPTBinnedPoint[ histBaseName ] = iEtaPTBinnedPoint; 
-        iEtaPTBinnedPointError.resize( size, std::vector< std::pair<double,double> >( totalProfs ) );
-        collectioniEtaPTBinnedPointError[ histBaseName ] = iEtaPTBinnedPointError; 
-
-        std::cout << "Made collection '" << histBaseName << "'\n";
-      }
-
-      // ****************************************************************************************************
-      // *                                          Jet calibration                                         *
-      // ****************************************************************************************************
-
-      // Read details of the TH2
-      int nBinsX      = hist2D->GetNbinsX();
-      double binWidth = hist2D->GetBinWidth(1);
-      double xPtMin   = hist2D->GetXaxis()->GetXmin();
-
-      // Get current pt range to profile
-      double ptLow, ptHigh;
-
-      for ( int iBin = 0; iBin < totalProfs; ++iBin){
-
-        ptLow  = ptMin + iBin*ptBinning;
-        ptHigh = ptMin + (iBin + 1)*ptBinning - 1;
-
-        // Indices of the bins to project over, add one to account for underflow bin
-        int binLow  = (ptLow  - xPtMin)/binWidth + 1;
-        int binHigh = (ptHigh - xPtMin)/binWidth + 1;
-
-
-        //	std::cout << ptLow << " = " << hist2D->GetBinCenter( binLow ) << "\t" << ptHigh << " = " << hist2D->GetBinCenter( binHigh ) << "\n";
-
-        TString ptLowStr  =  TString(Form("%d",Int_t(ptLow)));
-        TString ptHighStr =  TString(Form("%d",Int_t(ptHigh)));
-        TString ptRangeStr = ptLowStr + "_to_" + ptHighStr;
-
-        TString label = typeLabel[ curSubDir ];
-
-        TString newSaveName = "_prof_" + ptRangeStr;
-        TString newHistName = "#eta #in " + EtaStrLabel + ", " + "p_{T} #in [" + ptLowStr + ", " + ptHighStr + "]";
-
-
-        if ( histName.Contains("ratio_iEta") != 0 ){
-          newHistName = label + " Response - " + newHistName;
-        }
-        else if ( histName.Contains("corr_iEta") != 0 ) {
-          newHistName = label + " L1 P_{T} - " + newHistName;
-        }
-
-
-        TH1D *yProject = hist2D->ProjectionY( newHistName, binLow, binHigh, "eo");
-
-
-
-
-        // ********************************************************************************
-        // *                           Jet response calibration                           *
-        // ********************************************************************************
-
-        bool drawStats = false;
-        if ( histName.Contains("ratio_iEta") != 0 ){
-
-          //	    yProject->Rebin(5);
-          if(!drawStats) yProject->SetStats(0);
-          yProject->SetTitle(ptRangeStr+"GeV");
-          yProject->GetXaxis()->SetTitle("P^{L1}_{T}/P^{GEN}_{T}");
-          yProject->Draw();
-
-          TPaveStats *fitStat;
-
-          // ****************************************
-          // *             Fit gaussian             *
-          // ****************************************
-
-          double response    = -1;
-          double responseErr = -1;
-
-          // Ensure the histogram contains entries
-          if ( yProject->GetEntries() != 0){
-
-            const double nSigma = 1.5;
-            const double fitMin = -999;
-            const int    nIter  = 3;
-
-            if(doRebin) yProject->Rebin(responseRebin);
-            fit_gaussian( yProject, nSigma, fitMin, nIter );
-
-
-            yProject->GetXaxis()->SetRangeUser(0.,2.5);
-
-            TF1* gausResFit = (TF1*) yProject->GetListOfFunctions()->Last();
-
-            //statsbox wizardry
-            gPad->Update();
-            if(drawStats){
-              fitStat = (TPaveStats*)yProject->FindObject("stats");
-              fitStat->SetTextColor(kBlue);
-              fitStat->SetX1NDC(.57); fitStat->SetX2NDC(.88); fitStat->SetY1NDC(.14); fitStat->SetY2NDC(.53);
-              fitStat->Draw();
             }
-
-            if ( gausResFit) {
-              //		yProject->Fit(gausResFit,"QR");
-              gausResFit->SetLineColor(kRed);
-              gausResFit->SetLineWidth(1);
-              gausResFit->Draw("SAME");
-            }
-            canv->SaveAs(plotDirectory + filepath + histName + newSaveName + "FitGaus.png");   // write histogram to file
-            //    canv->SaveAs(plotDirectory + filepath + histName + newSaveName + "FitGaus.pdf");   // write histogram to file
-
-
-            if ( gausResFit) {
-
-              // Get gaussian fit mean 
-              response    = gausResFit->GetParameter( 1 );
-              //responseErr = gausResFit->GetParameter( 2 );
-              responseErr = gausResFit->GetParError( 1 );
-            }	      
-            std::cout << "Final fit: Response = " << response << " +/- " << responseErr << "\n";
-
           }
-
-          double histMean = yProject->GetMean();
-          double histErr  = yProject->GetRMS();
-
-          double absRelDiff = fabs(response - histMean)/histMean;
-          // Check whether there is a large disagreement (>10%) between the fit m\
-          // ean and histogram mean
-          if ( (absRelDiff > allowedFitDifference) && replaceBadPoints ){
-            response   = histMean;
-            responseErr = histErr;
-          }
-
-
-
-          std::cout << "Eta = " << EtaStr << "\tResponse = " << response << "\t+/- " << responseErr << "\n";	
-
-          double reciprocalResponse = 0;
-          double reciprocalResponseErr = 0;
-
-          if (response != 0){
-            reciprocalResponse    = 1/response;
-            reciprocalResponseErr = responseErr/(response*response);
-          }
-
-          //Check the errors aren't too huge to include the points in the fit
-          if((reciprocalResponseErr > allowedReciprocalResponseErr) && removeBadPoints){
-            reciprocalResponse=-1.;
-            reciprocalResponseErr=-1.;
-          }
-
-          // Store the inverted mean for plotting
-          collectioniEtaPTBinnedPoint[ histBaseName ][etaIndex][iBin].second      = reciprocalResponse;
-          // Error in reciprocal is given by: responseErr / Response^2
-          collectioniEtaPTBinnedPointError[ histBaseName ][etaIndex][iBin].second = reciprocalResponseErr;
-
         }
+      }
 
 
+      // Store an ordered vector of bins
+      std::vector<TString> etaBinsOrdered;
+      map<double, TString>::const_iterator itrBin;
+      for (itrBin = etaBins.begin(); itrBin != etaBins.end(); ++itrBin){
 
-        // ********************************************************************************
-        // *                              Jet PT calibration                              *
-        // ********************************************************************************
+        //	double etaLow  = itrBin->first;    // Extract bin lower eta
+        TString etaBin = itrBin->second; 
 
-        if ( (histName.Contains("corr_iEta") != 0) ){
-
-          //	    yProject->Rebin(4);
-          yProject->Draw();
-
-          TPaveStats *fitStat;
-
-          if(!drawStats) yProject->SetStats(0);
-
-          //          yProject->GetXaxis()->SetRangeUser(0.,200.);
-
-          // ****************************************
-          // *             Fit gaussian             *
-          // ****************************************
-
-          double l1Pt    = -1;
-          double l1PtErr = -1;
-
-
-          // Ensure the histogram contains entries
-          if ( yProject->GetEntries() != 0){
-
-            const double nSigma = 1.5;
-            const double fitMin = -999;
-            const int    nIter  = 3;
-
-            if(doRebin) yProject->Rebin(ptRebin);
-
-
-            fit_gaussian( yProject, nSigma, fitMin, nIter );
-
-            yProject->GetXaxis()->SetRangeUser(0.,210.);
-
-            TF1* gausPtFit = (TF1*) yProject->GetListOfFunctions()->Last();
-
-
-            //statsbox wizardry
-            gPad->Update();
-            if(drawStats){
-              fitStat = (TPaveStats*)yProject->FindObject("stats");
-              fitStat->SetTextColor(kBlue);
-              fitStat->SetX1NDC(.57); fitStat->SetX2NDC(.88); fitStat->SetY1NDC(.14); fitStat->SetY2NDC(.53);
-              fitStat->Draw();
-            }
-            if ( gausPtFit) { 
-              //		yProject->Fit(gausPtFit,"QR"); 
-              gausPtFit->SetLineColor(kRed);
-              gausPtFit->SetLineWidth(1);
-              gausPtFit->Draw("SAME");
-            }
-            canv->SaveAs(plotDirectory + filepath + histName + newSaveName + "FitGaus.png");   // write histogram to file
-            //      canv->SaveAs(plotDirectory + filepath + histName + newSaveName + "FitGaus.pdf");   // write histogram to file
-
-
-            if (gausPtFit){
-              // Get gaussian fit mean
-              l1Pt    = gausPtFit->GetParameter( 1 );
-              //l1PtErr = gausPtFit->GetParameter( 2 );
-              l1PtErr = gausPtFit->GetParError( 1 );
-            }
-
-            std::cout << "Final fit: L1Pt = " << l1Pt << " +/- " << l1PtErr << "\n";
-
-          }
-
-          double histMean = yProject->GetMean();
-          double histErr  = yProject->GetRMS();
-
-          double absRelDiff = fabs(l1Pt - histMean)/histMean;
-          // Check whether there is a large disagreement (>10%) between the fit m\
-          // ean and histogram mean
-          if ( (absRelDiff > allowedFitDifference) && replaceBadPoints ){
-            l1Pt    = histMean;
-            l1PtErr = histErr;
-          }
-
-          //Check the errors aren't too huge to include the points in the fit
-          if((l1PtErr > allowedPtErr) && removeBadPoints){
-            l1Pt=-1.;
-            l1PtErr=-1.;
-          }
-
-          std::cout << "Eta = " << EtaStr << "\tl1Pt = " << l1Pt << "+/-\t" << l1PtErr << "\n";	
-          // Store the mean for plotting
-          collectioniEtaPTBinnedPoint[ histBaseName ][etaIndex][iBin].first      = l1Pt;
-          collectioniEtaPTBinnedPointError[ histBaseName ][etaIndex][iBin].first = l1PtErr;
-
-        }
-
-
-
+        etaBinsOrdered.push_back( etaBin );
 
       }
 
 
-    }
 
-    //#ifdef DEBUG_OFF  
+      // ************************************************************************************
+      // *                               Plotting histograms                                *
+      // ************************************************************************************
+      PRINT("Plotting 2D Histograms")
+        // Enable the fit box
+        gStyle->SetOptFit(111111);
 
-    // ******************************************************************
-    // *                    Plot calibration TGraphs                    *
-    // ******************************************************************
-
-
-
-    // E
-    //      gStyle->SetOptFit(11111);
-
-
-
-
-    std::map<TString, std::vector< std::vector< std::pair<double,double> > > >::const_iterator calibIt;
-
-    for(calibIt = collectioniEtaPTBinnedPoint.begin(); calibIt != collectioniEtaPTBinnedPoint.end(); ++calibIt){
+      //=========================
+      // 2D Histograms
+      //=========================
+      SUBPRINT("2D Histograms")
+        // iterate through all histograms in the map
+        map<TString, TH2*>::const_iterator itr2D;
 
 
-      TString collName = calibIt->first;    // Extract collection
-      std::cout << "\n\nProcessing collection: " << collName << "------------------------------------------------------------\n\n\n\n";
 
 
-      // ROOT file to store calibration TGraphs
-      TFile* graphFile = new TFile( plotDirectory + collName + ".root", "RECREATE");
-
-      // Extract the directory to store plots
-      TString calibFilePath = filepath;
-      calibFilePath = calibFilePath.Remove( calibFilePath.Index( "EtaBinned" ) );
 
 
-      // Create a CMSSW compatable LUT
-      TString outputCMSSW = "\t" + collName + "LUT = cms.vdouble(\n";
 
-      // Iterate over iEta bins
-      //	for (int iEtaIndex = 0; iEtaIndex < 56; ++iEtaIndex)
-      for (uint etaIndex = 0; etaIndex < etaBinsOrdered.size(); ++etaIndex){
 
-        TString EtaStr = etaBinsOrdered[ etaIndex ];
+
+      // **************************************************
+      // *             Calibration parameters             *
+      // **************************************************
+
+      // pT width of bins
+      int ptBinning = setPtBin;
+
+      // Range over which to make profiles
+      double ptMin = setPtMin; 
+
+      //double ptMax = 120;
+      double ptMax = setPtMax;
+
+      //Rebinning options
+      bool doRebin = true;
+      int responseRebin=1;
+      int ptRebin=10;
+
+      //Option to replace fits with large errors with histograms
+      bool replaceBadPoints = false;
+      bool removeBadPoints = true;
+
+      //The allowed difference between the mean of the fit
+      //and the hist mean
+      double allowedFitDifference = 0.2;//0.1;
+      double allowedPtErr = ptBinning*2.0;//*1.5;
+      double allowedReciprocalResponseErr = 0.2;//0.1;
+
+
+      // **************************************************
+
+
+      // Determine the number of profile plots to produce (should probably round up?)
+      int totalProfs = int(( ptMax - ptMin )/ptBinning);
+
+
+      //DEBUGGING    
+      //DEBUGGING
+      //DEBUGGING
+      //      totalProfs = 3;
+      //DEBUGGING
+      //DEBUGGING
+      //DEBUGGING
+
+
+      // Points stored for the calibration fit, indices = [iEta][ptBin]
+      std::map<TString, std::vector< std::vector< std::pair<double,double> > > > collectioniEtaPTBinnedPoint;
+      std::map<TString, std::vector< std::vector< std::pair<double,double> > > > collectioniEtaPTBinnedPointError;
+
+
+
+      //       //   // Points stored for the calibration fit, indices = [iEta][ptBin]
+      //       //   std::vector< std::vector< std::pair<double,double> > > iEtaPTBinnedPoint;
+      //       //   // Resize to fit the required data
+      //       //   iEtaPTBinnedPoint.resize( 56, std::vector< std::pair<double,double> >( totalProfs ) );
+
+      //       // Store whether to avoid processing the specified iEta
+      //       std::vector<bool> iEtaVeto(56, false);
+
+
+      for(itr2D = histogram2D.begin(); itr2D != histogram2D.end(); ++itr2D){
+
+        TString histName = itr2D->first;    // Extract histogram name
+        TH2*    hist2D   = itr2D->second;   // Extract histogram
+        filepath = histogramDirectory[ histName ] + "/"; // Extract directory
+        TCanvas* canv = new TCanvas();
+
+
+
+
+        // Get the current eta bin
+        int etaIndex;
+        TString EtaStr;
+        for ( uint iEtaBin = 0; iEtaBin < etaBinsOrdered.size(); ++iEtaBin ){
+
+          TString tempEtaBin = etaBinsOrdered[ iEtaBin ];
+          if ( histName.Contains( tempEtaBin ) != 0 ){
+            EtaStr = tempEtaBin;
+            etaIndex = iEtaBin;
+
+            std::cout << EtaStr << "\t" << histName << "\n";
+            break;
+          }
+
+        }
+
         TString EtaStrLabel = EtaStr;
         EtaStrLabel.ReplaceAll("_to_", ", ");
         EtaStrLabel = "[" + EtaStrLabel + "]";
 
-        // Make a TGraph for each iEta bin
-        double xArr[999],    yArr[999];
-        double xErrArr[999], yErrArr[999];
-        // Residuals
-        double xResArr[999], yResArr[999];
 
-        int failedPoints = 0;
 
-        for (int iProf = 0; iProf < totalProfs; ++iProf){
+        hist2D->Draw("COLZ");                   
+        canv->SaveAs(plotDirectory + filepath + histName + ".png");   // write histogram to file
+        //canv->SaveAs(plotDirectory + filepath + histName + ".pdf");   // write histogram to file
 
-          double x    = collectioniEtaPTBinnedPoint[collName][etaIndex][iProf].first;
-          double y    = collectioniEtaPTBinnedPoint[collName][etaIndex][iProf].second;
-          double xErr = collectioniEtaPTBinnedPointError[collName][etaIndex][iProf].first;
-          double yErr = collectioniEtaPTBinnedPointError[collName][etaIndex][iProf].second;
+        // Store the name of the collection being calibrated, used to store the calibration data
+        TString histBaseName = histName;
 
-          // Skip failed fits
-          /*      if ( ( x = -1) || ( y == -1) 
-                  /       //Check for errors as well! Added my own
-                  || (xErr == -1) || (yErr == -1) 
-                  ){ continue; }
-                  */
-          if ( ( x < 0. ) || ( y < 0.) 
-              //Check for errors as well! Added my own
-              || (xErr <0. ) || (yErr < 0.) 
-             ){
-            failedPoints++;  
-            continue;
+        if (histBaseName.Contains("ratio_iEta") != 0){
+          histBaseName = histBaseName.Remove( histBaseName.Index( "_ratio" ) );
+          //      std::cout << "RES " << histBaseName << "\n";
+        }
+        else if(histBaseName.Contains("corr_iEta") != 0 ){
+          histBaseName = histBaseName.Remove( histBaseName.Index( "_corr" ) );
+          //      std::cout << "PT " << histBaseName << "\n";
+        }
+        else{
+          std::cout << "ERROR: Could not extract the collection type from '" << histName << "'\n";
+          exit(1);
+        }
+
+        // Check whether storage exists for the current collection
+        map<TString, std::vector< std::vector< std::pair<double,double> > > >::iterator it = collectioniEtaPTBinnedPoint.find( histBaseName );
+        if ( it == collectioniEtaPTBinnedPoint.end() ) { 
+          // Doesn't exist, make new storage
+
+          // Points stored for the calibration fit, indices = [iEta][ptBin] 
+          std::vector< std::vector< std::pair<double,double> > > iEtaPTBinnedPoint;
+          std::vector< std::vector< std::pair<double,double> > > iEtaPTBinnedPointError;
+
+          int size = etaBinsOrdered.size();
+
+          // Resize to fit the required data 
+          iEtaPTBinnedPoint.resize( size, std::vector< std::pair<double,double> >( totalProfs ) );
+          collectioniEtaPTBinnedPoint[ histBaseName ] = iEtaPTBinnedPoint; 
+          iEtaPTBinnedPointError.resize( size, std::vector< std::pair<double,double> >( totalProfs ) );
+          collectioniEtaPTBinnedPointError[ histBaseName ] = iEtaPTBinnedPointError; 
+
+          std::cout << "Made collection '" << histBaseName << "'\n";
+        }
+
+        // ****************************************************************************************************
+        // *                                          Jet calibration                                         *
+        // ****************************************************************************************************
+
+        // Read details of the TH2
+        int nBinsX      = hist2D->GetNbinsX();
+        double binWidth = hist2D->GetBinWidth(1);
+        double xPtMin   = hist2D->GetXaxis()->GetXmin();
+
+        // Get current pt range to profile
+        double ptLow, ptHigh;
+
+        for ( int iBin = 0; iBin < totalProfs; ++iBin){
+
+          ptLow  = ptMin + iBin*ptBinning;
+          ptHigh = ptMin + (iBin + 1)*ptBinning - 1;
+
+          // Indices of the bins to project over, add one to account for underflow bin
+          int binLow  = (ptLow  - xPtMin)/binWidth + 1;
+          int binHigh = (ptHigh - xPtMin)/binWidth + 1;
+
+
+          //	std::cout << ptLow << " = " << hist2D->GetBinCenter( binLow ) << "\t" << ptHigh << " = " << hist2D->GetBinCenter( binHigh ) << "\n";
+
+          TString ptLowStr  =  TString(Form("%d",Int_t(ptLow)));
+          TString ptHighStr =  TString(Form("%d",Int_t(ptHigh)));
+          TString ptRangeStr = ptLowStr + "_to_" + ptHighStr;
+
+          TString label = typeLabel[ curSubDir ];
+
+          TString newSaveName = "_prof_" + ptRangeStr;
+          TString newHistName = "#eta #in " + EtaStrLabel + ", " + "p_{T} #in [" + ptLowStr + ", " + ptHighStr + "]";
+
+
+          if ( histName.Contains("ratio_iEta") != 0 ){
+            newHistName = label + " Response - " + newHistName;
           }
-          std::cout << "[ " << x << ", " << y << " )\n";
+          else if ( histName.Contains("corr_iEta") != 0 ) {
+            newHistName = label + " L1 P_{T} - " + newHistName;
+          }
 
-          // Store data in arrays for TGraph input
-          xArr[ iProf - failedPoints ] = x;
-          yArr[ iProf - failedPoints ] = y;
-          xErrArr[ iProf - failedPoints ] = xErr;
-          yErrArr[ iProf - failedPoints ] = yErr;
+
+          TH1D *yProject = hist2D->ProjectionY( newHistName, binLow, binHigh, "eo");
+
+
+
+
+          // ********************************************************************************
+          // *                           Jet response calibration                           *
+          // ********************************************************************************
+
+          bool drawStats = false;
+          if ( histName.Contains("ratio_iEta") != 0 ){
+
+            //	    yProject->Rebin(5);
+            if(!drawStats) yProject->SetStats(0);
+            yProject->SetTitle(ptRangeStr+"GeV");
+            yProject->GetXaxis()->SetTitle("P^{L1}_{T}/P^{GEN}_{T}");
+            yProject->Draw();
+
+            TPaveStats *fitStat;
+
+            // ****************************************
+            // *             Fit gaussian             *
+            // ****************************************
+
+            double response    = -1;
+            double responseErr = -1;
+
+            // Ensure the histogram contains entries
+            if ( yProject->GetEntries() != 0){
+
+              const double nSigma = 1.5;
+              const double fitMin = -999;
+              const int    nIter  = 3;
+
+              if(doRebin) yProject->Rebin(responseRebin);
+              fit_gaussian( yProject, nSigma, fitMin, nIter );
+
+
+              yProject->GetXaxis()->SetRangeUser(0.,2.5);
+
+              TF1* gausResFit = (TF1*) yProject->GetListOfFunctions()->Last();
+
+              //statsbox wizardry
+              gPad->Update();
+              if(drawStats){
+                fitStat = (TPaveStats*)yProject->FindObject("stats");
+                fitStat->SetTextColor(kBlue);
+                fitStat->SetX1NDC(.57); fitStat->SetX2NDC(.88); fitStat->SetY1NDC(.14); fitStat->SetY2NDC(.53);
+                fitStat->Draw();
+              }
+
+              if ( gausResFit) {
+                //		yProject->Fit(gausResFit,"QR");
+                gausResFit->SetLineColor(kRed);
+                gausResFit->SetLineWidth(1);
+                gausResFit->Draw("SAME");
+              }
+              canv->SaveAs(plotDirectory + filepath + histName + newSaveName + "FitGaus.png");   // write histogram to file
+              //    canv->SaveAs(plotDirectory + filepath + histName + newSaveName + "FitGaus.pdf");   // write histogram to file
+
+
+              if ( gausResFit) {
+
+                // Get gaussian fit mean 
+                response    = gausResFit->GetParameter( 1 );
+                //responseErr = gausResFit->GetParameter( 2 );
+                responseErr = gausResFit->GetParError( 1 );
+
+                //Fill the chi2
+                responseChi2->Fill((ptLow+ptHigh)/2.0,etaIndex+0.5,gausResFit->GetChisquare()/(yProject->GetEntries()-3.0));
+              }	      
+              std::cout << "Final fit: Response = " << response << " +/- " << responseErr << "\n";
+
+            }
+
+            double histMean = yProject->GetMean();
+            double histErr  = yProject->GetRMS();
+
+            double absRelDiff = fabs(response - histMean)/histMean;
+            // Check whether there is a large disagreement (>10%) between the fit m\
+            // ean and histogram mean
+            if ( (absRelDiff > allowedFitDifference) && replaceBadPoints ){
+              response   = histMean;
+              responseErr = histErr;
+            }
+
+
+
+            std::cout << "Eta = " << EtaStr << "\tResponse = " << response << "\t+/- " << responseErr << "\n";	
+
+            double reciprocalResponse = 0;
+            double reciprocalResponseErr = 0;
+
+            if (response != 0){
+              reciprocalResponse    = 1/response;
+              reciprocalResponseErr = responseErr/(response*response);
+            }
+
+            //Check the errors aren't too huge to include the points in the fit
+            if((reciprocalResponseErr > allowedReciprocalResponseErr) && removeBadPoints){
+              reciprocalResponse=-1.;
+              reciprocalResponseErr=-1.;
+            }
+
+            // Store the inverted mean for plotting
+            collectioniEtaPTBinnedPoint[ histBaseName ][etaIndex][iBin].second      = reciprocalResponse;
+            // Error in reciprocal is given by: responseErr / Response^2
+            collectioniEtaPTBinnedPointError[ histBaseName ][etaIndex][iBin].second = reciprocalResponseErr;
+
+          }
+
+
+
+          // ********************************************************************************
+          // *                              Jet PT calibration                              *
+          // ********************************************************************************
+
+          if ( (histName.Contains("corr_iEta") != 0) ){
+
+            //	    yProject->Rebin(4);
+            yProject->Draw();
+
+            TPaveStats *fitStat;
+
+            if(!drawStats) yProject->SetStats(0);
+
+            //          yProject->GetXaxis()->SetRangeUser(0.,200.);
+
+            // ****************************************
+            // *             Fit gaussian             *
+            // ****************************************
+
+            double l1Pt    = -1;
+            double l1PtErr = -1;
+
+
+            // Ensure the histogram contains entries
+            if ( yProject->GetEntries() != 0){
+
+              const double nSigma = 1.5;
+              const double fitMin = -999;
+              const int    nIter  = 3;
+
+              if(doRebin) yProject->Rebin(ptRebin);
+
+
+              fit_gaussian( yProject, nSigma, fitMin, nIter );
+
+              yProject->GetXaxis()->SetRangeUser(0.,210.);
+
+              TF1* gausPtFit = (TF1*) yProject->GetListOfFunctions()->Last();
+
+
+              //statsbox wizardry
+              gPad->Update();
+              if(drawStats){
+                fitStat = (TPaveStats*)yProject->FindObject("stats");
+                fitStat->SetTextColor(kBlue);
+                fitStat->SetX1NDC(.57); fitStat->SetX2NDC(.88); fitStat->SetY1NDC(.14); fitStat->SetY2NDC(.53);
+                fitStat->Draw();
+              }
+              if ( gausPtFit) { 
+                //		yProject->Fit(gausPtFit,"QR"); 
+                gausPtFit->SetLineColor(kRed);
+                gausPtFit->SetLineWidth(1);
+                gausPtFit->Draw("SAME");
+              }
+              canv->SaveAs(plotDirectory + filepath + histName + newSaveName + "FitGaus.png");   // write histogram to file
+              //      canv->SaveAs(plotDirectory + filepath + histName + newSaveName + "FitGaus.pdf");   // write histogram to file
+
+
+              if (gausPtFit){
+                // Get gaussian fit mean
+                l1Pt    = gausPtFit->GetParameter( 1 );
+                //l1PtErr = gausPtFit->GetParameter( 2 );
+                l1PtErr = gausPtFit->GetParError( 1 );
+
+                //Fill the chi2
+                ptChi2->Fill((ptLow+ptHigh)/2.0,etaIndex+0.5,gausPtFit->GetChisquare()/(yProject->GetEntries()-3.0));
+              }
+
+              std::cout << "Final fit: L1Pt = " << l1Pt << " +/- " << l1PtErr << "\n";
+
+            }
+
+            double histMean = yProject->GetMean();
+            double histErr  = yProject->GetRMS();
+
+            double absRelDiff = fabs(l1Pt - histMean)/histMean;
+            // Check whether there is a large disagreement (>10%) between the fit m\
+            // ean and histogram mean
+            if ( (absRelDiff > allowedFitDifference) && replaceBadPoints ){
+              l1Pt    = histMean;
+              l1PtErr = histErr;
+            }
+
+            //Check the errors aren't too huge to include the points in the fit
+            if((l1PtErr > allowedPtErr) && removeBadPoints){
+              l1Pt=-1.;
+              l1PtErr=-1.;
+            }
+
+            std::cout << "Eta = " << EtaStr << "\tl1Pt = " << l1Pt << "+/-\t" << l1PtErr << "\n";	
+            // Store the mean for plotting
+            collectioniEtaPTBinnedPoint[ histBaseName ][etaIndex][iBin].first      = l1Pt;
+            collectioniEtaPTBinnedPointError[ histBaseName ][etaIndex][iBin].first = l1PtErr;
+
+          }
+
+
+
 
         }
 
-        // Make the Eta binned TGraph
-        TGraphErrors*  calibGraph = new TGraphErrors( totalProfs-failedPoints, xArr, yArr, xErrArr, yErrArr );
-        calibGraph->SetTitle("#eta #in " + EtaStrLabel + ";<L1 p_{T}> (GeV);<L1 p_{T}/GEN p_{T}>^{-1}");
-        calibGraph->SetMarkerStyle(8);
-        calibGraph->SetMarkerSize(0.5);
 
-        TCanvas* canv = new TCanvas();
-        canv->SetGridx();
-        canv->SetGridy();
+      }
+    
 
-        calibGraph->Draw("AP*");
-        canv->SaveAs(plotDirectory + calibFilePath + "calibGraph_iEta_" + EtaStr + ".png");   // write histogram to file    
-        //canv->SaveAs(plotDirectory + calibFilePath + "calibGraph_iEta_" + EtaStr + ".pdf");   // write histogram to file    
+      //#ifdef DEBUG_OFF  
 
-        TString EtaStrROOT = EtaStr;
-        EtaStrROOT.ReplaceAll("-","minus");
+      // ******************************************************************
+      // *                    Plot calibration TGraphs                    *
+      // ******************************************************************
 
-        // Save to the ROOT file
-        calibGraph->Write( "Eta_" + EtaStrROOT );
 
+
+      // E
+      //      gStyle->SetOptFit(11111);
+
+
+
+
+      std::map<TString, std::vector< std::vector< std::pair<double,double> > > >::const_iterator calibIt;
+
+      for(calibIt = collectioniEtaPTBinnedPoint.begin(); calibIt != collectioniEtaPTBinnedPoint.end(); ++calibIt){
+
+
+        TString collName = calibIt->first;    // Extract collection
+        std::cout << "\n\nProcessing collection: " << collName << "------------------------------------------------------------\n\n\n\n";
+
+
+        // ROOT file to store calibration TGraphs
+        TFile* graphFile = new TFile( plotDirectory + collName + ".root", "RECREATE");
+
+        // Extract the directory to store plots
+        TString calibFilePath = filepath;
+        calibFilePath = calibFilePath.Remove( calibFilePath.Index( "EtaBinned" ) );
+
+
+        // Create a CMSSW compatable LUT
+        TString outputCMSSW = "\t" + collName + "LUT = cms.vdouble(\n";
+
+        // Iterate over iEta bins
+        //	for (int iEtaIndex = 0; iEtaIndex < 56; ++iEtaIndex)
+        for (uint etaIndex = 0; etaIndex < etaBinsOrdered.size(); ++etaIndex){
+
+          TString EtaStr = etaBinsOrdered[ etaIndex ];
+          TString EtaStrLabel = EtaStr;
+          EtaStrLabel.ReplaceAll("_to_", ", ");
+          EtaStrLabel = "[" + EtaStrLabel + "]";
+
+          // Make a TGraph for each iEta bin
+          double xArr[999],    yArr[999];
+          double xErrArr[999], yErrArr[999];
+          // Residuals
+          double xResArr[999], yResArr[999];
+
+          int failedPoints = 0;
+
+          for (int iProf = 0; iProf < totalProfs; ++iProf){
+
+            double x    = collectioniEtaPTBinnedPoint[collName][etaIndex][iProf].first;
+            double y    = collectioniEtaPTBinnedPoint[collName][etaIndex][iProf].second;
+            double xErr = collectioniEtaPTBinnedPointError[collName][etaIndex][iProf].first;
+            double yErr = collectioniEtaPTBinnedPointError[collName][etaIndex][iProf].second;
+
+            // Skip failed fits
+            /*      if ( ( x = -1) || ( y == -1) 
+                    /       //Check for errors as well! Added my own
+                    || (xErr == -1) || (yErr == -1) 
+                    ){ continue; }
+                    */
+            if ( ( x < 0. ) || ( y < 0.) 
+                //Check for errors as well! Added my own
+                || (xErr <0. ) || (yErr < 0.) 
+               ){
+              failedPoints++;  
+              continue;
+            }
+            std::cout << "[ " << x << ", " << y << " )\n";
+
+            // Store data in arrays for TGraph input
+            xArr[ iProf - failedPoints ] = x;
+            yArr[ iProf - failedPoints ] = y;
+            xErrArr[ iProf - failedPoints ] = xErr;
+            yErrArr[ iProf - failedPoints ] = yErr;
+
+          }
+
+          // Make the Eta binned TGraph
+          TGraphErrors*  calibGraph = new TGraphErrors( totalProfs-failedPoints, xArr, yArr, xErrArr, yErrArr );
+          calibGraph->SetTitle("#eta #in " + EtaStrLabel + ";<L1 p_{T}> (GeV);<L1 p_{T}/GEN p_{T}>^{-1}");
+          calibGraph->SetMarkerStyle(8);
+          calibGraph->SetMarkerSize(0.5);
+
+          TCanvas* canv = new TCanvas();
+          canv->SetGridx();
+          canv->SetGridy();
+
+          calibGraph->Draw("AP*");
+          canv->SaveAs(plotDirectory + calibFilePath + "calibGraph_iEta_" + EtaStr + ".png");   // write histogram to file    
+          //canv->SaveAs(plotDirectory + calibFilePath + "calibGraph_iEta_" + EtaStr + ".pdf");   // write histogram to file    
+
+          TString EtaStrROOT = EtaStr;
+          EtaStrROOT.ReplaceAll("-","minus");
+
+          // Save to the ROOT file
+          calibGraph->Write( "Eta_" + EtaStrROOT );
+
+
+        }
+
+        outputCMSSW += "\n\t),";
+
+        ofstream calibLUT;
+        calibLUT.open( plotDirectory + collName + "LUT.txt" );
+        calibLUT << outputCMSSW;
+        calibLUT.close();
+
+
+        std::cout << "Made LUT: " + plotDirectory + collName + "LUT.txt" + "\n";
+        std::cout << outputCMSSW << "\n\n";
+
+
+        std::cout << "\n\nMade ROOT file: " + plotDirectory + collName + ".root" + "\n";
+        // Close the ROOT file
+        graphFile->Close();
 
       }
 
-      outputCMSSW += "\n\t),";
 
-      ofstream calibLUT;
-      calibLUT.open( plotDirectory + collName + "LUT.txt" );
-      calibLUT << outputCMSSW;
-      calibLUT.close();
+      // Delete the previous contents of the container
+      histogram2D.clear();
 
+      //Save the Chi2 histograms
+      chi2File->cd();
+      responseChi2->Write();
+      ptChi2->Write();
 
-      std::cout << "Made LUT: " + plotDirectory + collName + "LUT.txt" + "\n";
-      std::cout << outputCMSSW << "\n\n";
-
-
-      std::cout << "\n\nMade ROOT file: " + plotDirectory + collName + ".root" + "\n";
-      // Close the ROOT file
-      graphFile->Close();
-
+      f->cd();
     }
 
 
+
+
+
     // Delete the previous contents of the container
-    histogram2D.clear();
-
-  }
+    histogramDirectory.clear();
 
 
-
-
-
-
-
-
-
-  // Delete the previous contents of the container
-  histogramDirectory.clear();
-
-
-} // Directory loop
+  } // Directory loop
 
 
 
@@ -971,44 +988,45 @@ int getCalibration(){
 
 
 
-// **************************************************************************************************
-// *                                          Provenance                                            *
-// **************************************************************************************************
+  // **************************************************************************************************
+  // *                                          Provenance                                            *
+  // **************************************************************************************************
 
 
-// To test different text positions run root in interactive mode with the code:
-// TCanvas canv;
-// canv.SetGrid();
-// canv.DrawFrame(0,0,1,1);
-//
-// Print statistics of the program running
-TCanvas statCanv;
-TLatex latex;
-Float_t curY = 0.95; // current Y coordinate of text
-latex.SetTextSize(0.04);
-latex.DrawLatex(0.05, curY, "Input file:");
-latex.SetTextSize(0.025);
-curY -= 0.02;;
-latex.DrawLatex(0.05, curY, filename);
+  // To test different text positions run root in interactive mode with the code:
+  // TCanvas canv;
+  // canv.SetGrid();
+  // canv.DrawFrame(0,0,1,1);
+  //
+  // Print statistics of the program running
+  TCanvas statCanv;
+  TLatex latex;
+  Float_t curY = 0.95; // current Y coordinate of text
+  latex.SetTextSize(0.04);
+  latex.DrawLatex(0.05, curY, "Input file:");
+  latex.SetTextSize(0.025);
+  curY -= 0.02;;
+  latex.DrawLatex(0.05, curY, filename);
 
 
-// save and close .eps
-statCanv.SaveAs( plotDirectory + "Provenance.png" );
-//statCanv.SaveAs( plotDirectory + "Provenance.pdf" );
+  // save and close .eps
+  statCanv.SaveAs( plotDirectory + "Provenance.png" );
+  //statCanv.SaveAs( plotDirectory + "Provenance.pdf" );
 
 
 
-// Make webpage
-chdir( plotDirectory.Data() );
-system( "/home/hep/mb1512/.scripts/makeHTML.py" );
+  // Make webpage
+  chdir( plotDirectory.Data() );
+  system( "/home/hep/mb1512/.scripts/makeHTML.py" );
 
 
-std::cout << "\n\n\nOutput histograms to webpage: \n\n\t"
-<< plotDirectory.ReplaceAll("/home/hep/", "http://www.hep.ph.ic.ac.uk/~").ReplaceAll("/public_html","") 
-<< "\n\n\n";//mb1512/public_html/plots/";
+  std::cout << "\n\n\nOutput histograms to webpage: \n\n\t"
+    << plotDirectory.ReplaceAll("/home/hep/", "http://www.hep.ph.ic.ac.uk/~").ReplaceAll("/public_html","") 
+    << "\n\n\n";//mb1512/public_html/plots/";
 
-f->Close();
-return 0;
+  f->Close();
+  chi2File->Close();
+  return 0;
 
 }
 
