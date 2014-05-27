@@ -109,12 +109,30 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
   if(col2_matched_algo2_jet4_ptcorr.count(folderName) == 0) { col2_matched_algo2_jet4_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo2_jet4_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
   if(col2_saved_algo2.count(folderName) == 0) { col2_saved_algo2[folderName] = dir.make<TH2D>("col2_saved_algo2",";col2 p_{T};Max Matched p_{T};", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
 
-  //Calibration Plots
 
   //New plots
   //Loop over Pt bins
   if(pMade.count(folderName) ==0)
   {
+    //ESums
+    TFileDirectory esumsdir=dir.mkdir("esums");
+    col2_ht[folderName]  = esumsdir.make<TH1D>("col2_ht",";col2 H_{T};",3000,-0.5,2999.5);
+    col1_ht[folderName] = esumsdir.make<TH1D>("col1_ht",";col2 H_{T};",3000,-0.5,2999.5);
+
+    col2_mht_x[folderName]  = esumsdir.make<TH1D>("col2_mht_x",";col2 MH_{T};",1000,-500.5,499.5);
+    col1_mht_x[folderName]  = esumsdir.make<TH1D>("col1_mht_x",";col2 MH_{T};",1000,-500.5,499.5);
+
+    col2_mht_y[folderName]  = esumsdir.make<TH1D>("col2_mht_y",";col2 MH_{T};",1000,-500.5,499.5);
+    col1_mht_y[folderName]  = esumsdir.make<TH1D>("col1_mht_y",";col2 MH_{T};",1000,-500.5,499.5);
+
+    col2_mht[folderName]  = esumsdir.make<TH1D>("col2_mht",";col2 mh_{t};",3000,-0.5,2999.5);
+    col1_mht[folderName]  = esumsdir.make<TH1D>("col1_mht",";col2 mh_{t};",3000,-0.5,2999.5);
+
+    ht_resolution[folderName]  = esumsdir.make<TH1D>("ht_resolution",";(col1_ht-col2_ht)/col2_ht;",200,-10.5,9.5);
+    mht_x_resolution[folderName]  = esumsdir.make<TH1D>("mht_x_resolution",";(col1_mht_x-col2_mht_x)/col2_mht_x;",200,-10.5,9.5);
+    mht_y_resolution[folderName]  = esumsdir.make<TH1D>("mht_y_resolution",";(col1_mht_y-col2_mht_y)/col2_mht_y;",200,-10.5,9.5);
+    mht_resolution[folderName]  = esumsdir.make<TH1D>("mht_resolution",";(col1_mht-col2_mht)/col2_mht;",200,-10.5,9.5);
+    //Calibration Plots
     TFileDirectory calibdir=dir.mkdir("calibration");
 
     //for(std::map<TString,std::pair<int,int> >::const_iterator etaBinIt=etaCalibBins_.begin(); etaBinIt!=etaCalibBins_.end(); etaBinIt++)
@@ -147,21 +165,38 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
       //Loop over Pt bins
       for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
 
-        TFileDirectory ptdir = etadir.mkdir(ptBinIt->first.Data());
+	TFileDirectory ptdir = etadir.mkdir(ptBinIt->first.Data());
 
-        pt_ratio_nvts_algo1_alljet[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TH2D>("pt_ratio_nvts_algo1_alljet", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5, 600, -3.005, 2.995); 
-        pt_ratio_nvts_algo1_alljet_profile[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TProfile>("pt_ratio_nvts_algo1_alljet_profile", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5); 
-        pt_ratio_nvts_algo1_jet1[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TH2D>("pt_ratio_nvts_algo1_jet1", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5, 600, -3.005, 2.995); 
-        pt_ratio_nvts_algo1_jet1_profile[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TProfile>("pt_ratio_nvts_algo1_jet1_profile", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5); 
-        pt_ratio_nvts_algo1_jet2[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TH2D>("pt_ratio_nvts_algo1_jet2", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5, 600, -3.005, 2.995); 
-        pt_ratio_nvts_algo1_jet2_profile[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TProfile>("pt_ratio_nvts_algo1_jet2_profile", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5); 
-        pt_ratio_nvts_algo1_jet3[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TH2D>("pt_ratio_nvts_algo1_jet3", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5, 600, -3.005, 2.995); 
-        pt_ratio_nvts_algo1_jet3_profile[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TProfile>("pt_ratio_nvts_algo1_jet3_profile", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5); 
-        pt_ratio_nvts_algo1_jet4[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TH2D>("pt_ratio_nvts_algo1_jet4", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5, 600, -3.005, 2.995); 
-        pt_ratio_nvts_algo1_jet4_profile[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TProfile>("pt_ratio_nvts_algo1_jet4_profile", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5); 
+	pt_ratio_nvts_algo1_alljet[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TH2D>("pt_ratio_nvts_algo1_alljet", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5, 600, -3.005, 2.995); 
+	pt_ratio_nvts_algo1_alljet_profile[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TProfile>("pt_ratio_nvts_algo1_alljet_profile", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5); 
+	pt_ratio_nvts_algo1_jet1[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TH2D>("pt_ratio_nvts_algo1_jet1", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5, 600, -3.005, 2.995); 
+	pt_ratio_nvts_algo1_jet1_profile[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TProfile>("pt_ratio_nvts_algo1_jet1_profile", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5); 
+	pt_ratio_nvts_algo1_jet2[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TH2D>("pt_ratio_nvts_algo1_jet2", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5, 600, -3.005, 2.995); 
+	pt_ratio_nvts_algo1_jet2_profile[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TProfile>("pt_ratio_nvts_algo1_jet2_profile", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5); 
+	pt_ratio_nvts_algo1_jet3[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TH2D>("pt_ratio_nvts_algo1_jet3", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5, 600, -3.005, 2.995); 
+	pt_ratio_nvts_algo1_jet3_profile[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TProfile>("pt_ratio_nvts_algo1_jet3_profile", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5); 
+	pt_ratio_nvts_algo1_jet4[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TH2D>("pt_ratio_nvts_algo1_jet4", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5, 600, -3.005, 2.995); 
+	pt_ratio_nvts_algo1_jet4_profile[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first] = ptdir.make<TProfile>("pt_ratio_nvts_algo1_jet4_profile", ";NPV;(col1 pTgen-pTL1)/pTgen", 100, -0.5, 99.5); 
       }
     }
   }
+  col2_ht[folderName]->Fill(calculateHT(col2));
+  col1_ht[folderName]->Fill(calculateHT(col1));
+
+  col1_mht[folderName]->Fill(calculateMHT(col2)[2]);
+  col2_mht[folderName]->Fill(calculateMHT(col1)[2]);
+
+  col1_mht_x[folderName]->Fill(calculateMHT(col2)[0]);
+  col2_mht_x[folderName]->Fill(calculateMHT(col1)[0]);
+
+  col1_mht_y[folderName]->Fill(calculateMHT(col2)[1]);
+  col2_mht_y[folderName]->Fill(calculateMHT(col1)[1]);
+
+  if(calculateHT(col2) != 0) ht_resolution[folderName]->Fill(calculateHT(col1)/calculateHT(col2)-1);
+  if(calculateMHT(col2)[2] != 0) mht_x_resolution[folderName]->Fill(calculateMHT(col1)[0]/calculateMHT(col2)[0]-1);
+  if(calculateMHT(col2)[0] != 0) mht_y_resolution[folderName]->Fill(calculateMHT(col1)[1]/calculateMHT(col2)[1]-1);
+  if(calculateMHT(col2)[1] != 0) mht_resolution[folderName]->Fill(calculateMHT(col1)[2]/calculateMHT(col2)[2]-1);
+
 
   for(unsigned int i=0; i<col1.size(); i++) {
     col1_alljet_pt[folderName]->Fill(col1[i].pt());
@@ -189,88 +224,88 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
       //New plots
       for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
 
-        for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
-          if (col2[i].pt() > ptBinIt->second && col2[i].iEta()< etaBinIt->second && col2[i].iEta() > etaBinIt->second-14)
-          {
-            pt_ratio_nvts_algo1_alljet[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index[i]].pt())/col2[i].pt());
-            pt_ratio_nvts_algo1_alljet_profile[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index[i]].pt())/col2[i].pt());
-          }
-        }
+	for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
+	  if (col2[i].pt() > ptBinIt->second && col2[i].iEta()< etaBinIt->second && col2[i].iEta() > etaBinIt->second-14)
+	  {
+	    pt_ratio_nvts_algo1_alljet[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index[i]].pt())/col2[i].pt());
+	    pt_ratio_nvts_algo1_alljet_profile[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index[i]].pt())/col2[i].pt());
+	  }
+	}
       }
       //Turn On Plots
       for(std::map<TString,int>::const_iterator ptCutIt=ptCut.begin(); ptCutIt!=ptCut.end(); ptCutIt++)
       {
-        if (col1[col2_matched_index[i]].pt() > ptCutIt->second)
-        {
-          col2_matched_algo1_alljet_cut[TString(folderName)+ptCutIt->first]->Fill(col2[i].pt());
-        }
+	if (col1[col2_matched_index[i]].pt() > ptCutIt->second)
+	{
+	  col2_matched_algo1_alljet_cut[TString(folderName)+ptCutIt->first]->Fill(col2[i].pt());
+	}
       }
       //std::cout << col2[i].pt() << std::endl;
       col2_matched_algo1_alljet_pt[folderName]->Fill(col2[i].pt());
       col2_matched_algo1_alljet_eta[folderName]->Fill(g.new_iEta(col2[i].iEta()));
       col2_matched_algo1_ptcorr[folderName]->Fill(col1[col2_matched_index[i]].pt(), col2[i].pt());
       if(col2[i].pt() > 0.0) {
-        col2_matched_algo1_ptres[folderName]->Fill(col2[i].pt(), (col1[col2_matched_index[i]].pt() / col2[i].pt()) - 1.0 );
-        col2_matched_algo1_ptres_profile[folderName]->Fill(col2[i].pt(), (col1[col2_matched_index[i]].pt() / col2[i].pt()) - 1.0 );
-        col2_matched_algo1_ptratio[folderName]->Fill(col2[i].pt(), (col1[col2_matched_index[i]].pt() / col2[i].pt()));
+	col2_matched_algo1_ptres[folderName]->Fill(col2[i].pt(), (col1[col2_matched_index[i]].pt() / col2[i].pt()) - 1.0 );
+	col2_matched_algo1_ptres_profile[folderName]->Fill(col2[i].pt(), (col1[col2_matched_index[i]].pt() / col2[i].pt()) - 1.0 );
+	col2_matched_algo1_ptratio[folderName]->Fill(col2[i].pt(), (col1[col2_matched_index[i]].pt() / col2[i].pt()));
       }
       //CALIB plots
       if(i < 4)
-        for(auto etaBinIt=etaCalibBins_.begin(); etaBinIt!=etaCalibBins_.end(); etaBinIt++){
-          if (col2[i].iEta() >= etaBinIt->second.first && col2[i].iEta() < etaBinIt->second.second)
-          {
-            col2_calib_ratio[TString(folderName)+etaBinIt->first]->Fill(col2[i].pt(),col1[col2_matched_index[i]].pt()/col2[i].pt());
-            col2_calib_ratio_profile[TString(folderName)+etaBinIt->first]->Fill(col2[i].pt(),col1[col2_matched_index[i]].pt()/col2[i].pt());
-            col2_calib_corr[TString(folderName)+etaBinIt->first]->Fill(col2[i].pt(),col1[col2_matched_index[i]].pt());
-            col2_calib_corr_profile[TString(folderName)+etaBinIt->first]->Fill(col2[i].pt(),col1[col2_matched_index[i]].pt());
-          }
-        }
+	for(auto etaBinIt=etaCalibBins_.begin(); etaBinIt!=etaCalibBins_.end(); etaBinIt++){
+	  if (col2[i].iEta() >= etaBinIt->second.first && col2[i].iEta() < etaBinIt->second.second)
+	  {
+	    col2_calib_ratio[TString(folderName)+etaBinIt->first]->Fill(col2[i].pt(),col1[col2_matched_index[i]].pt()/col2[i].pt());
+	    col2_calib_ratio_profile[TString(folderName)+etaBinIt->first]->Fill(col2[i].pt(),col1[col2_matched_index[i]].pt()/col2[i].pt());
+	    col2_calib_corr[TString(folderName)+etaBinIt->first]->Fill(col2[i].pt(),col1[col2_matched_index[i]].pt());
+	    col2_calib_corr_profile[TString(folderName)+etaBinIt->first]->Fill(col2[i].pt(),col1[col2_matched_index[i]].pt());
+	  }
+	}
 
       if(i == 0) { col2_matched_algo1_jet1_pt[folderName]->Fill(col2[i].pt()); col2_matched_algo1_jet1_eta[folderName]->Fill(g.new_iEta(col2[i].iEta())); 
-        col2_matched_algo1_jet1_ptcorr[folderName]->Fill(col1[col2_matched_index[i]].pt(), col2[i].pt()); 
+	col2_matched_algo1_jet1_ptcorr[folderName]->Fill(col1[col2_matched_index[i]].pt(), col2[i].pt()); 
 
 
-        for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
+	for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
 
-          for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
-            if (col2[i].pt() > ptBinIt->second && col2[i].iEta()< etaBinIt->second && col2[i].iEta() > etaBinIt->second-14)
-            {
-              pt_ratio_nvts_algo1_jet1[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index[i]].pt())/col2[i].pt());
-              pt_ratio_nvts_algo1_jet1_profile[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index[i]].pt())/col2[i].pt());
-            }
-          }
-        }
+	  for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
+	    if (col2[i].pt() > ptBinIt->second && col2[i].iEta()< etaBinIt->second && col2[i].iEta() > etaBinIt->second-14)
+	    {
+	      pt_ratio_nvts_algo1_jet1[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index[i]].pt())/col2[i].pt());
+	      pt_ratio_nvts_algo1_jet1_profile[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index[i]].pt())/col2[i].pt());
+	    }
+	  }
+	}
 
-        //Turn On Plots
-        for(std::map<TString,int>::const_iterator ptCutIt=ptCut.begin(); ptCutIt!=ptCut.end(); ptCutIt++)
-        {
-          if (col1[col2_matched_index[i]].pt() > ptCutIt->second)
-          {
-            col2_matched_algo1_jet1_cut[TString(folderName)+ptCutIt->first]->Fill(col2[i].pt());
-          }
-        }
+	//Turn On Plots
+	for(std::map<TString,int>::const_iterator ptCutIt=ptCut.begin(); ptCutIt!=ptCut.end(); ptCutIt++)
+	{
+	  if (col1[col2_matched_index[i]].pt() > ptCutIt->second)
+	  {
+	    col2_matched_algo1_jet1_cut[TString(folderName)+ptCutIt->first]->Fill(col2[i].pt());
+	  }
+	}
 
       }
       if(i == 1) { col2_matched_algo1_jet2_pt[folderName]->Fill(col2[i].pt()); col2_matched_algo1_jet2_eta[folderName]->Fill(g.new_iEta(col2[i].iEta())); col2_matched_algo1_jet2_ptcorr[folderName]->Fill(col1[col2_matched_index[i]].pt(), col2[i].pt()); 
 
-        for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
+	for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
 
-          for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
-            if (col2[i].pt() > ptBinIt->second && col2[i].iEta()< etaBinIt->second && col2[i].iEta() > etaBinIt->second-14)
-            {
-              pt_ratio_nvts_algo1_jet2[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index[i]].pt())/col2[i].pt());
-              pt_ratio_nvts_algo1_jet2_profile[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index[i]].pt())/col2[i].pt());
-            }
-          }
-        }
-        //Turn On Plots
-        for(std::map<TString,int>::const_iterator ptCutIt=ptCut.begin(); ptCutIt!=ptCut.end(); ptCutIt++)
-        {
-          if (col1[col2_matched_index[i]].pt() > ptCutIt->second)
-          {
-            col2_matched_algo1_jet2_cut[TString(folderName)+ptCutIt->first]->Fill(col2[i].pt());
-          }
-        }
+	  for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
+	    if (col2[i].pt() > ptBinIt->second && col2[i].iEta()< etaBinIt->second && col2[i].iEta() > etaBinIt->second-14)
+	    {
+	      pt_ratio_nvts_algo1_jet2[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index[i]].pt())/col2[i].pt());
+	      pt_ratio_nvts_algo1_jet2_profile[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index[i]].pt())/col2[i].pt());
+	    }
+	  }
+	}
+	//Turn On Plots
+	for(std::map<TString,int>::const_iterator ptCutIt=ptCut.begin(); ptCutIt!=ptCut.end(); ptCutIt++)
+	{
+	  if (col1[col2_matched_index[i]].pt() > ptCutIt->second)
+	  {
+	    col2_matched_algo1_jet2_cut[TString(folderName)+ptCutIt->first]->Fill(col2[i].pt());
+	  }
+	}
 
 
       }
@@ -279,24 +314,24 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
 
       if(i == 2) { col2_matched_algo1_jet3_pt[folderName]->Fill(col2[i].pt()); col2_matched_algo1_jet3_eta[folderName]->Fill(g.new_iEta(col2[i].iEta())); col2_matched_algo1_jet3_ptcorr[folderName]->Fill(col1[col2_matched_index[i]].pt(), col2[i].pt());
 
-        for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
+	for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
 
-          for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
-            if (col2[i].pt() > ptBinIt->second && col2[i].iEta()< etaBinIt->second && col2[i].iEta() > etaBinIt->second-14)
-            {
-              pt_ratio_nvts_algo1_jet3[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index[i]].pt())/col2[i].pt());
-              pt_ratio_nvts_algo1_jet3_profile[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index[i]].pt())/col2[i].pt());
-            }
-          }
-        }
-        //Turn On Plots
-        for(std::map<TString,int>::const_iterator ptCutIt=ptCut.begin(); ptCutIt!=ptCut.end(); ptCutIt++)
-        {
-          if (col1[col2_matched_index[i]].pt() > ptCutIt->second)
-          {
-            col2_matched_algo1_jet3_cut[TString(folderName)+ptCutIt->first]->Fill(col2[i].pt());
-          }
-        }
+	  for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
+	    if (col2[i].pt() > ptBinIt->second && col2[i].iEta()< etaBinIt->second && col2[i].iEta() > etaBinIt->second-14)
+	    {
+	      pt_ratio_nvts_algo1_jet3[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index[i]].pt())/col2[i].pt());
+	      pt_ratio_nvts_algo1_jet3_profile[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index[i]].pt())/col2[i].pt());
+	    }
+	  }
+	}
+	//Turn On Plots
+	for(std::map<TString,int>::const_iterator ptCutIt=ptCut.begin(); ptCutIt!=ptCut.end(); ptCutIt++)
+	{
+	  if (col1[col2_matched_index[i]].pt() > ptCutIt->second)
+	  {
+	    col2_matched_algo1_jet3_cut[TString(folderName)+ptCutIt->first]->Fill(col2[i].pt());
+	  }
+	}
 
 
 
@@ -304,24 +339,24 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
 
       if(i == 3) { col2_matched_algo1_jet4_pt[folderName]->Fill(col2[i].pt()); col2_matched_algo1_jet4_eta[folderName]->Fill(g.new_iEta(col2[i].iEta())); col2_matched_algo1_jet4_ptcorr[folderName]->Fill(col1[col2_matched_index[i]].pt(), col2[i].pt()); 
 
-        for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
+	for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
 
-          for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
-            if (col2[i].pt() > ptBinIt->second && col2[i].iEta()< etaBinIt->second && col2[i].iEta() > etaBinIt->second-14)
-            {
-              pt_ratio_nvts_algo1_jet4[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index[i]].pt())/col2[i].pt());
-              pt_ratio_nvts_algo1_jet4_profile[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index[i]].pt())/col2[i].pt());
-            }
-          }
-        }
-        //Turn On Plots
-        for(std::map<TString,int>::const_iterator ptCutIt=ptCut.begin(); ptCutIt!=ptCut.end(); ptCutIt++)
-        {
-          if (col1[col2_matched_index[i]].pt() > ptCutIt->second)
-          {
-            col2_matched_algo1_jet4_cut[TString(folderName)+ptCutIt->first]->Fill(col2[i].pt());
-          }
-        }
+	  for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
+	    if (col2[i].pt() > ptBinIt->second && col2[i].iEta()< etaBinIt->second && col2[i].iEta() > etaBinIt->second-14)
+	    {
+	      pt_ratio_nvts_algo1_jet4[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index[i]].pt())/col2[i].pt());
+	      pt_ratio_nvts_algo1_jet4_profile[TString(folderName)+ptBinIt->first+"_"+etaBinIt->first]->Fill(mNPV,(col2[i].pt()-col1[col2_matched_index[i]].pt())/col2[i].pt());
+	    }
+	  }
+	}
+	//Turn On Plots
+	for(std::map<TString,int>::const_iterator ptCutIt=ptCut.begin(); ptCutIt!=ptCut.end(); ptCutIt++)
+	{
+	  if (col1[col2_matched_index[i]].pt() > ptCutIt->second)
+	  {
+	    col2_matched_algo1_jet4_cut[TString(folderName)+ptCutIt->first]->Fill(col2[i].pt());
+	  }
+	}
 
 
       }
@@ -340,9 +375,9 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
       col2_matched_algo2_alljet_eta[folderName]->Fill(g.new_iEta(col2[i].iEta()));
       col2_matched_algo2_ptcorr[folderName]->Fill(col1[col2_matched_index[i]].pt(), col2[i].pt());
       if(col2[i].pt() > 0.0) {
-        col2_matched_algo2_ptres[folderName]->Fill(col2[i].pt(), (col1[col2_matched_index[i]].pt() / col2[i].pt()) - 1.0 );
-        col2_matched_algo2_ptres_profile[folderName]->Fill(col2[i].pt(), (col1[col2_matched_index[i]].pt() / col2[i].pt()) - 1.0 );
-        col2_matched_algo2_ptratio[folderName]->Fill(col2[i].pt(), (col1[col2_matched_index[i]].pt() / col2[i].pt()));
+	col2_matched_algo2_ptres[folderName]->Fill(col2[i].pt(), (col1[col2_matched_index[i]].pt() / col2[i].pt()) - 1.0 );
+	col2_matched_algo2_ptres_profile[folderName]->Fill(col2[i].pt(), (col1[col2_matched_index[i]].pt() / col2[i].pt()) - 1.0 );
+	col2_matched_algo2_ptratio[folderName]->Fill(col2[i].pt(), (col1[col2_matched_index[i]].pt() / col2[i].pt()));
       }
 
       if(i == 0) { col2_matched_algo2_jet1_pt[folderName]->Fill(col2[i].pt()); col2_matched_algo2_jet1_eta[folderName]->Fill(g.new_iEta(col2[i].iEta())); col2_matched_algo2_jet1_ptcorr[folderName]->Fill(col1[col2_matched_index[i]].pt(), col2[i].pt()); }
@@ -354,19 +389,19 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
     //if (col1[col2_matched_index[i]].pt()/col2[i].pt() > 900. && folderName =="5400_donut_gen" ) {this->mPrintMe = true; std::cout << mPrintMe << std::endl;}
     //Turn On Plots
     /*      else
-            {
-            if (col2[i].pt()>200.) {
-            int max=0;
-            for (unsigned int j =0; j <col1.size();j++)
-            {
-            if (max < col1[j].pt()) max = col1[j].pt();
-            }
-            col2_saved_algo2[folderName]->Fill(col2[i].pt(),max);
-            if (max < col2[i].pt()) this->mPrintMe=true; std::cout << "PRINT "<<col2[i].pt() <<std::endl; 
+	    {
+	    if (col2[i].pt()>200.) {
+	    int max=0;
+	    for (unsigned int j =0; j <col1.size();j++)
+	    {
+	    if (max < col1[j].pt()) max = col1[j].pt();
+	    }
+	    col2_saved_algo2[folderName]->Fill(col2[i].pt(),max);
+	    if (max < col2[i].pt()) this->mPrintMe=true; std::cout << "PRINT "<<col2[i].pt() <<std::endl; 
     //	    break;
     }
     }
-    */ 
+     */ 
   }
 
   return;
@@ -402,11 +437,11 @@ void CaloTowerAnalyser::bookPusHists(TString folderName){
       //Loop over the global 2D histograms
       for(std::vector<TString>::const_iterator gVIt=globalPusVars_.begin(); gVIt!=globalPusVars_.end(); gVIt++){
 
-        TFileDirectory subsubdir = subdir.mkdir(gVIt->Data());
-        pusHists2d_[*gVIt+"_"+*l1SIt+"_"+*l1VIt] = subsubdir.make<TH2F>(*gVIt+"_"+*l1SIt+"_"+*l1VIt,";"+*gVIt+";"+*l1SIt+"_"+*l1VIt,
-            40,-0.5,79.5,60,-0.5,59.5);
-        pusProfile_[*gVIt+"_"+*l1SIt+"_"+*l1VIt] = subsubdir.make<TProfile>(*gVIt+"_"+*l1SIt+"_"+*l1VIt+"_profile",";"+*gVIt+";"+*l1SIt+"_"+*l1VIt,
-            40,-0.5,79.5,-0.5,39.5);
+	TFileDirectory subsubdir = subdir.mkdir(gVIt->Data());
+	pusHists2d_[*gVIt+"_"+*l1SIt+"_"+*l1VIt] = subsubdir.make<TH2F>(*gVIt+"_"+*l1SIt+"_"+*l1VIt,";"+*gVIt+";"+*l1SIt+"_"+*l1VIt,
+	    40,-0.5,79.5,60,-0.5,59.5);
+	pusProfile_[*gVIt+"_"+*l1SIt+"_"+*l1VIt] = subsubdir.make<TProfile>(*gVIt+"_"+*l1SIt+"_"+*l1VIt+"_profile",";"+*gVIt+";"+*l1SIt+"_"+*l1VIt,
+	    40,-0.5,79.5,-0.5,39.5);
 
       }
     }
@@ -420,25 +455,25 @@ void CaloTowerAnalyser::bookPusHists(TString folderName){
       //Loop over Pt bins
       for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
 
-        TFileDirectory ptdir = etadir.mkdir(ptBinIt->first.Data());
+	TFileDirectory ptdir = etadir.mkdir(ptBinIt->first.Data());
 
-        //Loop over the different strip permutations
-        for(std::vector<TString>::const_iterator l1VIt=l1PusVars_.begin(); l1VIt!=l1PusVars_.end(); l1VIt++){
+	//Loop over the different strip permutations
+	for(std::vector<TString>::const_iterator l1VIt=l1PusVars_.begin(); l1VIt!=l1PusVars_.end(); l1VIt++){
 
-          pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_"+*l1VIt] = 
-            ptdir.make<TH1F>(*l1SIt+"_"+*l1VIt,"Size "+*l1SIt+" energy "+*l1VIt, 60,-0.5,59.5);
+	  pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_"+*l1VIt] = 
+	    ptdir.make<TH1F>(*l1SIt+"_"+*l1VIt,"Size "+*l1SIt+" energy "+*l1VIt, 60,-0.5,59.5);
 
-          //Loop over the global 2D histograms
-          for(std::vector<TString>::const_iterator gVIt=globalPusVars_.begin(); gVIt!=globalPusVars_.end(); gVIt++){
+	  //Loop over the global 2D histograms
+	  for(std::vector<TString>::const_iterator gVIt=globalPusVars_.begin(); gVIt!=globalPusVars_.end(); gVIt++){
 
-            TFileDirectory subptdir = ptdir.mkdir(gVIt->Data());
-            pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_"+*l1VIt] = 
-              subptdir.make<TH2F>(*gVIt+"_"+*l1SIt+"_"+*l1VIt,";"+*gVIt+";"+*l1SIt+"_"+*l1VIt,40,-0.5,79.5,60,-0.5,59.5);
-            pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_"+*l1VIt] = 
-              subptdir.make<TProfile>(*gVIt+"_"+*l1SIt+"_"+*l1VIt+"_profile",";"+*gVIt+";"+*l1SIt+"_"+*l1VIt,40,-0.5,79.5,-0.5,39.5);
+	    TFileDirectory subptdir = ptdir.mkdir(gVIt->Data());
+	    pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_"+*l1VIt] = 
+	      subptdir.make<TH2F>(*gVIt+"_"+*l1SIt+"_"+*l1VIt,";"+*gVIt+";"+*l1SIt+"_"+*l1VIt,40,-0.5,79.5,60,-0.5,59.5);
+	    pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_"+*l1VIt] = 
+	      subptdir.make<TProfile>(*gVIt+"_"+*l1SIt+"_"+*l1VIt+"_profile",";"+*gVIt+";"+*l1SIt+"_"+*l1VIt,40,-0.5,79.5,-0.5,39.5);
 
-          }
-        }
+	  }
+	}
 
       }
     }
@@ -605,33 +640,33 @@ void CaloTowerAnalyser::makePusHists(const std::vector< std::vector<int> >& myar
     for(std::map<TString,int>::const_iterator nintIt = nintBins_.begin(); nintIt!=nintBins_.end(); nintIt++){
       if(mNPV<nintIt->second && mNPV>nintIt->second-5){
 
-        //Check only isolated jets
-        jJet thisjet = *L1_5450;
-        //Get bottom 3 of the outer ring
-        double out1_bottom3 = thisjet.getOuterStrips()[0]+thisjet.getOuterStrips()[1]+thisjet.getOuterStrips()[2];
-        double out1_bottom2 = thisjet.getOuterStrips()[0]+thisjet.getOuterStrips()[1];
+	//Check only isolated jets
+	jJet thisjet = *L1_5450;
+	//Get bottom 3 of the outer ring
+	double out1_bottom3 = thisjet.getOuterStrips()[0]+thisjet.getOuterStrips()[1]+thisjet.getOuterStrips()[2];
+	double out1_bottom2 = thisjet.getOuterStrips()[0]+thisjet.getOuterStrips()[1];
 
-        pusHists2d_[nintIt->first+"_ring0_total_4"]->Fill((double)L1_5450->ringSums().at(0)/L1_5450->ringAreas().at(0),L1_5450->pt());
-        pusHists2d_[nintIt->first+"_ring1_total_4"]->Fill((double)L1_5450->ringSums().at(1)/L1_5450->ringAreas().at(1),L1_5450->pt());
-        pusHists2d_[nintIt->first+"_ring2_total_4"]->Fill((double)L1_5450->ringSums().at(2)/L1_5450->ringAreas().at(2),L1_5450->pt());
-        pusHists2d_[nintIt->first+"_ring3_total_4"]->Fill((double)L1_5450->ringSums().at(3)/L1_5450->ringAreas().at(3),L1_5450->pt());
-        pusHists2d_[nintIt->first+"_ring4_total_4"]->Fill((double)L1_5450->ringSums().at(4)/L1_5450->ringAreas().at(4),L1_5450->pt());
-        pusHists2d_[nintIt->first+"_ring5_total_4"]->Fill((double)L1_5450->getOuterSum()/L1_5450->ringAreas().at(5),L1_5450->pt());
-        pusHists2d_[nintIt->first+"_donut_total_4"]->Fill((double)thisjet.PUE()/18.0,L1_5450->pt());
-        pusHists2d_[nintIt->first+"_subtract_total_4"]->Fill((double)thisjet.PUE()*4.5,L1_5450->pt());
-        pusHists2d_[nintIt->first+"_out1_bottom3_total_4"]->Fill((double)out1_bottom3*3.0,L1_5450->pt());
-        pusHists2d_[nintIt->first+"_out1_bottom2_total_4"]->Fill((double)out1_bottom2*4.5,L1_5450->pt());
-        if( !(thisjet.isolatedJet(L1_5450_jJet,81))) continue;
-        pusHists2d_[nintIt->first+"_ring0_total_4iso"]->Fill((double)L1_5450->ringSums().at(0)/L1_5450->ringAreas().at(0),L1_5450->pt());
-        pusHists2d_[nintIt->first+"_ring1_total_4iso"]->Fill((double)L1_5450->ringSums().at(1)/L1_5450->ringAreas().at(1),L1_5450->pt());
-        pusHists2d_[nintIt->first+"_ring2_total_4iso"]->Fill((double)L1_5450->ringSums().at(2)/L1_5450->ringAreas().at(2),L1_5450->pt());
-        pusHists2d_[nintIt->first+"_ring3_total_4iso"]->Fill((double)L1_5450->ringSums().at(3)/L1_5450->ringAreas().at(3),L1_5450->pt());
-        pusHists2d_[nintIt->first+"_ring4_total_4iso"]->Fill((double)L1_5450->ringSums().at(4)/L1_5450->ringAreas().at(4),L1_5450->pt());
-        pusHists2d_[nintIt->first+"_ring5_total_4iso"]->Fill((double)L1_5450->getOuterSum()/L1_5450->ringAreas().at(5),L1_5450->pt());
-        pusHists2d_[nintIt->first+"_donut_total_4iso"]->Fill((double)thisjet.PUE()/18.0,L1_5450->pt());
-        pusHists2d_[nintIt->first+"_subtract_total_4iso"]->Fill((double)thisjet.PUE()*4.5,L1_5450->pt());
-        pusHists2d_[nintIt->first+"_out1_bottom3_total_4iso"]->Fill((double)out1_bottom3*3.0,L1_5450->pt());
-        pusHists2d_[nintIt->first+"_out1_bottom2_total_4iso"]->Fill((double)out1_bottom2*4.5,L1_5450->pt());
+	pusHists2d_[nintIt->first+"_ring0_total_4"]->Fill((double)L1_5450->ringSums().at(0)/L1_5450->ringAreas().at(0),L1_5450->pt());
+	pusHists2d_[nintIt->first+"_ring1_total_4"]->Fill((double)L1_5450->ringSums().at(1)/L1_5450->ringAreas().at(1),L1_5450->pt());
+	pusHists2d_[nintIt->first+"_ring2_total_4"]->Fill((double)L1_5450->ringSums().at(2)/L1_5450->ringAreas().at(2),L1_5450->pt());
+	pusHists2d_[nintIt->first+"_ring3_total_4"]->Fill((double)L1_5450->ringSums().at(3)/L1_5450->ringAreas().at(3),L1_5450->pt());
+	pusHists2d_[nintIt->first+"_ring4_total_4"]->Fill((double)L1_5450->ringSums().at(4)/L1_5450->ringAreas().at(4),L1_5450->pt());
+	pusHists2d_[nintIt->first+"_ring5_total_4"]->Fill((double)L1_5450->getOuterSum()/L1_5450->ringAreas().at(5),L1_5450->pt());
+	pusHists2d_[nintIt->first+"_donut_total_4"]->Fill((double)thisjet.PUE()/18.0,L1_5450->pt());
+	pusHists2d_[nintIt->first+"_subtract_total_4"]->Fill((double)thisjet.PUE()*4.5,L1_5450->pt());
+	pusHists2d_[nintIt->first+"_out1_bottom3_total_4"]->Fill((double)out1_bottom3*3.0,L1_5450->pt());
+	pusHists2d_[nintIt->first+"_out1_bottom2_total_4"]->Fill((double)out1_bottom2*4.5,L1_5450->pt());
+	if( !(thisjet.isolatedJet(L1_5450_jJet,81))) continue;
+	pusHists2d_[nintIt->first+"_ring0_total_4iso"]->Fill((double)L1_5450->ringSums().at(0)/L1_5450->ringAreas().at(0),L1_5450->pt());
+	pusHists2d_[nintIt->first+"_ring1_total_4iso"]->Fill((double)L1_5450->ringSums().at(1)/L1_5450->ringAreas().at(1),L1_5450->pt());
+	pusHists2d_[nintIt->first+"_ring2_total_4iso"]->Fill((double)L1_5450->ringSums().at(2)/L1_5450->ringAreas().at(2),L1_5450->pt());
+	pusHists2d_[nintIt->first+"_ring3_total_4iso"]->Fill((double)L1_5450->ringSums().at(3)/L1_5450->ringAreas().at(3),L1_5450->pt());
+	pusHists2d_[nintIt->first+"_ring4_total_4iso"]->Fill((double)L1_5450->ringSums().at(4)/L1_5450->ringAreas().at(4),L1_5450->pt());
+	pusHists2d_[nintIt->first+"_ring5_total_4iso"]->Fill((double)L1_5450->getOuterSum()/L1_5450->ringAreas().at(5),L1_5450->pt());
+	pusHists2d_[nintIt->first+"_donut_total_4iso"]->Fill((double)thisjet.PUE()/18.0,L1_5450->pt());
+	pusHists2d_[nintIt->first+"_subtract_total_4iso"]->Fill((double)thisjet.PUE()*4.5,L1_5450->pt());
+	pusHists2d_[nintIt->first+"_out1_bottom3_total_4iso"]->Fill((double)out1_bottom3*3.0,L1_5450->pt());
+	pusHists2d_[nintIt->first+"_out1_bottom2_total_4iso"]->Fill((double)out1_bottom2*4.5,L1_5450->pt());
       }
     }
   }
@@ -640,30 +675,30 @@ void CaloTowerAnalyser::makePusHists(const std::vector< std::vector<int> >& myar
     for(std::map<TString,int>::const_iterator nintIt = nintBins_.begin(); nintIt!=nintBins_.end(); nintIt++){
       if(mNPV<nintIt->second && mNPV>nintIt->second-5){
 
-        //Check only isolated jets
-        jJet thisjet = *L1_5450;
-        double out1_bottom3 = thisjet.getOuterStrips()[0]+thisjet.getOuterStrips()[1]+thisjet.getOuterStrips()[2];
-        double out1_bottom2 = thisjet.getOuterStrips()[0]+thisjet.getOuterStrips()[1];
+	//Check only isolated jets
+	jJet thisjet = *L1_5450;
+	double out1_bottom3 = thisjet.getOuterStrips()[0]+thisjet.getOuterStrips()[1]+thisjet.getOuterStrips()[2];
+	double out1_bottom2 = thisjet.getOuterStrips()[0]+thisjet.getOuterStrips()[1];
 
-        pusHists2d_[nintIt->first+"_ring0_total_3"]->Fill((double)L1_5450->ringSums().at(0)/L1_5450->ringAreas().at(0),L1_5450->pt());
-        pusHists2d_[nintIt->first+"_ring1_total_3"]->Fill((double)L1_5450->ringSums().at(1)/L1_5450->ringAreas().at(1),L1_5450->pt());
-        pusHists2d_[nintIt->first+"_ring2_total_3"]->Fill((double)L1_5450->ringSums().at(2)/L1_5450->ringAreas().at(2),L1_5450->pt());
-        pusHists2d_[nintIt->first+"_ring3_total_3"]->Fill((double)L1_5450->ringSums().at(3)/L1_5450->ringAreas().at(3),L1_5450->pt());
-        pusHists2d_[nintIt->first+"_ring4_total_3"]->Fill((double)L1_5450->getOuterSum()/L1_5450->ringAreas().at(4),L1_5450->pt());
-        pusHists2d_[nintIt->first+"_donut_total_3"]->Fill((double)thisjet.PUE()/14.0,L1_5450->pt());
-        pusHists2d_[nintIt->first+"_subtract_total_3"]->Fill((double)thisjet.PUE()*3.5,L1_5450->pt());
-        pusHists2d_[nintIt->first+"_out1_bottom3_total_3"]->Fill((double)out1_bottom3*2.333,L1_5450->pt());
-        pusHists2d_[nintIt->first+"_out1_bottom2_total_3"]->Fill((double)out1_bottom2*3.5,L1_5450->pt());
-        if( !(thisjet.isolatedJet(L1_5450_jJet,81))) continue;
-        pusHists2d_[nintIt->first+"_ring0_total_3iso"]->Fill((double)L1_5450->ringSums().at(0)/L1_5450->ringAreas().at(0),L1_5450->pt());
-        pusHists2d_[nintIt->first+"_ring1_total_3iso"]->Fill((double)L1_5450->ringSums().at(1)/L1_5450->ringAreas().at(1),L1_5450->pt());
-        pusHists2d_[nintIt->first+"_ring2_total_3iso"]->Fill((double)L1_5450->ringSums().at(2)/L1_5450->ringAreas().at(2),L1_5450->pt());
-        pusHists2d_[nintIt->first+"_ring3_total_3iso"]->Fill((double)L1_5450->ringSums().at(3)/L1_5450->ringAreas().at(3),L1_5450->pt());
-        pusHists2d_[nintIt->first+"_ring4_total_3iso"]->Fill((double)L1_5450->getOuterSum()/L1_5450->ringAreas().at(4),L1_5450->pt());
-        pusHists2d_[nintIt->first+"_donut_total_3iso"]->Fill((double)thisjet.PUE()/14.0,L1_5450->pt());
-        pusHists2d_[nintIt->first+"_subtract_total_3iso"]->Fill((double)thisjet.PUE()*3.5,L1_5450->pt());
-        pusHists2d_[nintIt->first+"_out1_bottom3_total_3iso"]->Fill((double)out1_bottom3*2.333,L1_5450->pt());
-        pusHists2d_[nintIt->first+"_out1_bottom2_total_3iso"]->Fill((double)out1_bottom2*3.5,L1_5450->pt());
+	pusHists2d_[nintIt->first+"_ring0_total_3"]->Fill((double)L1_5450->ringSums().at(0)/L1_5450->ringAreas().at(0),L1_5450->pt());
+	pusHists2d_[nintIt->first+"_ring1_total_3"]->Fill((double)L1_5450->ringSums().at(1)/L1_5450->ringAreas().at(1),L1_5450->pt());
+	pusHists2d_[nintIt->first+"_ring2_total_3"]->Fill((double)L1_5450->ringSums().at(2)/L1_5450->ringAreas().at(2),L1_5450->pt());
+	pusHists2d_[nintIt->first+"_ring3_total_3"]->Fill((double)L1_5450->ringSums().at(3)/L1_5450->ringAreas().at(3),L1_5450->pt());
+	pusHists2d_[nintIt->first+"_ring4_total_3"]->Fill((double)L1_5450->getOuterSum()/L1_5450->ringAreas().at(4),L1_5450->pt());
+	pusHists2d_[nintIt->first+"_donut_total_3"]->Fill((double)thisjet.PUE()/14.0,L1_5450->pt());
+	pusHists2d_[nintIt->first+"_subtract_total_3"]->Fill((double)thisjet.PUE()*3.5,L1_5450->pt());
+	pusHists2d_[nintIt->first+"_out1_bottom3_total_3"]->Fill((double)out1_bottom3*2.333,L1_5450->pt());
+	pusHists2d_[nintIt->first+"_out1_bottom2_total_3"]->Fill((double)out1_bottom2*3.5,L1_5450->pt());
+	if( !(thisjet.isolatedJet(L1_5450_jJet,81))) continue;
+	pusHists2d_[nintIt->first+"_ring0_total_3iso"]->Fill((double)L1_5450->ringSums().at(0)/L1_5450->ringAreas().at(0),L1_5450->pt());
+	pusHists2d_[nintIt->first+"_ring1_total_3iso"]->Fill((double)L1_5450->ringSums().at(1)/L1_5450->ringAreas().at(1),L1_5450->pt());
+	pusHists2d_[nintIt->first+"_ring2_total_3iso"]->Fill((double)L1_5450->ringSums().at(2)/L1_5450->ringAreas().at(2),L1_5450->pt());
+	pusHists2d_[nintIt->first+"_ring3_total_3iso"]->Fill((double)L1_5450->ringSums().at(3)/L1_5450->ringAreas().at(3),L1_5450->pt());
+	pusHists2d_[nintIt->first+"_ring4_total_3iso"]->Fill((double)L1_5450->getOuterSum()/L1_5450->ringAreas().at(4),L1_5450->pt());
+	pusHists2d_[nintIt->first+"_donut_total_3iso"]->Fill((double)thisjet.PUE()/14.0,L1_5450->pt());
+	pusHists2d_[nintIt->first+"_subtract_total_3iso"]->Fill((double)thisjet.PUE()*3.5,L1_5450->pt());
+	pusHists2d_[nintIt->first+"_out1_bottom3_total_3iso"]->Fill((double)out1_bottom3*2.333,L1_5450->pt());
+	pusHists2d_[nintIt->first+"_out1_bottom2_total_3iso"]->Fill((double)out1_bottom2*3.5,L1_5450->pt());
       }
     }
   }
@@ -696,7 +731,7 @@ void CaloTowerAnalyser::makePusHists(const std::vector< std::vector<int> >& myar
   for(std::vector<TString>::const_iterator l1SIt=l1Sizes_.begin(); l1SIt!=l1Sizes_.end(); l1SIt++){
     for(unsigned i=0; i<L1_jJet_map[*l1SIt+"_out1"].size(); i++){
       if(isolatedOnly){
-        if( !(L1_jJet_map[*l1SIt+"_out1"][i].isolatedJet(L1_jJet_map[*l1SIt+"_out1"],dR2Max))) continue;
+	if( !(L1_jJet_map[*l1SIt+"_out1"][i].isolatedJet(L1_jJet_map[*l1SIt+"_out1"],dR2Max))) continue;
       }
       pusHists1d_[*l1SIt+"_strip1"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0]);
       pusHists1d_[*l1SIt+"_strip2"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1]);
@@ -705,27 +740,27 @@ void CaloTowerAnalyser::makePusHists(const std::vector< std::vector<int> >& myar
       pusHists1d_[*l1SIt+"_out1_middle2"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].PUE());
       //Fill the different binned hists
       for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
-        if(L1_jJet_map[*l1SIt+"_out1"][i].iEta() > etaBinIt->second || L1_jJet_map[*l1SIt+"_out1"][i].iEta() < etaBinIt->second-14)
-          continue; 
-        for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
+	if(L1_jJet_map[*l1SIt+"_out1"][i].iEta() > etaBinIt->second || L1_jJet_map[*l1SIt+"_out1"][i].iEta() < etaBinIt->second-14)
+	  continue; 
+	for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
 
-          if(L1_jJet_map[*l1SIt+"_out1"][i].pt() > ptBinIt->second || L1_jJet_map[*l1SIt+"_out1"][i].pt() < ptBinIt->second-20)
-            continue; 
+	  if(L1_jJet_map[*l1SIt+"_out1"][i].pt() > ptBinIt->second || L1_jJet_map[*l1SIt+"_out1"][i].pt() < ptBinIt->second-20)
+	    continue; 
 
-          pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip1"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0]);
-          pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip2"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1]);
-          pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip3"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[2]);
-          pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip4"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[3]);
-          pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_out1_middle2"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].PUE());
+	  pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip1"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0]);
+	  pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip2"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1]);
+	  pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip3"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[2]);
+	  pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip4"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[3]);
+	  pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_out1_middle2"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].PUE());
 
 
-        }
+	}
       }
 
     }
     for(unsigned i=0; i<L1_jJet_map[*l1SIt+"_out2"].size(); i++){
       if(isolatedOnly){
-        if( !(L1_jJet_map[*l1SIt+"_out2"][i].isolatedJet(L1_jJet_map[*l1SIt+"_out2"],dR2Max))) continue;
+	if( !(L1_jJet_map[*l1SIt+"_out2"][i].isolatedJet(L1_jJet_map[*l1SIt+"_out2"],dR2Max))) continue;
       }
       pusHists1d_[*l1SIt+"_strip5"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0]);
       pusHists1d_[*l1SIt+"_strip6"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1]);
@@ -735,21 +770,21 @@ void CaloTowerAnalyser::makePusHists(const std::vector< std::vector<int> >& myar
 
       //Fill the different binned hists
       for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
-        if(L1_jJet_map[*l1SIt+"_out2"][i].iEta() > etaBinIt->second || L1_jJet_map[*l1SIt+"_out2"][i].iEta() < etaBinIt->second-14)
-          continue; 
-        for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
+	if(L1_jJet_map[*l1SIt+"_out2"][i].iEta() > etaBinIt->second || L1_jJet_map[*l1SIt+"_out2"][i].iEta() < etaBinIt->second-14)
+	  continue; 
+	for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
 
-          if(L1_jJet_map[*l1SIt+"_out2"][i].pt() > ptBinIt->second || L1_jJet_map[*l1SIt+"_out2"][i].pt() < ptBinIt->second-20)
-            continue; 
+	  if(L1_jJet_map[*l1SIt+"_out2"][i].pt() > ptBinIt->second || L1_jJet_map[*l1SIt+"_out2"][i].pt() < ptBinIt->second-20)
+	    continue; 
 
-          pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip5"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0]);
-          pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip6"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1]);
-          pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip7"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[2]);
-          pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip8"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[3]);
-          pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_out2_middle2"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].PUE());
+	  pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip5"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0]);
+	  pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip6"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1]);
+	  pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip7"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[2]);
+	  pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip8"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[3]);
+	  pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_out2_middle2"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].PUE());
 
 
-        }
+	}
       }
     }
   }
@@ -759,104 +794,104 @@ void CaloTowerAnalyser::makePusHists(const std::vector< std::vector<int> >& myar
     for(std::vector<TString>::const_iterator l1SIt=l1Sizes_.begin(); l1SIt!=l1Sizes_.end(); l1SIt++){
 
       for(unsigned i=0; i<L1_jJet_map[*l1SIt+"_out1"].size(); i++){
-        if(isolatedOnly){
-          if( !(L1_jJet_map[*l1SIt+"_out1"][i].isolatedJet(L1_jJet_map[*l1SIt+"_out1"],dR2Max))) continue;
-        }
-        pusHists2d_[*gVIt+"_"+*l1SIt+"_strip1"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0]);
-        pusHists2d_[*gVIt+"_"+*l1SIt+"_strip2"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1]);
-        pusHists2d_[*gVIt+"_"+*l1SIt+"_strip3"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[2]);
-        pusHists2d_[*gVIt+"_"+*l1SIt+"_strip4"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[3]);
-        pusHists2d_[*gVIt+"_"+*l1SIt+"_out1_middle2"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].PUE());
+	if(isolatedOnly){
+	  if( !(L1_jJet_map[*l1SIt+"_out1"][i].isolatedJet(L1_jJet_map[*l1SIt+"_out1"],dR2Max))) continue;
+	}
+	pusHists2d_[*gVIt+"_"+*l1SIt+"_strip1"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0]);
+	pusHists2d_[*gVIt+"_"+*l1SIt+"_strip2"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1]);
+	pusHists2d_[*gVIt+"_"+*l1SIt+"_strip3"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[2]);
+	pusHists2d_[*gVIt+"_"+*l1SIt+"_strip4"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[3]);
+	pusHists2d_[*gVIt+"_"+*l1SIt+"_out1_middle2"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].PUE());
 
-        pusProfile_[*gVIt+"_"+*l1SIt+"_strip1"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0]);
-        pusProfile_[*gVIt+"_"+*l1SIt+"_strip2"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1]);
-        pusProfile_[*gVIt+"_"+*l1SIt+"_strip3"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[2]);
-        pusProfile_[*gVIt+"_"+*l1SIt+"_strip4"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[3]);
-        pusProfile_[*gVIt+"_"+*l1SIt+"_out1_middle2"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].PUE());
+	pusProfile_[*gVIt+"_"+*l1SIt+"_strip1"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0]);
+	pusProfile_[*gVIt+"_"+*l1SIt+"_strip2"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1]);
+	pusProfile_[*gVIt+"_"+*l1SIt+"_strip3"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[2]);
+	pusProfile_[*gVIt+"_"+*l1SIt+"_strip4"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[3]);
+	pusProfile_[*gVIt+"_"+*l1SIt+"_out1_middle2"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].PUE());
 
-        for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
-          if(L1_jJet_map[*l1SIt+"_out1"][i].iEta() > etaBinIt->second || L1_jJet_map[*l1SIt+"_out1"][i].iEta() < etaBinIt->second-14)
-            continue; 
-          for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
+	for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
+	  if(L1_jJet_map[*l1SIt+"_out1"][i].iEta() > etaBinIt->second || L1_jJet_map[*l1SIt+"_out1"][i].iEta() < etaBinIt->second-14)
+	    continue; 
+	  for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
 
-            if(L1_jJet_map[*l1SIt+"_out1"][i].pt() > ptBinIt->second || L1_jJet_map[*l1SIt+"_out1"][i].pt() < ptBinIt->second-20)
-              continue; 
+	    if(L1_jJet_map[*l1SIt+"_out1"][i].pt() > ptBinIt->second || L1_jJet_map[*l1SIt+"_out1"][i].pt() < ptBinIt->second-20)
+	      continue; 
 
-            pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip1"]->Fill(
-                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0]);
-            pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip2"]->Fill(
-                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1]);
-            pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip3"]->Fill(
-                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[2]);
-            pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip4"]->Fill(
-                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[3]);
-            pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_out1_middle2"]->Fill(
-                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].PUE());
+	    pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip1"]->Fill(
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0]);
+	    pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip2"]->Fill(
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1]);
+	    pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip3"]->Fill(
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[2]);
+	    pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip4"]->Fill(
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[3]);
+	    pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_out1_middle2"]->Fill(
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].PUE());
 
-            pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip1"]->Fill(
-                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0]);
-            pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip2"]->Fill(
-                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1]);
-            pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip3"]->Fill(
-                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[2]);
-            pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip4"]->Fill(
-                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[3]);
-            pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_out1_middle2"]->Fill(
-                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].PUE());
+	    pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip1"]->Fill(
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0]);
+	    pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip2"]->Fill(
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1]);
+	    pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip3"]->Fill(
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[2]);
+	    pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip4"]->Fill(
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[3]);
+	    pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_out1_middle2"]->Fill(
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].PUE());
 
-          }
-        }
+	  }
+	}
 
 
       }
       for(unsigned i=0; i<L1_jJet_map[*l1SIt+"_out2"].size(); i++){
-        if(isolatedOnly){
-          if( !(L1_jJet_map[*l1SIt+"_out2"][i].isolatedJet(L1_jJet_map[*l1SIt+"_out2"],dR2Max))) continue;
-        }
-        pusHists2d_[*gVIt+"_"+*l1SIt+"_strip5"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0]);
-        pusHists2d_[*gVIt+"_"+*l1SIt+"_strip6"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1]);
-        pusHists2d_[*gVIt+"_"+*l1SIt+"_strip7"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[2]);
-        pusHists2d_[*gVIt+"_"+*l1SIt+"_strip8"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[3]);
-        pusHists2d_[*gVIt+"_"+*l1SIt+"_out2_middle2"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].PUE());
+	if(isolatedOnly){
+	  if( !(L1_jJet_map[*l1SIt+"_out2"][i].isolatedJet(L1_jJet_map[*l1SIt+"_out2"],dR2Max))) continue;
+	}
+	pusHists2d_[*gVIt+"_"+*l1SIt+"_strip5"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0]);
+	pusHists2d_[*gVIt+"_"+*l1SIt+"_strip6"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1]);
+	pusHists2d_[*gVIt+"_"+*l1SIt+"_strip7"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[2]);
+	pusHists2d_[*gVIt+"_"+*l1SIt+"_strip8"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[3]);
+	pusHists2d_[*gVIt+"_"+*l1SIt+"_out2_middle2"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].PUE());
 
-        pusProfile_[*gVIt+"_"+*l1SIt+"_strip5"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0]);
-        pusProfile_[*gVIt+"_"+*l1SIt+"_strip6"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1]);
-        pusProfile_[*gVIt+"_"+*l1SIt+"_strip7"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[2]);
-        pusProfile_[*gVIt+"_"+*l1SIt+"_strip8"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[3]);
-        pusProfile_[*gVIt+"_"+*l1SIt+"_out2_middle2"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].PUE());
+	pusProfile_[*gVIt+"_"+*l1SIt+"_strip5"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0]);
+	pusProfile_[*gVIt+"_"+*l1SIt+"_strip6"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1]);
+	pusProfile_[*gVIt+"_"+*l1SIt+"_strip7"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[2]);
+	pusProfile_[*gVIt+"_"+*l1SIt+"_strip8"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[3]);
+	pusProfile_[*gVIt+"_"+*l1SIt+"_out2_middle2"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].PUE());
 
-        for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
-          if(L1_jJet_map[*l1SIt+"_out1"][i].iEta() > etaBinIt->second || L1_jJet_map[*l1SIt+"_out1"][i].iEta() < etaBinIt->second-14)
-            continue; 
-          for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
+	for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
+	  if(L1_jJet_map[*l1SIt+"_out1"][i].iEta() > etaBinIt->second || L1_jJet_map[*l1SIt+"_out1"][i].iEta() < etaBinIt->second-14)
+	    continue; 
+	  for(std::map<TString,int>::const_iterator ptBinIt=ptBins_.begin(); ptBinIt!=ptBins_.end(); ptBinIt++){
 
-            if(L1_jJet_map[*l1SIt+"_out1"][i].pt() > ptBinIt->second || L1_jJet_map[*l1SIt+"_out1"][i].pt() < ptBinIt->second-20)
-              continue; 
+	    if(L1_jJet_map[*l1SIt+"_out1"][i].pt() > ptBinIt->second || L1_jJet_map[*l1SIt+"_out1"][i].pt() < ptBinIt->second-20)
+	      continue; 
 
-            pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip5"]->Fill(
-                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0]);
-            pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip6"]->Fill(
-                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1]);
-            pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip7"]->Fill(
-                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[2]);
-            pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip8"]->Fill(
-                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[3]);
-            pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_out2_middle2"]->Fill(
-                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].PUE());
+	    pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip5"]->Fill(
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0]);
+	    pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip6"]->Fill(
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1]);
+	    pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip7"]->Fill(
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[2]);
+	    pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip8"]->Fill(
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[3]);
+	    pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_out2_middle2"]->Fill(
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].PUE());
 
-            pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip5"]->Fill(
-                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0]);
-            pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip6"]->Fill(
-                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1]);
-            pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip7"]->Fill(
-                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[2]);
-            pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip8"]->Fill(
-                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[3]);
-            pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_out2_middle2"]->Fill(
-                globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].PUE());
+	    pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip5"]->Fill(
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0]);
+	    pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip6"]->Fill(
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1]);
+	    pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip7"]->Fill(
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[2]);
+	    pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip8"]->Fill(
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[3]);
+	    pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_out2_middle2"]->Fill(
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].PUE());
 
-          }
-        }
+	  }
+	}
 
 
       }
