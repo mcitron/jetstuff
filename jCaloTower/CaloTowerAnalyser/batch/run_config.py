@@ -15,7 +15,8 @@ outputdir="/afs/cern.ch/work/m/mcitron/jadjets/CMSSW_6_2_0/src/jCaloTower/CaloTo
 #rundir="/afs/cern.ch/work/m/mcitron/jadjets/CMSSW_6_2_0/src/jCaloTower/CaloTowerAnalyser/"
 #input='file:/afs/cern.ch/work/m/mcitron/public/TriggerTowers_NeutrinoGun_13TeV_PU40_50ns_1-10_skimmed_v3.root'    
 #input = "file:/afs/cern.ch/work/a/aelwood/public/TriggerTowers_TTbar_13TeV_PU40_50ns_1-10_skimmed_v3.root"
-input = "file:/afs/cern.ch/work/m/mcitron/public/output_run4.root"
+#input = "file:/afs/cern.ch/work/m/mcitron/public/output_run4.root"
+input = "file:/afs/cern.ch/work/a/aelwood/public/TriggerTowers_TTbar_13TeV_PU40_50ns_1-10_skimmed_v3.root"
 print totevents,Nruns,outputdir,input 
 arg_array=[]
 for i in range(0,Nruns):
