@@ -1,7 +1,7 @@
 void plotTurnons(){
 
    std::vector<TString> jettype;
-   jettype.push_back("5400");
+   jettype.push_back("5400_calib");
    //jettype.push_back("5450");
    std::vector<TString> ptcut;
    ptcut.push_back("pt20");
@@ -24,14 +24,14 @@ void plotTurnons(){
          TGraphAsymmErrors* nopus = f->Get(*iType+"_nopus/"+*iJet+*iPt);
          TGraphAsymmErrors* donut = f->Get(*iType+"_donut/"+*iJet+*iPt);
          TGraphAsymmErrors* global = f->Get(*iType+"_global/"+*iJet+*iPt);
-         TGraphAsymmErrors* gct = f->Get("gct/"+*iJet+*iPt);
+         //TGraphAsymmErrors* gct = f->Get("gct/"+*iJet+*iPt);
 
          TLegend* leg = new TLegend(0.7,0.2,1.0,0.5);
          leg->SetFillColor(0);
          leg->AddEntry(nopus,"No PUS","lep");
          leg->AddEntry(donut,"Donut Sub","lep");
          leg->AddEntry(global,"Global Sub","lep");
-         if(*iJet!="alljet") leg->AddEntry(gct,"GCT","lep");
+         //if(*iJet!="alljet") leg->AddEntry(gct,"GCT","lep");
 
          TCanvas * c = new TCanvas("c","",600,600);
 
@@ -43,8 +43,8 @@ void plotTurnons(){
          donut->Draw("lp same");
          global->SetLineColor(4);
          global->Draw("lp same");
-         gct->SetLineColor(8);
-         if(*iJet!="alljet") gct->Draw("lp same");
+         //gct->SetLineColor(8);
+         //if(*iJet!="alljet") gct->Draw("lp same");
 
          leg->Draw();
 
