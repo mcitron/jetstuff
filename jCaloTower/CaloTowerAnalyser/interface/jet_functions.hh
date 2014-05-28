@@ -63,10 +63,11 @@ std::vector<jJet> CaloTowerAnalyser::getL1JetsMask(const std::vector< std::vecto
 
       std::vector<int> localsums(nringsveto+1,0); //to hold the ring sums (+1 for centre)
       std::vector<int> areas(nringsveto+1,0); //to hold the ring areas (i.e. when we get up against the boundaries)
-      std::vector<int> outerstrips(nstripsdonut,0); //to hold the energies in the 4 surrounding outer strips (excluding corners)
+      //std::vector<int> outerstrips(nstripsdonut,0); //to hold the energies in the 4 surrounding outer strips (excluding corners)
+      std::vector<std::pair<int,int>> outerstrips(nstripsdonut,std::make_pair(0,0)); //to hold the energies in the 4 surrounding outer strips (excluding corners)//AND THEIR AREAS!
       areas[0]=1;
       int jetarea = 1;
-      int pusarea=0;
+      //int pusarea=0;
       for(int l=(j-phisizedonut); l<=(j+phisizedonut); l++) {
         for(int k=(i-etasizedonut); k<=(i+etasizedonut); k++) {
           if(k < 0 || k > 55) continue; //i.e. out of bounds of eta<3
@@ -92,8 +93,8 @@ std::vector<jJet> CaloTowerAnalyser::getL1JetsMask(const std::vector< std::vecto
           {
             if(mask_donut[dl][dk] != 0)
             {
-              outerstrips[mask_donut[dl][dk]-1]+=input[k][newl];
-              pusarea++;
+              outerstrips[mask_donut[dl][dk]-1].first+=input[k][newl];
+              outerstrips[mask_donut[dl][dk]-1].second++;
               //	     std::cout << mask_donut[dl][dk];
             }
           }
@@ -151,10 +152,10 @@ std::vector<jJet> CaloTowerAnalyser::getL1JetsMask(const std::vector< std::vecto
         //this is with PUS:
         if(totalenergy > 0.0) {
           //TEMP
-          areas.at(areas.size()-1)=pusarea;
+          //areas.at(areas.size()-1)=pusarea;
 
           //TEMP
-          L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetTower,jetarea,pusarea));
+          L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetTower,jetarea));
         }
 
       }
@@ -188,9 +189,9 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
 
       std::vector<int> localsums(jetsize+1,0); //to hold the ring sums (+1 for centre)
       std::vector<int> areas(jetsize+1,0); //to hold the ring areas (i.e. when we get up against the boundaries)
-      std::vector<int> outerstrips(4,0); //to hold the energies in the 4 surrounding outer strips (excluding corners)
+      std::vector<std::pair<int,int>> outerstrips(4,std::make_pair(0,0)); //to hold the energies in the 4 surrounding outer strips (excluding corners)
       int jetarea = 1;
-      int pusarea = 0;
+      //int pusarea = 0;
       for(int k=(i-jetsize); k<=(i+jetsize); k++) {
         for(int l=(j-jetsize); l<=(j+jetsize); l++) {
           if(k < 0 || k > 55) continue; //i.e. out of bounds of eta<3
@@ -214,10 +215,10 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
               if (m <= vetowindowsize) localsums[m] += input[k][newl]; 
               areas[m]+=1;
               if(m == jetsize) { //i.e. we are in the outer ring and want to parameterise PU
-                if( (k-i) == m && abs(j-l) <= (m-1) ) { outerstrips[0] += input[k][newl];pusarea++; }
-                if( (i-k) == m && abs(j-l) <= (m-1) ) { outerstrips[1] += input[k][newl];pusarea++; }
-                if( (l-j) == m && abs(i-k) <= (m-1) ) { outerstrips[2] += input[k][newl];pusarea++; }
-                if( (j-l) == m && abs(i-k) <= (m-1) ) { outerstrips[3] += input[k][newl];pusarea++; }
+                if( (k-i) == m && abs(j-l) <= (m-1) ) { outerstrips[0].first += input[k][newl];outerstrips[0].second+=1;}
+                if( (i-k) == m && abs(j-l) <= (m-1) ) { outerstrips[1].first += input[k][newl];outerstrips[1].second+=1;}
+                if( (l-j) == m && abs(i-k) <= (m-1) ) { outerstrips[2].first += input[k][newl];outerstrips[2].second+=1;}
+                if( (j-l) == m && abs(i-k) <= (m-1) ) { outerstrips[3].first += input[k][newl];outerstrips[3].second+=1;}
               }
 
               if(m > 0 && m <= vetowindowsize) { //i.e. don't compare the central tower or towers outside vetowindowsize
@@ -248,7 +249,7 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
 
         //this means we have a viable candidate
         if(totalenergy > 0.0) {
-          L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetTower,jetarea,pusarea));
+          L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetTower,jetarea));
         }
 
       }

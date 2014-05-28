@@ -15,9 +15,8 @@ class jJet {
 public:
   jJet(double pt, int ieta, int iphi);
   jJet(double pt, int ieta, int iphi,int bx);
-  jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<int> outerstrips, int jetarea);
-  jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<int> outerstrips,std::vector<int> towers, int jetarea);
-  jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<int> outerstrips,std::vector<int> towers, int jetarea,int pusarea);
+  jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<std::pair<int,int> > outerstrips, int jetarea);
+  jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<std::pair<int,int> > outerstrips,std::vector<int> towers, int jetarea);
   int iEta() const;
   int iPhi() const;
   int gEta() const;
@@ -27,7 +26,7 @@ public:
   bool isolatedJet(const std::vector<jJet>& jetCollection, double dR2Max);
   std::vector<int> ringSums() const;
   std::vector<int> ringAreas() const;
-  std::vector<int> getOuterStrips() const;
+  std::vector<std::pair<int,int> > getOuterStrips() const;
   std::vector<int> getTowers() const;
   int DeltaR2(const jJet & jet2) const;
   int PUE();
@@ -44,22 +43,17 @@ private:
   int mbx;
   std::vector<int> mringsums;
   std::vector<int> mringareas;
-  std::vector<int> mouterstrips;
+  std::vector<std::pair<int,int>> mouterstrips;
   std::vector<int> mtowers;
   int marea;
-  int mpusarea;
 };
 
 jJet::jJet(double pt, int ieta, int iphi) : mpt(pt), mieta(ieta), miphi(iphi) {}
 jJet::jJet(double pt, int geta, int gphi,int bx) : mpt(pt), mgeta(geta), mgphi(gphi),mbx(bx) {}
-jJet::jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<int> outerstrips, int jetarea) : mpt(pt), mieta(ieta), miphi(iphi), mringsums(ringsums), mringareas(ringareas), mouterstrips(outerstrips),marea(jetarea) {
+jJet::jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<std::pair<int,int> > outerstrips, int jetarea) : mpt(pt), mieta(ieta), miphi(iphi), mringsums(ringsums), mringareas(ringareas), mouterstrips(outerstrips),marea(jetarea) {
    std::sort(mouterstrips.begin(), mouterstrips.end());
 }
-jJet::jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<int> outerstrips, std::vector<int> towers, int jetarea) : mpt(pt), mieta(ieta), miphi(iphi), mringsums(ringsums), mringareas(ringareas), mouterstrips(outerstrips),mtowers(towers),marea(jetarea) {
-   std::sort(mouterstrips.begin(), mouterstrips.end());
-   std::sort(mtowers.begin(), mtowers.end());
-}
-jJet::jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<int> outerstrips, std::vector<int> towers, int jetarea,int pusarea) : mpt(pt), mieta(ieta), miphi(iphi), mringsums(ringsums), mringareas(ringareas), mouterstrips(outerstrips),mtowers(towers),marea(jetarea),mpusarea(pusarea) {
+jJet::jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<std::pair<int,int> > outerstrips, std::vector<int> towers, int jetarea) : mpt(pt), mieta(ieta), miphi(iphi), mringsums(ringsums), mringareas(ringareas), mouterstrips(outerstrips),mtowers(towers),marea(jetarea) {
    std::sort(mouterstrips.begin(), mouterstrips.end());
    std::sort(mtowers.begin(), mtowers.end());
 }
@@ -71,16 +65,16 @@ int jJet::gPhi() const { return mgphi; }
 double jJet::pt() const { return mpt; }
 std::vector<int> jJet::ringSums() const { return mringsums; }
 std::vector<int> jJet::ringAreas() const { return mringareas; }
-std::vector<int> jJet::getOuterStrips() const { return mouterstrips; }
+std::vector<std::pair<int,int> > jJet::getOuterStrips() const { return mouterstrips; }
 std::vector<int> jJet::getTowers() const { return mtowers; }
 
 int jJet::getOuterSum() const 
 { 
    int outerRing = 0;
-   for (auto ring = mouterstrips.begin(); ring != mouterstrips.end(); ring++) outerRing+=*ring;
+   for (auto ring = mouterstrips.begin(); ring != mouterstrips.end(); ring++) outerRing+=ring->first;
    return outerRing;
 }
-int jJet::PUE() { return (mouterstrips[1] + mouterstrips[2]); } //i.e. sum up the middle two energies
+int jJet::PUE() { return (mouterstrips[1].first + mouterstrips[2].first); } //i.e. sum up the middle two energies
 
 void jJet::setPt(double pt) 
 {
@@ -88,7 +82,7 @@ void jJet::setPt(double pt)
 }
 double jJet::eatDonut() {
    //double lastringsum = this->ringSums().at(this->ringSums().size() - 1);
-   double scaleDonut = (double)marea/(double)mpusarea;
+   double scaleDonut = (double)marea/(double)(mouterstrips[1].second + mouterstrips[2].second);
    double donutenergy = this->PUE() * scaleDonut; //3.5 = 7x7 / 2x7
    return (this->pt() - donutenergy);
 }

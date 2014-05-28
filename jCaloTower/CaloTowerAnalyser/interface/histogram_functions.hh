@@ -643,8 +643,8 @@ void CaloTowerAnalyser::makePusHists(const std::vector< std::vector<int> >& myar
 	//Check only isolated jets
 	jJet thisjet = *L1_5450;
 	//Get bottom 3 of the outer ring
-	double out1_bottom3 = thisjet.getOuterStrips()[0]+thisjet.getOuterStrips()[1]+thisjet.getOuterStrips()[2];
-	double out1_bottom2 = thisjet.getOuterStrips()[0]+thisjet.getOuterStrips()[1];
+	double out1_bottom3 = thisjet.getOuterStrips()[0].first+thisjet.getOuterStrips()[1].first+thisjet.getOuterStrips()[2].first;
+	double out1_bottom2 = thisjet.getOuterStrips()[0].first+thisjet.getOuterStrips()[1].first;
 
 	pusHists2d_[nintIt->first+"_ring0_total_4"]->Fill((double)L1_5450->ringSums().at(0)/L1_5450->ringAreas().at(0),L1_5450->pt());
 	pusHists2d_[nintIt->first+"_ring1_total_4"]->Fill((double)L1_5450->ringSums().at(1)/L1_5450->ringAreas().at(1),L1_5450->pt());
@@ -677,8 +677,8 @@ void CaloTowerAnalyser::makePusHists(const std::vector< std::vector<int> >& myar
 
 	//Check only isolated jets
 	jJet thisjet = *L1_5450;
-	double out1_bottom3 = thisjet.getOuterStrips()[0]+thisjet.getOuterStrips()[1]+thisjet.getOuterStrips()[2];
-	double out1_bottom2 = thisjet.getOuterStrips()[0]+thisjet.getOuterStrips()[1];
+	double out1_bottom3 = thisjet.getOuterStrips()[0].first+thisjet.getOuterStrips()[1].first+thisjet.getOuterStrips()[2].first;
+	double out1_bottom2 = thisjet.getOuterStrips()[0].first+thisjet.getOuterStrips()[1].first;
 
 	pusHists2d_[nintIt->first+"_ring0_total_3"]->Fill((double)L1_5450->ringSums().at(0)/L1_5450->ringAreas().at(0),L1_5450->pt());
 	pusHists2d_[nintIt->first+"_ring1_total_3"]->Fill((double)L1_5450->ringSums().at(1)/L1_5450->ringAreas().at(1),L1_5450->pt());
@@ -733,10 +733,10 @@ void CaloTowerAnalyser::makePusHists(const std::vector< std::vector<int> >& myar
       if(isolatedOnly){
 	if( !(L1_jJet_map[*l1SIt+"_out1"][i].isolatedJet(L1_jJet_map[*l1SIt+"_out1"],dR2Max))) continue;
       }
-      pusHists1d_[*l1SIt+"_strip1"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0]);
-      pusHists1d_[*l1SIt+"_strip2"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1]);
-      pusHists1d_[*l1SIt+"_strip3"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[2]);
-      pusHists1d_[*l1SIt+"_strip4"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[3]);
+      pusHists1d_[*l1SIt+"_strip1"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0].first);
+      pusHists1d_[*l1SIt+"_strip2"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1].first);
+      pusHists1d_[*l1SIt+"_strip3"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[2].first);
+      pusHists1d_[*l1SIt+"_strip4"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[3].first);
       pusHists1d_[*l1SIt+"_out1_middle2"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].PUE());
       //Fill the different binned hists
       for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
@@ -747,10 +747,10 @@ void CaloTowerAnalyser::makePusHists(const std::vector< std::vector<int> >& myar
 	  if(L1_jJet_map[*l1SIt+"_out1"][i].pt() > ptBinIt->second || L1_jJet_map[*l1SIt+"_out1"][i].pt() < ptBinIt->second-20)
 	    continue; 
 
-	  pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip1"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0]);
-	  pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip2"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1]);
-	  pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip3"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[2]);
-	  pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip4"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[3]);
+	  pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip1"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0].first);
+	  pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip2"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1].first);
+	  pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip3"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[2].first);
+	  pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip4"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[3].first);
 	  pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_out1_middle2"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].PUE());
 
 
@@ -762,10 +762,10 @@ void CaloTowerAnalyser::makePusHists(const std::vector< std::vector<int> >& myar
       if(isolatedOnly){
 	if( !(L1_jJet_map[*l1SIt+"_out2"][i].isolatedJet(L1_jJet_map[*l1SIt+"_out2"],dR2Max))) continue;
       }
-      pusHists1d_[*l1SIt+"_strip5"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0]);
-      pusHists1d_[*l1SIt+"_strip6"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1]);
-      pusHists1d_[*l1SIt+"_strip7"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[2]);
-      pusHists1d_[*l1SIt+"_strip8"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[3]);
+      pusHists1d_[*l1SIt+"_strip5"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0].first);
+      pusHists1d_[*l1SIt+"_strip6"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1].first);
+      pusHists1d_[*l1SIt+"_strip7"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[2].first);
+      pusHists1d_[*l1SIt+"_strip8"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[3].first);
       pusHists1d_[*l1SIt+"_out2_middle2"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].PUE());
 
       //Fill the different binned hists
@@ -777,10 +777,10 @@ void CaloTowerAnalyser::makePusHists(const std::vector< std::vector<int> >& myar
 	  if(L1_jJet_map[*l1SIt+"_out2"][i].pt() > ptBinIt->second || L1_jJet_map[*l1SIt+"_out2"][i].pt() < ptBinIt->second-20)
 	    continue; 
 
-	  pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip5"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0]);
-	  pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip6"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1]);
-	  pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip7"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[2]);
-	  pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip8"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[3]);
+	  pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip5"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0].first);
+	  pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip6"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1].first);
+	  pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip7"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[2].first);
+	  pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_strip8"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[3].first);
 	  pusHists1d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*l1SIt+"_out2_middle2"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].PUE());
 
 
@@ -797,16 +797,16 @@ void CaloTowerAnalyser::makePusHists(const std::vector< std::vector<int> >& myar
 	if(isolatedOnly){
 	  if( !(L1_jJet_map[*l1SIt+"_out1"][i].isolatedJet(L1_jJet_map[*l1SIt+"_out1"],dR2Max))) continue;
 	}
-	pusHists2d_[*gVIt+"_"+*l1SIt+"_strip1"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0]);
-	pusHists2d_[*gVIt+"_"+*l1SIt+"_strip2"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1]);
-	pusHists2d_[*gVIt+"_"+*l1SIt+"_strip3"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[2]);
-	pusHists2d_[*gVIt+"_"+*l1SIt+"_strip4"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[3]);
+	pusHists2d_[*gVIt+"_"+*l1SIt+"_strip1"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0].first);
+	pusHists2d_[*gVIt+"_"+*l1SIt+"_strip2"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1].first);
+	pusHists2d_[*gVIt+"_"+*l1SIt+"_strip3"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[2].first);
+	pusHists2d_[*gVIt+"_"+*l1SIt+"_strip4"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[3].first);
 	pusHists2d_[*gVIt+"_"+*l1SIt+"_out1_middle2"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].PUE());
 
-	pusProfile_[*gVIt+"_"+*l1SIt+"_strip1"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0]);
-	pusProfile_[*gVIt+"_"+*l1SIt+"_strip2"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1]);
-	pusProfile_[*gVIt+"_"+*l1SIt+"_strip3"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[2]);
-	pusProfile_[*gVIt+"_"+*l1SIt+"_strip4"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[3]);
+	pusProfile_[*gVIt+"_"+*l1SIt+"_strip1"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0].first);
+	pusProfile_[*gVIt+"_"+*l1SIt+"_strip2"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1].first);
+	pusProfile_[*gVIt+"_"+*l1SIt+"_strip3"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[2].first);
+	pusProfile_[*gVIt+"_"+*l1SIt+"_strip4"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[3].first);
 	pusProfile_[*gVIt+"_"+*l1SIt+"_out1_middle2"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].PUE());
 
 	for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
@@ -818,24 +818,24 @@ void CaloTowerAnalyser::makePusHists(const std::vector< std::vector<int> >& myar
 	      continue; 
 
 	    pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip1"]->Fill(
-		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0]);
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0].first);
 	    pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip2"]->Fill(
-		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1]);
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1].first);
 	    pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip3"]->Fill(
-		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[2]);
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[2].first);
 	    pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip4"]->Fill(
-		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[3]);
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[3].first);
 	    pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_out1_middle2"]->Fill(
 		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].PUE());
 
 	    pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip1"]->Fill(
-		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0]);
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0].first);
 	    pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip2"]->Fill(
-		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1]);
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1].first);
 	    pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip3"]->Fill(
-		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[2]);
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[2].first);
 	    pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip4"]->Fill(
-		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[3]);
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[3].first);
 	    pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_out1_middle2"]->Fill(
 		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].PUE());
 
@@ -848,16 +848,16 @@ void CaloTowerAnalyser::makePusHists(const std::vector< std::vector<int> >& myar
 	if(isolatedOnly){
 	  if( !(L1_jJet_map[*l1SIt+"_out2"][i].isolatedJet(L1_jJet_map[*l1SIt+"_out2"],dR2Max))) continue;
 	}
-	pusHists2d_[*gVIt+"_"+*l1SIt+"_strip5"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0]);
-	pusHists2d_[*gVIt+"_"+*l1SIt+"_strip6"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1]);
-	pusHists2d_[*gVIt+"_"+*l1SIt+"_strip7"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[2]);
-	pusHists2d_[*gVIt+"_"+*l1SIt+"_strip8"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[3]);
+	pusHists2d_[*gVIt+"_"+*l1SIt+"_strip5"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0].first);
+	pusHists2d_[*gVIt+"_"+*l1SIt+"_strip6"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1].first);
+	pusHists2d_[*gVIt+"_"+*l1SIt+"_strip7"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[2].first);
+	pusHists2d_[*gVIt+"_"+*l1SIt+"_strip8"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[3].first);
 	pusHists2d_[*gVIt+"_"+*l1SIt+"_out2_middle2"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].PUE());
 
-	pusProfile_[*gVIt+"_"+*l1SIt+"_strip5"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0]);
-	pusProfile_[*gVIt+"_"+*l1SIt+"_strip6"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1]);
-	pusProfile_[*gVIt+"_"+*l1SIt+"_strip7"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[2]);
-	pusProfile_[*gVIt+"_"+*l1SIt+"_strip8"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[3]);
+	pusProfile_[*gVIt+"_"+*l1SIt+"_strip5"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0].first);
+	pusProfile_[*gVIt+"_"+*l1SIt+"_strip6"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1].first);
+	pusProfile_[*gVIt+"_"+*l1SIt+"_strip7"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[2].first);
+	pusProfile_[*gVIt+"_"+*l1SIt+"_strip8"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[3].first);
 	pusProfile_[*gVIt+"_"+*l1SIt+"_out2_middle2"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].PUE());
 
 	for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
@@ -869,24 +869,24 @@ void CaloTowerAnalyser::makePusHists(const std::vector< std::vector<int> >& myar
 	      continue; 
 
 	    pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip5"]->Fill(
-		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0]);
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0].first);
 	    pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip6"]->Fill(
-		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1]);
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1].first);
 	    pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip7"]->Fill(
-		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[2]);
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[2].first);
 	    pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip8"]->Fill(
-		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[3]);
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[3].first);
 	    pusHists2d_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_out2_middle2"]->Fill(
 		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].PUE());
 
 	    pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip5"]->Fill(
-		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0]);
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0].first);
 	    pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip6"]->Fill(
-		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1]);
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1].first);
 	    pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip7"]->Fill(
-		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[2]);
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[2].first);
 	    pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_strip8"]->Fill(
-		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[3]);
+		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[3].first);
 	    pusProfile_[etaBinIt->first+"_"+ptBinIt->first+"_"+*gVIt+"_"+*l1SIt+"_out2_middle2"]->Fill(
 		globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].PUE());
 

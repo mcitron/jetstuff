@@ -475,6 +475,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
        L1_5400donut_jJet_mask.push_back(jJet(newenergydonut5400, L1_5400_jJet_mask[i].iEta(), L1_5400_jJet_mask[i].iPhi()));
        }
        }*/
+/*
   for(unsigned int i=0; i<L1_4300_jJet.size(); i++) {
     double newenergydonut4300=L1_4300_jJet[i].eatDonut();
     double newenergyglobal4300=L1_4300_jJet[i].eatGlobe(median_jet_4300);
@@ -490,7 +491,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       L1_4300global_jJet.push_back(jJet(newenergyglobal4300, L1_4300_jJet[i].iEta(), L1_4300_jJet[i].iPhi())); 
 
     }
-  }
+  }*/
   for(unsigned int i=0; i<L1_5450_jJet.size(); i++) {
     double newenergydonut5450=L1_5450_jJet[i].eatDonut();
     double newenergyglobal5450=L1_5450_jJet[i].eatGlobe(median_jet_5450);
@@ -520,13 +521,13 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   this->compareJetCollections(calibrated_L1_5400donut_jJet, L1_5400donut_jJet,"5400_donut_calib_uncalib",false);
   this->compareJetCollections(calibrated_L1_5400_jJet, ak4genjetsp_jJet,"5400_nopus_calib_uncalib",false);
   this->compareJetCollections(calibrated_L1_5400global_jJet, ak4genjetsp_jJet, "5400_global_calib_uncalib",false);
+  this->compareJetCollections(L1_5450donut_jJet, ak4genjetsp_jJet,"5450_donut_gen",false);
+  this->compareJetCollections(L1_5450_jJet, ak4genjetsp_jJet,"5450_nopus_gen",false);
   /*
      this->compareJetCollections(L1_4300donut_jJet, ak4genjetsp_jJet,"4300_donut_gen",false);
      this->compareJetCollections(L1_4300_jJet, ak4genjetsp_jJet,"4300_nopus_gen",false);
      this->compareJetCollections(L1_4300global_jJet, ak4genjetsp_jJet, "4300_global_gen",false);
 
-     this->compareJetCollections(L1_5450donut_jJet, ak4genjetsp_jJet,"5450_donut_gen",false);
-     this->compareJetCollections(L1_5450_jJet, ak4genjetsp_jJet,"5450_nopus_gen",false);
      this->compareJetCollections(L1_5450global_jJet, ak4genjetsp_jJet, "5450_global_gen",false);
 
      this->compareJetCollections(L1_6550_jJet, ak4genjetsp_jJet,"6550_nopus_gen",false);
@@ -536,7 +537,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 
      this->compareJetCollections(gct_jJet, ak4genjetsp_jJet, "gct_gen",true);
-   */  
+     */  
   double mean_top_pt=0.;
   for (auto iTop = top_jJet.begin();iTop != top_jJet.end(); iTop++)
   {
@@ -671,7 +672,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
      }
      }
      }
-   */
+     */
   /*
      this->compareJetCollections(L1_4300_jJet, ak4genjetsp_jJet, "L14300_ak4genjetsp");
      this->compareJetCollections(L1_4300donut_jJet, ak4genjetsp_jJet, "L14300donut_ak4genjetsp");
@@ -704,7 +705,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
      this->compareJetCollections(L1_4300_jJet, ak4tt_jJet, "L14300_ak4tt");
      this->compareJetCollections(L1_4300donut_jJet, ak4tt_jJet, "L14300donut_ak4tt");
      this->compareJetCollections(L1_5400_jJet, ak4tt_jJet, "L15400_ak4tt");
-   */  
+     */  
   //  printOneEvent(triggertowers, L1_jJet, ak4ttjets, genJetCol, ak4genjetsp); 
 
 
@@ -736,7 +737,7 @@ CaloTowerAnalyser::endJob()
    CaloTowerAnalyser::beginRun(edm::Run const&, edm::EventSetup const&)
    {
    }
- */
+   */
 
 // ------------ method called when ending the processing of a run  ------------
 /*
@@ -744,7 +745,7 @@ CaloTowerAnalyser::endJob()
    CaloTowerAnalyser::endRun(edm::Run const&, edm::EventSetup const&)
    {
    }
- */
+   */
 
 // ------------ method called when starting to processes a luminosity block  ------------
 /*
@@ -752,7 +753,7 @@ CaloTowerAnalyser::endJob()
    CaloTowerAnalyser::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
    {
    }
- */
+   */
 
 // ------------ method called when ending the processing of a luminosity block  ------------
 /*
@@ -760,7 +761,7 @@ CaloTowerAnalyser::endJob()
    CaloTowerAnalyser::endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
    {
    }
- */
+   */
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
 void
