@@ -22,7 +22,7 @@ process.source = cms.Source("PoolSource",
     #'file:/afs/cern.ch/work/j/jad/public/TriggerTowers_TTbar_13TeV_PU40_25ns_1-10_skimmed_v2.root'
     #'file:/afs/cern.ch/work/j/jad/public/TriggerTowers_TTbar_13TeV_noPU_test2_v3.root'
     #'file:/afs/cern.ch/work/j/jad/public/TriggerTowers_TTbar_13TeV_PU40_50ns_1-10_skimmed_v3.root'    
-      '{1}'
+      {1}
     ),
     skipEvents=cms.untracked.uint32({2})
 )

@@ -11,7 +11,7 @@ Nruns = 10
 #Nruns = sys.argv[1]
 #outputdir = sys.argv[2]
 #input = sys.argv[3]
-outputdir="/afs/cern.ch/work/m/mcitron/jadjets/CMSSW_6_2_0/src/jCaloTower/CaloTowerAnalyser/batch/qcd_new_calib_140527"
+outputdir="/afs/cern.ch/work/m/mcitron/jadjets/CMSSW_6_2_0/src/jCaloTower/CaloTowerAnalyser/batch/qcd_new_calib_140528"
 #rundir="/afs/cern.ch/work/m/mcitron/jadjets/CMSSW_6_2_0/src/jCaloTower/CaloTowerAnalyser/"
 #input='file:/afs/cern.ch/work/m/mcitron/public/TriggerTowers_NeutrinoGun_13TeV_PU40_50ns_1-10_skimmed_v3.root'    
 #input = "file:/afs/cern.ch/work/a/aelwood/public/TriggerTowers_TTbar_13TeV_PU40_50ns_1-10_skimmed_v3.root"
@@ -30,7 +30,7 @@ with open(filelist) as f:
 configinput=make_config.make_config_input(arg_array[int(num)][0],arg_array[int(num)][1],arg_array[int(num)][2],arg_array[int(num)][3])
 if not os.path.exists(outputdir):
     os.makedirs(outputdir)
-
+print configinput
 os.chdir(outputdir)
 
 f = open('config_'+num+'.py','w')
