@@ -505,9 +505,9 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     }
   }
   //Calibration
-  std::vector<jJet> calibrated_L1_5400_jJet = calibrateL1Jets(L1_5400_jJet,getLut(jetType::nopus),0,9999);
-  std::vector<jJet> calibrated_L1_5400global_jJet = calibrateL1Jets(L1_5400global_jJet,getLut(jetType::global),0,9999);
-  std::vector<jJet> calibrated_L1_5400donut_jJet = calibrateL1Jets(L1_5400donut_jJet,getLut(jetType::donut),0,9999);
+  std::vector<jJet> calibrated_L1_5400_jJet = calibrateL1Jets(L1_5400_jJet,jetType::l15400nopus,0,9999);
+  std::vector<jJet> calibrated_L1_5400global_jJet = calibrateL1Jets(L1_5400global_jJet,jetType::l15400global,0,9999);
+  std::vector<jJet> calibrated_L1_5400donut_jJet = calibrateL1Jets(L1_5400donut_jJet,jetType::l15400donut,0,9999);
   //this->mPrintMe = false;
 
   this->compareJetCollections(L1_5400donut_jJet, ak4genjetsp_jJet,"5400_donut_gen",false);

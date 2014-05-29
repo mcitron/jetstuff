@@ -5,62 +5,105 @@
 
 double calibFit( Double_t *v, Double_t *par ){
 
-   // JETMET uses log10 rather than the ln used here...
-   double logX = log(v[0]);
+  // JETMET uses log10 rather than the ln used here...
+  double logX = log(v[0]);
 
-   double term1 = par[1] / ( logX * logX + par[2] );
-   double term2 = par[3] * exp( -par[4]*((logX - par[5])*(logX - par[5])) );
+  double term1 = par[1] / ( logX * logX + par[2] );
+  double term2 = par[3] * exp( -par[4]*((logX - par[5])*(logX - par[5])) );
 
-   // Final fitting function 
-   double f    = par[0] + term1 + term2; 
+  // Final fitting function 
+  double f    = par[0] + term1 + term2; 
 
-   return f;
-   //return 1.0/f;
+  return f;
+  //return 1.0/f;
 }
 
 enum jetType{
-   donut,
-   nopus,
-   global
+  l15400donut,
+  l15400nopus,
+  l15400global,
+  l15400donut10,
+  l15400nopus10,
+  l15400global10,
+  l15400donut20,
+  l15400nopus20,
+  l15400global20,
+  l15450donut,
+  l15450nopus,
+  l15450global,
+  l15450donut10,
+  l15450nopus10,
+  l15450global10,
+  l15450donut20,
+  l15450nopus20,
+  l15450global20
 };
 
 std::vector<double> getLut(const jetType & type){
-  
-   std::vector<double> lut;
 
-   for(int i=0; i<48; i++){
+  std::vector<double> lut;
 
-     if(type==jetType::5400donut) lut.push_back(luts5400::donutLut[i]);
-     else if(type==jetType::5400global) lut.push_back(luts5400::globalLut[i]);
-     else if(type==jetType::5400nopus) lut.push_back(luts5400::nopusLut[i]);
-     else if(type==jetType::5400donut20) lut.push_back(luts5400::donutLut20[i]);
-     else if(type==jetType::5400global20) lut.push_back(luts5400::globalLut20[i]);
-     else if(type==jetType::5400nopus20) lut.push_back(luts5400::nopusLut20[i]);
-     else if(type==jetType::5400donut10) lut.push_back(luts5400::donutLut10[i]);
-     else if(type==jetType::5400global10) lut.push_back(luts5400::globalLut10[i]);
-     else if(type==jetType::5400nopus10) lut.push_back(luts5400::nopusLut10[i]);
-     
-     else if(type==jetType::5450donut) lut.push_back(luts5450::donutLut[i]);
-     else if(type==jetType::5450global) lut.push_back(luts5450::globalLut[i]);
-     else if(type==jetType::5450nopus) lut.push_back(luts5450::nopusLut[i]);
-     else if(type==jetType::5450donut20) lut.push_back(luts5450::donutLut20[i]);
-     else if(type==jetType::5450global20) lut.push_back(luts5450::globalLut20[i]);
-     else if(type==jetType::5450nopus20) lut.push_back(luts5450::nopusLut20[i]);
-     else if(type==jetType::5450donut10) lut.push_back(luts5450::donutLut10[i]);
-     else if(type==jetType::5450global10) lut.push_back(luts5450::globalLut10[i]);
-     else if(type==jetType::5450nopus10) lut.push_back(luts5450::nopusLut10[i]);
+  for(int i=0; i<48; i++){
 
-     else std::cout << "Invalid type to get lut" << std::endl;
+    if(type==jetType::l15400donut) lut.push_back(luts5400::donutLut[i]);
+    else if(type==jetType::l15400global) lut.push_back(luts5400::globalLut[i]);
+    else if(type==jetType::l15400nopus) lut.push_back(luts5400::nopusLut[i]);
+    else if(type==jetType::l15400donut20) lut.push_back(luts5400::donutLut20[i]);
+    else if(type==jetType::l15400global20) lut.push_back(luts5400::globalLut20[i]);
+    else if(type==jetType::l15400nopus20) lut.push_back(luts5400::nopusLut20[i]);
+    else if(type==jetType::l15400donut10) lut.push_back(luts5400::donutLut10[i]);
+    else if(type==jetType::l15400global10) lut.push_back(luts5400::globalLut10[i]);
+    else if(type==jetType::l15400nopus10) lut.push_back(luts5400::nopusLut10[i]);
 
-   }
+    else if(type==jetType::l15450donut) lut.push_back(luts5450::donutLut[i]);
+    else if(type==jetType::l15450global) lut.push_back(luts5450::globalLut[i]);
+    else if(type==jetType::l15450nopus) lut.push_back(luts5450::nopusLut[i]);
+    else if(type==jetType::l15450donut20) lut.push_back(luts5450::donutLut20[i]);
+    else if(type==jetType::l15450global20) lut.push_back(luts5450::globalLut20[i]);
+    else if(type==jetType::l15450nopus20) lut.push_back(luts5450::nopusLut20[i]);
+    else if(type==jetType::l15450donut10) lut.push_back(luts5450::donutLut10[i]);
+    else if(type==jetType::l15450global10) lut.push_back(luts5450::globalLut10[i]);
+    else if(type==jetType::l15450nopus10) lut.push_back(luts5450::nopusLut10[i]);
 
-   return lut;
+    else std::cout << "Invalid type to get lut" << std::endl;
+
+  }
+
+  return lut;
 
 }
 
-std::vector<jJet> calibrateL1Jets(const std::vector<jJet>& inJets, const std::vector<double>& lut, double ptMin, double ptMax){
+std::vector<jJet> calibrateL1Jets(const std::vector<jJet>& inJets, const jetType & type, double ptMin, double ptMax){
+
+  double lut[48];
 
   std::vector<jJet> outJets;
+
+  if(type==jetType::l15400donut) lut=luts5400::donutLut;
+  else if(type==jetType::l15400global) lut=luts5400::globalLut;
+  else if(type==jetType::l15400nopus) lut=luts5400::nopusLut;
+  else if(type==jetType::l15400donut20) lut=luts5400::donutLut20;
+  else if(type==jetType::l15400global20) lut=luts5400::globalLut20;
+  else if(type==jetType::l15400nopus20) lut=luts5400::nopusLut20;
+  else if(type==jetType::l15400donut10) lut=luts5400::donutLut10;
+  else if(type==jetType::l15400global10) lut=luts5400::globalLut10;
+  else if(type==jetType::l15400nopus10) lut=luts5400::nopusLut10;
+
+  else if(type==jetType::l15450donut) lut=luts5450::donutLut;
+  else if(type==jetType::l15450global) lut=luts5450::globalLut;
+  else if(type==jetType::l15450nopus) lut=luts5450::nopusLut;
+  else if(type==jetType::l15450donut20) lut=luts5450::donutLut20;
+  else if(type==jetType::l15450global20) lut=luts5450::globalLut20;
+  else if(type==jetType::l15450nopus20) lut=luts5450::nopusLut20;
+  else if(type==jetType::l15450donut10) lut=luts5450::donutLut10;
+  else if(type==jetType::l15450global10) lut=luts5450::globalLut10;
+  else if(type==jetType::l15450nopus10) lut=luts5450::nopusLut10;
+
+  else{
+    std::cout << "Invalid type to get lut" << std::endl;
+    return outJets;
+  }
+
 
   for(auto iJet = inJets.begin(); iJet!=inJets.end(); iJet++){
 
