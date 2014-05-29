@@ -191,8 +191,8 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
   // Get GCT jets (uncalib) collection
   edm::Handle<L1GctJetCandCollection> GctUncalibCenJets;
-  edm::InputTag gctUncalibCenJets("valGctDigis","cenJets","skimrun");
-  //edm::InputTag gctUncalibCenJets("valGctDigis","cenJets","jadtest");
+  //edm::InputTag gctUncalibCenJets("valGctDigis","cenJets","skimrun");
+  edm::InputTag gctUncalibCenJets("valGctDigis","cenJets","jadtest");
   iEvent.getByLabel(gctUncalibCenJets, GctUncalibCenJets);
   std::vector<jJet> gct_jJet_uncalib;
   for(unsigned int i=0; i<GctUncalibCenJets->size(); i++) {
@@ -206,8 +206,8 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
   // Get GCT jets (calib) collection
   edm::Handle<L1GctJetCandCollection> GctCalibCenJets;
-  //edm::InputTag gctCalibCenJets("gctDigis","cenJets","jadtest");
-  edm::InputTag gctCalibCenJets("gctDigis","cenJets","skimrun");
+  edm::InputTag gctCalibCenJets("gctDigis","cenJets","jadtest");
+  //edm::InputTag gctCalibCenJets("gctDigis","cenJets","skimrun");
   iEvent.getByLabel(gctCalibCenJets, GctCalibCenJets);
   std::vector<jJet> gct_jJet_calib;
 
@@ -227,8 +227,8 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
   // Get gen jet collection
   edm::Handle<reco::GenJetCollection> hGenJetProduct;
-  edm::InputTag genjetselector("ak4GenJets","","skimrun");
-  //edm::InputTag genjetselector("ak4GenJets","","jadtest");
+  //edm::InputTag genjetselector("ak4GenJets","","skimrun");
+  edm::InputTag genjetselector("ak4GenJets","","jadtest");
   //iEvent.getByLabel("ak4GenJets", hGenJetProduct);
   iEvent.getByLabel(genjetselector, hGenJetProduct);
   const reco::GenJetCollection * genJetCol = 0;

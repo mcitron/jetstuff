@@ -186,7 +186,7 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
       //std::cout << "new: (" << i << ", " << j << ", " << input[i][j] << ")" << std::endl;
       int numtowersaboveme=0;
       int numtowersabovethresh=0;
-
+      int seedtower = input[i][j];  
       std::vector<int> localsums(jetsize+1,0); //to hold the ring sums (+1 for centre)
       std::vector<int> areas(jetsize+1,0); //to hold the ring areas (i.e. when we get up against the boundaries)
       std::vector<std::pair<int,int>> outerstrips(4,std::make_pair(0,0)); //to hold the energies in the 4 surrounding outer strips (excluding corners)
@@ -249,7 +249,7 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
 
         //this means we have a viable candidate
         if(totalenergy > 0.0) {
-          L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetTower,jetarea));
+          L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetTower,jetarea, seedtower));
         }
 
       }

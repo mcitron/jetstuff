@@ -1,13 +1,14 @@
-void makeRate()
+void makeRateEff()
 {
 
-//   TFile * f = TFile::Open("./neutrino_skim_run.root");
-   TFile * f_neutrino = TFile::Open("matts_neutrino_fullrun.root");
-   TFile * f_ttbar = TFile::Open("matts_ttbar_fullrun.root");
+   TFile * f_neutrino = TFile::Open("./neutrino_skim_run.root");
+   TFile * f_ttbar = TFile::Open("./global_PUS_TEST.root");
+   //TFile * f_neutrino = TFile::Open("matts_neutrino_fullrun.root");
+   //TFile * f_ttbar = TFile::Open("matts_ttbar_fullrun.root");
 
    std::vector<TString> PUSregime;
    PUSregime.push_back("5400_nopus");
-   PUSregime.push_back("5450_nopus");
+   /*PUSregime.push_back("5450_nopus");
    PUSregime.push_back("4300_nopus");
    PUSregime.push_back("5400_donut");
    PUSregime.push_back("5450_donut");
@@ -15,7 +16,7 @@ void makeRate()
    PUSregime.push_back("5400_global");
    PUSregime.push_back("5450_global");
    PUSregime.push_back("4300_global");
-   PUSregime.push_back("gct");
+   PUSregime.push_back("gct");*/
    std::vector<TString> jetnum;
    jetnum.push_back("alljet");
    jetnum.push_back("jet1");
@@ -34,8 +35,10 @@ void makeRate()
      for (auto iJet = jetnum.begin(); iJet!=jetnum.end(); iJet++)
      {
        //std::cout << "demo/"+*iPUS+"_gen/col2_"+*iJet+"_pt" << std::endl;
-       TH1D * origplot_ttbar = f_ttbar->Get(("demo/"+*iPUS+"_gen/col1_"+*iJet+"_pt").Data());
-       TH1D * origplot_neutrino = f_neutrino->Get(("demo/"+*iPUS+"_gen/col1_"+*iJet+"_pt").Data());
+       //TH1D * origplot_ttbar = f_ttbar->Get(("demo/"+*iPUS+"_gen/col1_"+*iJet+"_pt").Data());
+       //TH1D * origplot_neutrino = f_neutrino->Get(("demo/"+*iPUS+"_gen/col1_"+*iJet+"_pt").Data());
+       TH1D * origplot_ttbar = f_ttbar->Get(("demo/"+*iPUS+"_gen/col1_seed_"+*iJet).Data());
+       TH1D * origplot_neutrino = f_neutrino->Get(("demo/"+*iPUS+"_gen/col1_seed_"+*iJet).Data());
 
        //Make the rates
        TH1D * cumuplot_ttbar = makeCumu(origplot_ttbar);
