@@ -167,7 +167,7 @@ double ptStep = 5;
 //=======================
 
 
-TString filename = "qcd_full_10eta.root";
+TString filename = "qcd_new_calib_140528.root";
 
 
 // Directory inside ROOT file
@@ -177,9 +177,9 @@ TString ROOTdir  = "";
 //  TString plotDirectory = "plots/Mk1Release/Presentation/8x8_PreFix/";
 int nEtaBins=8;
 double setPtBin=5;
-double setPtMin=5;
+double setPtMin=0;
 double setPtMax=300;
-TString plotDirectory = "qcd_8eta_5to300bin5";
+TString plotDirectory = "qcd_0to300b5_";
 
 
 
@@ -297,9 +297,9 @@ int getCalibration(){
     subDirs.push_back( "/5400_donut_gen/" );
     subDirs.push_back( "/5400_global_gen/" );
     subDirs.push_back( "/5400_nopus_gen/" );
- /*   subDirs.push_back( "/5450_donut_gen/" );
-    subDirs.push_back( "/5450_global_gen/" );
-    subDirs.push_back( "/5450_nopus_gen/" );*/
+    subDirs.push_back( "/5450_donut_gen/" );
+ //   subDirs.push_back( "/5450_global_gen/" );
+    subDirs.push_back( "/5450_nopus_gen/" );
     //subDirs.push_back( "/Calibration_LPUS_ak5PUS_AllJets/" );
 
     //	   subDirs.push_back( "/Calibration_UncalibCurr_ak5PUS/" );     
@@ -309,9 +309,9 @@ int getCalibration(){
     typeLabel[ "/5400_donut_gen/" ] = "5400_donut_4Jets";
     typeLabel[ "/5400_global_gen/" ] = "5400_global_4Jets";
     typeLabel[ "/5400_nopus_gen/" ] = "5400_nopus_4Jets";
-/*    typeLabel[ "/5450_donut_gen/" ] = "5450_donut_4Jets";
-    typeLabel[ "/5450_global_gen/" ] = "5450_global_4Jets";
-    typeLabel[ "/5450_nopus_gen/" ] = "5450_nopus_4Jets";*/
+    typeLabel[ "/5450_donut_gen/" ] = "5450_donut_4Jets";
+  //  typeLabel[ "/5450_global_gen/" ] = "5450_global_4Jets";
+    typeLabel[ "/5450_nopus_gen/" ] = "5450_nopus_4Jets";
     //typeLabel[ "/Calibration_LPUS_ak5PUS_AllJets/" ] = "LPUS_AllJets";
 
 
@@ -652,7 +652,7 @@ int getCalibration(){
 
               const double nSigma = 1.5;
               const double fitMin = -999;
-              const int    nIter  = 3;
+              const int    nIter  = 5;
 
               if(doRebin) yProject->Rebin(responseRebin);
               fit_gaussian( yProject, nSigma, fitMin, nIter );
@@ -689,7 +689,7 @@ int getCalibration(){
                 responseErr = gausResFit->GetParError( 1 );
 
                 //Fill the chi2
-                responseChi2->Fill((ptLow+ptHigh)/2.0,etaIndex+0.5,gausResFit->GetChisquare()/(yProject->GetEntries()-3.0));
+                responseChi2->Fill((ptLow+ptHigh)/2.0,etaIndex+0.5,gausResFit->GetChisquare()/(yProject->GetNbinsX()-3.0));
               }	      
               std::cout << "Final fit: Response = " << response << " +/- " << responseErr << "\n";
 
@@ -761,7 +761,7 @@ int getCalibration(){
 
               const double nSigma = 1.5;
               const double fitMin = -999;
-              const int    nIter  = 3;
+              const int    nIter  = 5;
 
               if(doRebin) yProject->Rebin(ptRebin);
 
@@ -798,7 +798,7 @@ int getCalibration(){
                 l1PtErr = gausPtFit->GetParError( 1 );
 
                 //Fill the chi2
-                ptChi2->Fill((ptLow+ptHigh)/2.0,etaIndex+0.5,gausPtFit->GetChisquare()/(yProject->GetEntries()-3.0));
+                ptChi2->Fill((ptLow+ptHigh)/2.0,etaIndex+0.5,gausPtFit->GetChisquare()/(yProject->GetNbinsX()-3.0));
               }
 
               std::cout << "Final fit: L1Pt = " << l1Pt << " +/- " << l1PtErr << "\n";
