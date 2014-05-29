@@ -56,7 +56,7 @@ Implementation:
 #include "jCaloTower/CaloTowerAnalyser/interface/jad_jet_class.hh"
 #include "jCaloTower/CaloTowerAnalyser/interface/matching_algo.hh"
 #include "jCaloTower/CaloTowerAnalyser/interface/mask.hh"
-#include "jCaloTower/CaloTowerAnalyser/interface/calibration_params_8eta.hh"
+#include "jCaloTower/CaloTowerAnalyser/interface/calibration_params.hh"
 
 #include "fastjet/GhostedAreaSpec.hh"
 #include "fastjet/ClusterSequenceArea.hh"

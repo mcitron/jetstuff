@@ -11,6 +11,7 @@
 #include <TLine.h>
 #include <TKey.h>
 #include <fstream> 
+#include <stdio.h>
 
 // Returns a vector [ntuplePath, objectName] 
 std::vector < std::pair <TString, TString> > getROOTobjects(TFile* f, TString rootDir, TString objectType);
@@ -180,7 +181,10 @@ void recalibrateGraph(TFile *file, TString directory, TString &outputLowPt, TStr
 
 double calibrateGraph(TFile *file, TString directory, TString &outputCMSSW, double calibFitMin = 0, double calibFitMax = 300, TString graph = "Eta_minus3.000_to_minus2.172", bool silent = false ){
 
+  char charName[20];
+  sprintf(charName,"chi2Fits_%d_to_%d",int(calibFitMin),int(calibFitMax));
 
+  file->cd(charName);
 
   TGraphErrors *gr1 = (TGraphErrors*)file->Get( graph );
 
@@ -397,7 +401,8 @@ double calibrateGraph(TFile *file, TString directory, TString &outputCMSSW, doub
   //canvOut->SaveAs( directory + graph + "_res.pdf" );
 
 
-  return residual->GetRMS();
+  //return residual->GetRMS();
+  return calibrationFit->GetChisquare();
 }
 
 
@@ -449,8 +454,10 @@ int calibrateFile(TString ROOTFile,  double calibFitMin = 0, double calibFitMax 
   //TFile *f = new TFile(ROOTFile, "OPEN");
   TFile *f = new TFile(ROOTFile, "UPDATE");
 
+  char charName[20];
+  sprintf(charName,"chi2Fits_%d_to_%d",int(calibFitMin),int(calibFitMax));
 
-
+  TH1D* chi2Fits = new TH1D("chi2Fits","Chi2 for each eta bin", 8,0.,8.);
 
 
   // list of histogram names in ROOT file with their corresponding directory structure 
@@ -460,6 +467,9 @@ int calibrateFile(TString ROOTFile,  double calibFitMin = 0, double calibFitMax 
 
   TString outputCMSSW;
 
+  f->mkdir(charName);
+
+  int etaBin=0;
   // Calibrate each histogram in the ROOTfile
   for (unsigned int i = 0; i < fileHistPair.size(); i++){
 
@@ -469,10 +479,19 @@ int calibrateFile(TString ROOTFile,  double calibFitMin = 0, double calibFitMax 
 
     // Run calibration on the graph
     if(!histogramName.Contains("withfit")){
-      calibrateGraph( f, directory, outputCMSSW, calibFitMin, calibFitMax, histogramName, silent );
+      //calibrateGraph( f, directory, outputCMSSW, calibFitMin, calibFitMax, histogramName, silent );
+      double chi2 = calibrateGraph( f, directory, outputCMSSW, calibFitMin, calibFitMax, histogramName, silent );
+      std::cout << std::endl << histogramName.Data() << " chi2: " << chi2 << std::endl;
+      chi2Fits->Fill(etaBin,chi2);
+      etaBin++;
     }
   }
 
+  f->cd(charName);
+
+  chi2Fits->Write();
+
+  f->Close();
 
   std::cout << "Output LUT: \n\n";
   std::cout << outputCMSSW << "\n\n";

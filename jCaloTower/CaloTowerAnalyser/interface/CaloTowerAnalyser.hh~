@@ -56,7 +56,7 @@ Implementation:
 #include "jCaloTower/CaloTowerAnalyser/interface/jad_jet_class.hh"
 #include "jCaloTower/CaloTowerAnalyser/interface/matching_algo.hh"
 #include "jCaloTower/CaloTowerAnalyser/interface/mask.hh"
-#include "jCaloTower/CaloTowerAnalyser/interface/calibration_params.hh"
+#include "jCaloTower/CaloTowerAnalyser/interface/calibration_params_8eta.hh"
 
 #include "fastjet/GhostedAreaSpec.hh"
 #include "fastjet/ClusterSequenceArea.hh"
@@ -104,8 +104,10 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     void setPtBins(std::map<TString,int> ptBins);
     void setNintBins(std::map<TString,int> nintBins);
     void bookPusHists(TString folderName);
-    void makePusHists(const std::vector< std::vector<int> >& myarray);
+    void makePusHists(const std::vector< std::vector<int> >& myarray,const std::vector<jJet>& L1_4300_jJet,const std::vector<jJet>& L1_5450_jJet);
     double getMedian(const std::vector<jJet> & jets);
+    double calculateHT(const std::vector<jJet> & jets);
+    std::vector<double> calculateMHT(const std::vector<jJet> & jets);
 
 
   private:
@@ -124,6 +126,8 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     // ----------member data ---------------------------
     int mEventNumber;
     int mNPV;
+    double mET=0;
+    std::vector<double> mMET;
     std::vector<pair_info> pairs;
     TH1D * num_tops_per_event;
     TH1D * median_energy_per_event;
@@ -149,6 +153,10 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     TH1D * eff_over_x3_top;
     TH1D * eff_over_x4_top;
     TH1D * mean_top_pt_hist;
+    TH1D * met_hist;
+    TH1D * et_hist;
+    TH1D * met_x_hist;
+    TH1D * met_y_hist;
 
 
     TH1D * genjet_pt;
@@ -275,6 +283,26 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     std::map<TString,TProfile*> col2_calib_ratio_profile;
     std::map<TString,TH2D*> col2_calib_corr;
     std::map<TString,TProfile*> col2_calib_corr_profile;
+    //Esums
+    std::map<TString,TH1D*> col1_ht;
+    std::map<TString,TH1D*> col2_ht;
+    std::map<TString,TH1D*> col1_mht;
+    std::map<TString,TH1D*> col2_mht;
+    std::map<TString,TH1D*> col1_mht_x;
+    std::map<TString,TH1D*> col2_mht_x;
+    std::map<TString,TH1D*> col1_mht_y;
+    std::map<TString,TH1D*> col2_mht_y;
+
+
+
+    std::map<TString,TH1D*> ht_resolution;
+    std::map<TString,TH1D*> mht_x_resolution;
+    std::map<TString,TH1D*> mht_y_resolution;
+    std::map<TString,TH1D*> mht_resolution;
+
+
+
+
 };
 
 void CaloTowerAnalyser::SetNPV(int npv) { mNPV = npv; }
