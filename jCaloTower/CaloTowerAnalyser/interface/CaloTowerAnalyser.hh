@@ -300,6 +300,8 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     std::map<TString,TH1D*> mht_y_resolution;
     std::map<TString,TH1D*> mht_resolution;
 
+    std::map<TString,TH1D*> col2_ht_cut;
+    std::map<TString,TH1D*> col2_mht_cut;
 
 
 
