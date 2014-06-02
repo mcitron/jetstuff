@@ -1,22 +1,24 @@
 void makeRateEff()
 {
 
-  TFile * f_neutrino = TFile::Open("./neutrino_skim_run.root");
-  TFile * f_ttbar = TFile::Open("./global_PUS_TEST.root");
+  TFile * f_ttbar = TFile::Open("../../ttbar_out/ttbar_30May014.root");
+  TFile * f_neutrino = TFile::Open("../../neutrino_gun_out/neutrinogun_30May014.root");
   //TFile * f_neutrino = TFile::Open("matts_neutrino_fullrun.root");
   //TFile * f_ttbar = TFile::Open("matts_ttbar_fullrun.root");
 
   std::vector<TString> PUSregime;
   PUSregime.push_back("5400_nopus");
+  PUSregime.push_back("5400_calib_nopus");
   PUSregime.push_back("5450_nopus");
-  PUSregime.push_back("4300_nopus");
-  PUSregime.push_back("5450_global");
-  PUSregime.push_back("4300_global");
-  PUSregime.push_back("gct");
+  PUSregime.push_back("5450_calib_nopus");
+  PUSregime.push_back("5400_global");
   PUSregime.push_back("5400_calib_global");
   PUSregime.push_back("5450_global");
-  PUSregime.push_back("4300_global");
-  PUSregime.push_back("gct");
+  PUSregime.push_back("5400_donut");
+  PUSregime.push_back("5400_calib_donut");
+  PUSregime.push_back("5450_donut");
+  PUSregime.push_back("5450_calib_donut");
+  //PUSregime.push_back("gct");
   std::vector<TString> jetnum;
   jetnum.push_back("alljet");
   jetnum.push_back("jet1");
@@ -35,10 +37,10 @@ void makeRateEff()
     for (auto iJet = jetnum.begin(); iJet!=jetnum.end(); iJet++)
     {
       //std::cout << "demo/"+*iPUS+"_gen/col2_"+*iJet+"_pt" << std::endl;
-      //TH1D * origplot_ttbar = f_ttbar->Get(("demo/"+*iPUS+"_gen/col1_"+*iJet+"_pt").Data());
-      //TH1D * origplot_neutrino = f_neutrino->Get(("demo/"+*iPUS+"_gen/col1_"+*iJet+"_pt").Data());
-      TH1D * origplot_ttbar = f_ttbar->Get(("demo/"+*iPUS+"_gen/col1_seed_"+*iJet).Data());
-      TH1D * origplot_neutrino = f_neutrino->Get(("demo/"+*iPUS+"_gen/col1_seed_"+*iJet).Data());
+      TH1D * origplot_ttbar = f_ttbar->Get(("demo/"+*iPUS+"_gen/col1_"+*iJet+"_pt").Data());
+      TH1D * origplot_neutrino = f_neutrino->Get(("demo/"+*iPUS+"_gen/col1_"+*iJet+"_pt").Data());
+      //TH1D * origplot_ttbar = f_ttbar->Get(("demo/"+*iPUS+"_gen/col1_seed_"+*iJet).Data());
+      //TH1D * origplot_neutrino = f_neutrino->Get(("demo/"+*iPUS+"_gen/col1_seed_"+*iJet).Data());
 
       //Make the rates
       TH1D * cumuplot_ttbar = makeCumu(origplot_ttbar);
@@ -50,16 +52,16 @@ void makeRateEff()
       if(cumuplot_ttbar->GetNbinsX() != cumuplot_neutrino->GetNbinsX()) std::cout << "Different binning between rate and efficiency\n";
       else{
 
-	TGraph * rate_efficiency = 
-	  new TGraph(cumuplot_ttbar->GetNbinsX());
-	rate_efficiency->SetName("rate_efficiency_"+*iJet);
-	rate_efficiency->SetTitle(";Efficiency (ttbar normalised rate);Rate (0 bias normalised rate)");
+        TGraph * rate_efficiency = 
+          new TGraph(cumuplot_ttbar->GetNbinsX());
+        rate_efficiency->SetName("rate_efficiency_"+*iJet);
+        rate_efficiency->SetTitle(";Efficiency (ttbar normalised rate);Rate (0 bias normalised rate)");
 
-	for(unsigned bin=0; bin<cumuplot_ttbar->GetNbinsX(); bin++){
-	  rate_efficiency->SetPoint(bin, cumuplot_ttbar->GetBinContent(bin), cumuplot_neutrino->GetBinContent(bin));
-	}
+        for(unsigned bin=0; bin<cumuplot_ttbar->GetNbinsX(); bin++){
+          rate_efficiency->SetPoint(bin, cumuplot_ttbar->GetBinContent(bin), cumuplot_neutrino->GetBinContent(bin));
+        }
 
-	rate_efficiency->Write();
+        rate_efficiency->Write();
       }
 
 
@@ -82,7 +84,8 @@ TH1D * makeCumu(TH1D * input)
   for (int bins = 1; bins < input->GetNbinsX(); bins++)
   {
     dummy += input->GetBinContent(bins);
-    output->SetBinContent(bins,1.-(double)dummy/norm);
+    if (norm!=0) output->SetBinContent(bins,1.-(double)dummy/norm);
+    else output->SetBinContent(bins,0.);
   } 
   return output;
 }
