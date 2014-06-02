@@ -18,7 +18,7 @@ CaloTowerAnalyser::CaloTowerAnalyser(const edm::ParameterSet& iConfig) {
 
   //edm::Service<TFileService> fs;
   edm::Service<TFileService> fs;
-
+  mskim=iConfig.getParameter<std::string>("skim_name");
   // std::string folderName = "Event_";
   // std::stringstream caseNumber;
   // caseNumber << eventNumber;
@@ -153,20 +153,23 @@ CaloTowerAnalyser::~CaloTowerAnalyser()
 
 }
 
-double CaloTowerAnalyser::calculateHT(const std::vector<jJet> & jets) {
+double CaloTowerAnalyser::calculateHT(const std::vector<jJet> & jets, const int & thresh) {
   double ht=0.0;
   for(unsigned int i=0; i< jets.size(); i++) {
-    ht += jets[i].pt();
+    if (jets[i].pt() > thresh)  ht += jets[i].pt();
   }
   return ht;
 }
 
-std::vector<double> CaloTowerAnalyser::calculateMHT(const std::vector<jJet> & jets) {
+std::vector<double> CaloTowerAnalyser::calculateMHT(const std::vector<jJet> & jets, const int & thresh) {
   double mht_x=0.0;
   double mht_y=0.0;
   for(unsigned int i=0; i< jets.size(); i++) {
-    mht_x -= cos(g.phi(jets[i].iPhi()))*jets[i].pt();
-    mht_y -= sin(g.phi(jets[i].iPhi()))*jets[i].pt();
+    if (jets[i].pt() > thresh)
+    {
+      mht_x -= cos(g.phi(jets[i].iPhi()))*jets[i].pt();
+      mht_y -= sin(g.phi(jets[i].iPhi()))*jets[i].pt();
+    }
   }
   std::vector<double> results;
   results.push_back(mht_x);
@@ -177,7 +180,6 @@ std::vector<double> CaloTowerAnalyser::calculateMHT(const std::vector<jJet> & je
 //
 // member functions
 //
-
 // ------------ method called for each event  ------------
   void
 CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
@@ -192,7 +194,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   // Get GCT jets (uncalib) collection
   edm::Handle<L1GctJetCandCollection> GctUncalibCenJets;
   //edm::InputTag gctUncalibCenJets("valGctDigis","cenJets","skimrun");
-  edm::InputTag gctUncalibCenJets("valGctDigis","cenJets","jadtest");
+  edm::InputTag gctUncalibCenJets("valGctDigis","cenJets",mskim);
   iEvent.getByLabel(gctUncalibCenJets, GctUncalibCenJets);
   std::vector<jJet> gct_jJet_uncalib;
   for(unsigned int i=0; i<GctUncalibCenJets->size(); i++) {
@@ -206,7 +208,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
   // Get GCT jets (calib) collection
   edm::Handle<L1GctJetCandCollection> GctCalibCenJets;
-  edm::InputTag gctCalibCenJets("gctDigis","cenJets","jadtest");
+  edm::InputTag gctCalibCenJets("gctDigis","cenJets",mskim);
   //edm::InputTag gctCalibCenJets("gctDigis","cenJets","skimrun");
   iEvent.getByLabel(gctCalibCenJets, GctCalibCenJets);
   std::vector<jJet> gct_jJet_calib;
@@ -228,7 +230,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   // Get gen jet collection
   edm::Handle<reco::GenJetCollection> hGenJetProduct;
   //edm::InputTag genjetselector("ak4GenJets","","skimrun");
-  edm::InputTag genjetselector("ak4GenJets","","jadtest");
+  edm::InputTag genjetselector("ak4GenJets","",mskim);
   //iEvent.getByLabel("ak4GenJets", hGenJetProduct);
   iEvent.getByLabel(genjetselector, hGenJetProduct);
   const reco::GenJetCollection * genJetCol = 0;
@@ -475,23 +477,23 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
        L1_5400donut_jJet_mask.push_back(jJet(newenergydonut5400, L1_5400_jJet_mask[i].iEta(), L1_5400_jJet_mask[i].iPhi()));
        }
        }*/
-/*
-  for(unsigned int i=0; i<L1_4300_jJet.size(); i++) {
-    double newenergydonut4300=L1_4300_jJet[i].eatDonut();
-    double newenergyglobal4300=L1_4300_jJet[i].eatGlobe(median_jet_4300);
-    if(newenergydonut4300 >= 0.0) { 
-      L1_4300donut_jJet.push_back(jJet(newenergydonut4300, L1_4300_jJet[i].iEta(), L1_4300_jJet[i].iPhi()));
-      L1_4300_real_jJet.push_back(L1_4300_jJet[i]);
-    }
-    else
-    {
-      L1_4300_pu_jJet.push_back(L1_4300_jJet[i]);
-    }
-    if(newenergyglobal4300 >= 0.0) {
-      L1_4300global_jJet.push_back(jJet(newenergyglobal4300, L1_4300_jJet[i].iEta(), L1_4300_jJet[i].iPhi())); 
+  /*
+     for(unsigned int i=0; i<L1_4300_jJet.size(); i++) {
+     double newenergydonut4300=L1_4300_jJet[i].eatDonut();
+     double newenergyglobal4300=L1_4300_jJet[i].eatGlobe(median_jet_4300);
+     if(newenergydonut4300 >= 0.0) { 
+     L1_4300donut_jJet.push_back(jJet(newenergydonut4300, L1_4300_jJet[i].iEta(), L1_4300_jJet[i].iPhi()));
+     L1_4300_real_jJet.push_back(L1_4300_jJet[i]);
+     }
+     else
+     {
+     L1_4300_pu_jJet.push_back(L1_4300_jJet[i]);
+     }
+     if(newenergyglobal4300 >= 0.0) {
+     L1_4300global_jJet.push_back(jJet(newenergyglobal4300, L1_4300_jJet[i].iEta(), L1_4300_jJet[i].iPhi())); 
 
-    }
-  }*/
+     }
+     }*/
   for(unsigned int i=0; i<L1_5450_jJet.size(); i++) {
     double newenergydonut5450=L1_5450_jJet[i].eatDonut();
     double newenergyglobal5450=L1_5450_jJet[i].eatGlobe(median_jet_5450);
@@ -530,6 +532,8 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
   this->compareJetCollections(calibrated_L1_5450donut_jJet, ak4genjetsp_jJet,"5450_calib_donut_gen",false);
   this->compareJetCollections(calibrated_L1_5450_jJet, ak4genjetsp_jJet,"5450_calib_nopus_gen",false);
+  this->compareJetCollections(gct_jJet_calib, ak4genjetsp_jJet, "gct_calib_gen",true);
+  this->compareJetCollections(gct_jJet_uncalib, ak4genjetsp_jJet, "gct_uncalib_gen",true);
   /*
      this->compareJetCollections(L1_4300donut_jJet, ak4genjetsp_jJet,"4300_donut_gen",false);
      this->compareJetCollections(L1_4300_jJet, ak4genjetsp_jJet,"4300_nopus_gen",false);
@@ -542,8 +546,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
      this->compareJetCollections(top_jJet, ak4tt_jJet, "top_tt_gen",false);
 
 
-     this->compareJetCollections(gct_jJet, ak4genjetsp_jJet, "gct_gen",true);
-     */  
+   */  
   double mean_top_pt=0.;
   for (auto iTop = top_jJet.begin();iTop != top_jJet.end(); iTop++)
   {
@@ -678,7 +681,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
      }
      }
      }
-     */
+   */
   /*
      this->compareJetCollections(L1_4300_jJet, ak4genjetsp_jJet, "L14300_ak4genjetsp");
      this->compareJetCollections(L1_4300donut_jJet, ak4genjetsp_jJet, "L14300donut_ak4genjetsp");
@@ -711,7 +714,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
      this->compareJetCollections(L1_4300_jJet, ak4tt_jJet, "L14300_ak4tt");
      this->compareJetCollections(L1_4300donut_jJet, ak4tt_jJet, "L14300donut_ak4tt");
      this->compareJetCollections(L1_5400_jJet, ak4tt_jJet, "L15400_ak4tt");
-     */  
+   */  
   //  printOneEvent(triggertowers, L1_jJet, ak4ttjets, genJetCol, ak4genjetsp); 
 
 
@@ -743,7 +746,7 @@ CaloTowerAnalyser::endJob()
    CaloTowerAnalyser::beginRun(edm::Run const&, edm::EventSetup const&)
    {
    }
-   */
+ */
 
 // ------------ method called when ending the processing of a run  ------------
 /*
@@ -751,7 +754,7 @@ CaloTowerAnalyser::endJob()
    CaloTowerAnalyser::endRun(edm::Run const&, edm::EventSetup const&)
    {
    }
-   */
+ */
 
 // ------------ method called when starting to processes a luminosity block  ------------
 /*
@@ -759,7 +762,7 @@ CaloTowerAnalyser::endJob()
    CaloTowerAnalyser::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
    {
    }
-   */
+ */
 
 // ------------ method called when ending the processing of a luminosity block  ------------
 /*
@@ -767,7 +770,7 @@ CaloTowerAnalyser::endJob()
    CaloTowerAnalyser::endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
    {
    }
-   */
+ */
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
 void

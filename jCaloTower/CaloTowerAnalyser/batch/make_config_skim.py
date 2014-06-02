@@ -11,23 +11,23 @@ threshold  = cms.untracked.string('ERROR')
 
 
 
-process.source = cms.Source("PoolSource",
- fileNames = cms.untracked.vstring(
+#process.source = cms.Source("PoolSource",
+# fileNames = cms.untracked.vstring(
 
     #Neutrino13 PU40 50ns
-   {0} 
-   ),
+ #  {0} 
+ #  ),
 
    # RAW files
-   secondaryFileNames = cms.untracked.vstring(
-   )
-)
-
+  # secondaryFileNames = cms.untracked.vstring(
+  # )
+#)
+process.load({0})
 
 
 process.o1 = cms.OutputModule("PoolOutputModule",
   #fileName = cms.untracked.string('/afs/cern.ch/work/m/mcitron/public/TriggerTowers_NeutrinoGun_13TeV_PU40_50ns_1-10_skimmed_v3.root'),
-  fileName = cms.untracked.string('{1}'),
+  fileName = cms.untracked.string('file:/{1}'),
 #   fileName = cms.untracked.string('output.root'),
     #SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('trigger_')),
     outputCommands = cms.untracked.vstring(
@@ -77,7 +77,7 @@ process.maxEvents = cms.untracked.PSet(
     # restrict number of events to 1000
     #input = cms.untracked.int32(10)
     # run over all events
-    input = cms.untracked.int32(-1)
+    input = cms.untracked.int32(10000)
 )
 
 process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')

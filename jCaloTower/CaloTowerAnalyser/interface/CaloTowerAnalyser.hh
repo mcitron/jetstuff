@@ -106,8 +106,8 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     void bookPusHists(TString folderName);
     void makePusHists(const std::vector< std::vector<int> >& myarray,const std::vector<jJet>& L1_4300_jJet,const std::vector<jJet>& L1_5450_jJet);
     double getMedian(const std::vector<jJet> & jets);
-    double calculateHT(const std::vector<jJet> & jets);
-    std::vector<double> calculateMHT(const std::vector<jJet> & jets);
+    double calculateHT(const std::vector<jJet> & jets,const int & thresh);
+    std::vector<double> calculateMHT(const std::vector<jJet> & jets,const int & thresh);
 
 
   private:
@@ -191,7 +191,7 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     TH2D * deltaGenL1_R3;
     TH2D * deltaGenL1_R4;
 
-
+    std::string mskim;
     TriggerTowerGeometry g; //to run the constructor -- could also make this static
 
     std::map<std::string, TH1D * > col1_jet1_eta;
@@ -310,6 +310,11 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     std::map<TString,TH1D*> col1_seed_jet3;
     std::map<TString,TH1D*> col1_seed_jet4;
 
+    std::map<TString,TH2D*> col1_NPV_seed_alljet;
+    std::map<TString,TH2D*> col1_NPV_seed_jet1;
+    std::map<TString,TH2D*> col1_NPV_seed_jet2;
+    std::map<TString,TH2D*> col1_NPV_seed_jet3;
+    std::map<TString,TH2D*> col1_NPV_seed_jet4;
 
 };
 

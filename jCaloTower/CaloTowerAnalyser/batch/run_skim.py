@@ -9,8 +9,8 @@ num = str(int(os.environ['LSB_JOBINDEX'])-1)
 # sys.exit(1)
 #outputdir=sys.argv[1]#'file:/afs/cern.ch/work/m/mcitron/public/'    
 #filelist=sys.argv[2]#'/afs/cern.ch/work/m/mcitron/jadjets/CMSSW_6_2_0/src/jCaloTower/CaloTowerAnalyser/batch/testin.txt'
-outputdir='file:/afs/cern.ch/work/m/mcitron/public/QCD'    
-filelist='/afs/cern.ch/work/m/mcitron/jadjets/CMSSW_6_2_0/src/jCaloTower/CaloTowerAnalyser/batch/testin.txt'
+outputdir='//afs/cern.ch/work/m/mcitron/public/QCDPU1/'    
+filelist='/afs/cern.ch/work/m/mcitron/jadjets/CMSSW_6_2_0/src/jCaloTower/CaloTowerAnalyser/batch/qcd_pu1.txt'
 arg_array=[]
 i=0
 with open(filelist) as f:
@@ -23,12 +23,12 @@ configinput=make_config_skim.make_config_input(arg_array[int(num)][0],arg_array[
 if not os.path.exists(outputdir):
     os.makedirs(outputdir)
 
-os.chdir(outputdir)
+#os.chdir(outputdir)
 
-f = open('config_'+num+'.py','w')
+f = open(outputdir+'config_'+num+'.py','w')
 f.write(configinput)
 print configinput
-with open("cmssw_"+num+".log",'w') as f:
- subprocess.call(["cmsRun", "config_"+num+".py"],stdout=f)
+with open(outputdir+"cmssw_"+num+".log",'w') as f:
+ subprocess.call(["cmsRun", outputdir+"config_"+num+".py"],stdout=f)
 
 #os.remove('config_'+num+'.py')
