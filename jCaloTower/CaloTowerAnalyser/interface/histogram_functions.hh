@@ -43,79 +43,80 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
   edm::Service<TFileService> fs;
   TFileDirectory dir = fs->mkdir(folderName);
 
+  TFileDirectory otherdir=dir.mkdir("other");
   //check initialised via means of mMapping, e.g.
-  if(col1_jet1_eta.count(folderName) == 0) { col1_jet1_eta[folderName] = dir.make<TH1D>("col1_jet1_eta",";eta jet1;",57, -0.5, 56.5); }
-  if(col1_jet2_eta.count(folderName) == 0) { col1_jet2_eta[folderName] = dir.make<TH1D>("col1_jet2_eta",";eta jet2;",57, -0.5, 56.5); }
-  if(col1_jet3_eta.count(folderName) == 0) { col1_jet3_eta[folderName] = dir.make<TH1D>("col1_jet3_eta",";eta jet3;",57, -0.5, 56.5); }
-  if(col1_jet4_eta.count(folderName) == 0) { col1_jet4_eta[folderName] = dir.make<TH1D>("col1_jet4_eta",";eta jet4;",57, -0.5, 56.5); }
+  if(col1_jet1_eta.count(folderName) == 0) { col1_jet1_eta[folderName] = otherdir.make<TH1D>("col1_jet1_eta",";eta jet1;",57, -0.5, 56.5); }
+  if(col1_jet2_eta.count(folderName) == 0) { col1_jet2_eta[folderName] = otherdir.make<TH1D>("col1_jet2_eta",";eta jet2;",57, -0.5, 56.5); }
+  if(col1_jet3_eta.count(folderName) == 0) { col1_jet3_eta[folderName] = otherdir.make<TH1D>("col1_jet3_eta",";eta jet3;",57, -0.5, 56.5); }
+  if(col1_jet4_eta.count(folderName) == 0) { col1_jet4_eta[folderName] = otherdir.make<TH1D>("col1_jet4_eta",";eta jet4;",57, -0.5, 56.5); }
 
-  if(col2_jet1_eta.count(folderName) == 0) { col2_jet1_eta[folderName] = dir.make<TH1D>("col2_jet1_eta",";eta jet1;",57, -0.5, 56.5); }
-  if(col2_jet2_eta.count(folderName) == 0) { col2_jet2_eta[folderName] = dir.make<TH1D>("col2_jet2_eta",";eta jet2;",57, -0.5, 56.5); }
-  if(col2_jet3_eta.count(folderName) == 0) { col2_jet3_eta[folderName] = dir.make<TH1D>("col2_jet3_eta",";eta jet3;",57, -0.5, 56.5); }
-  if(col2_jet4_eta.count(folderName) == 0) { col2_jet4_eta[folderName] = dir.make<TH1D>("col2_jet4_eta",";eta jet4;",57, -0.5, 56.5); }
+  if(col2_jet1_eta.count(folderName) == 0) { col2_jet1_eta[folderName] = otherdir.make<TH1D>("col2_jet1_eta",";eta jet1;",57, -0.5, 56.5); }
+  if(col2_jet2_eta.count(folderName) == 0) { col2_jet2_eta[folderName] = otherdir.make<TH1D>("col2_jet2_eta",";eta jet2;",57, -0.5, 56.5); }
+  if(col2_jet3_eta.count(folderName) == 0) { col2_jet3_eta[folderName] = otherdir.make<TH1D>("col2_jet3_eta",";eta jet3;",57, -0.5, 56.5); }
+  if(col2_jet4_eta.count(folderName) == 0) { col2_jet4_eta[folderName] = otherdir.make<TH1D>("col2_jet4_eta",";eta jet4;",57, -0.5, 56.5); }
 
-  if(col1_jet1_pt.count(folderName) == 0) { col1_jet1_pt[folderName] = dir.make<TH1D>("col1_jet1_pt",";p_{T} jet1;",1000, -0.5, 999.5); }
-  if(col1_jet2_pt.count(folderName) == 0) { col1_jet2_pt[folderName] = dir.make<TH1D>("col1_jet2_pt",";p_{T} jet2;",1000, -0.5, 999.5); }
-  if(col1_jet3_pt.count(folderName) == 0) { col1_jet3_pt[folderName] = dir.make<TH1D>("col1_jet3_pt",";p_{T} jet3;",1000, -0.5, 999.5); }
-  if(col1_jet4_pt.count(folderName) == 0) { col1_jet4_pt[folderName] = dir.make<TH1D>("col1_jet4_pt",";p_{T} jet4;",1000, -0.5, 999.5); }
+  if(col1_jet1_pt.count(folderName) == 0) { col1_jet1_pt[folderName] = otherdir.make<TH1D>("col1_jet1_pt",";p_{T} jet1;",1000, -0.5, 999.5); }
+  if(col1_jet2_pt.count(folderName) == 0) { col1_jet2_pt[folderName] = otherdir.make<TH1D>("col1_jet2_pt",";p_{T} jet2;",1000, -0.5, 999.5); }
+  if(col1_jet3_pt.count(folderName) == 0) { col1_jet3_pt[folderName] = otherdir.make<TH1D>("col1_jet3_pt",";p_{T} jet3;",1000, -0.5, 999.5); }
+  if(col1_jet4_pt.count(folderName) == 0) { col1_jet4_pt[folderName] = otherdir.make<TH1D>("col1_jet4_pt",";p_{T} jet4;",1000, -0.5, 999.5); }
 
-  if(col1_alljet_pt_NPV.count(folderName) == 0) { col1_alljet_pt_NPV[folderName] = dir.make<TH2D>("col1_alljet_pt_NPV",";NPV;p_{T} jet1",100,-0.5,99.5,1000, -0.5, 999.5); }
-  if(col1_jet1_pt_NPV.count(folderName) == 0) { col1_jet1_pt_NPV[folderName] = dir.make<TH2D>("col1_jet1_pt_NPV",";NPV;p_{T} jet1",100,-0.5,99.5,1000, -0.5, 999.5); }
-  if(col1_jet2_pt_NPV.count(folderName) == 0) { col1_jet2_pt_NPV[folderName] = dir.make<TH2D>("col1_jet2_pt_NPV",";NPV;p_{T} jet2",100,-0.5,99.5,1000, -0.5, 999.5); }
-  if(col1_jet3_pt_NPV.count(folderName) == 0) { col1_jet3_pt_NPV[folderName] = dir.make<TH2D>("col1_jet3_pt_NPV",";NPV;p_{T} jet3",100,-0.5,99.5,1000, -0.5, 999.5); }
-  if(col1_jet4_pt_NPV.count(folderName) == 0) { col1_jet4_pt_NPV[folderName] = dir.make<TH2D>("col1_jet4_pt_NPV",";NPV;p_{T} jet4",100,-0.5,99.5,1000, -0.5, 999.5); }
+  if(col1_alljet_pt_NPV.count(folderName) == 0) { col1_alljet_pt_NPV[folderName] = otherdir.make<TH2D>("col1_alljet_pt_NPV",";NPV;p_{T} jet1",100,-0.5,99.5,1000, -0.5, 999.5); }
+  if(col1_jet1_pt_NPV.count(folderName) == 0) { col1_jet1_pt_NPV[folderName] = otherdir.make<TH2D>("col1_jet1_pt_NPV",";NPV;p_{T} jet1",100,-0.5,99.5,1000, -0.5, 999.5); }
+  if(col1_jet2_pt_NPV.count(folderName) == 0) { col1_jet2_pt_NPV[folderName] = otherdir.make<TH2D>("col1_jet2_pt_NPV",";NPV;p_{T} jet2",100,-0.5,99.5,1000, -0.5, 999.5); }
+  if(col1_jet3_pt_NPV.count(folderName) == 0) { col1_jet3_pt_NPV[folderName] = otherdir.make<TH2D>("col1_jet3_pt_NPV",";NPV;p_{T} jet3",100,-0.5,99.5,1000, -0.5, 999.5); }
+  if(col1_jet4_pt_NPV.count(folderName) == 0) { col1_jet4_pt_NPV[folderName] = otherdir.make<TH2D>("col1_jet4_pt_NPV",";NPV;p_{T} jet4",100,-0.5,99.5,1000, -0.5, 999.5); }
 
-  if(col2_jet1_pt.count(folderName) == 0) { col2_jet1_pt[folderName] = dir.make<TH1D>("col2_jet1_pt",";p_{T} jet1;",1000, -0.5, 999.5); }
-  if(col2_jet2_pt.count(folderName) == 0) { col2_jet2_pt[folderName] = dir.make<TH1D>("col2_jet2_pt",";p_{T} jet2;",1000, -0.5, 999.5); }
-  if(col2_jet3_pt.count(folderName) == 0) { col2_jet3_pt[folderName] = dir.make<TH1D>("col2_jet3_pt",";p_{T} jet3;",1000, -0.5, 999.5); }
-  if(col2_jet4_pt.count(folderName) == 0) { col2_jet4_pt[folderName] = dir.make<TH1D>("col2_jet4_pt",";p_{T} jet4;",1000, -0.5, 999.5); }
+  if(col2_jet1_pt.count(folderName) == 0) { col2_jet1_pt[folderName] = otherdir.make<TH1D>("col2_jet1_pt",";p_{T} jet1;",1000, -0.5, 999.5); }
+  if(col2_jet2_pt.count(folderName) == 0) { col2_jet2_pt[folderName] = otherdir.make<TH1D>("col2_jet2_pt",";p_{T} jet2;",1000, -0.5, 999.5); }
+  if(col2_jet3_pt.count(folderName) == 0) { col2_jet3_pt[folderName] = otherdir.make<TH1D>("col2_jet3_pt",";p_{T} jet3;",1000, -0.5, 999.5); }
+  if(col2_jet4_pt.count(folderName) == 0) { col2_jet4_pt[folderName] = otherdir.make<TH1D>("col2_jet4_pt",";p_{T} jet4;",1000, -0.5, 999.5); }
 
-  if(col1_alljet_pt.count(folderName) == 0) { col1_alljet_pt[folderName] = dir.make<TH1D>("col1_alljet_pt",";p_{T} all jets;",1000, -0.5, 999.5); }
-  if(col2_alljet_pt.count(folderName) == 0) { col2_alljet_pt[folderName] = dir.make<TH1D>("col2_alljet_pt",";p_{T} all jets;",1000, -0.5, 999.5); }
-  if(col1_alljet_eta.count(folderName) == 0) { col1_alljet_eta[folderName] = dir.make<TH1D>("col1_alljet_eta",";eta all jets;",57, -0.5, 56.5); }
-  if(col2_alljet_eta.count(folderName) == 0) { col2_alljet_eta[folderName] = dir.make<TH1D>("col2_alljet_eta",";eta all jets;",57, -0.5, 56.5);}
+  if(col1_alljet_pt.count(folderName) == 0) { col1_alljet_pt[folderName] = otherdir.make<TH1D>("col1_alljet_pt",";p_{T} all jets;",1000, -0.5, 999.5); }
+  if(col2_alljet_pt.count(folderName) == 0) { col2_alljet_pt[folderName] = otherdir.make<TH1D>("col2_alljet_pt",";p_{T} all jets;",1000, -0.5, 999.5); }
+  if(col1_alljet_eta.count(folderName) == 0) { col1_alljet_eta[folderName] = otherdir.make<TH1D>("col1_alljet_eta",";eta all jets;",57, -0.5, 56.5); }
+  if(col2_alljet_eta.count(folderName) == 0) { col2_alljet_eta[folderName] = otherdir.make<TH1D>("col2_alljet_eta",";eta all jets;",57, -0.5, 56.5);}
 
-  if(col2_matched_algo1_alljet_pt.count(folderName) == 0) { col2_matched_algo1_alljet_pt[folderName] = dir.make<TH1D>("col2_matched_algo1_alljet_pt",";p_{T} all jets matched;",1000, -0.5, 999.5); }
-  if(col2_matched_algo1_alljet_eta.count(folderName) == 0) { col2_matched_algo1_alljet_eta[folderName] = dir.make<TH1D>("col2_matched_algo1_alljet_eta",";eta all jets matched;",57, -0.5, 56.5); }
-  if(col2_matched_algo1_ptcorr.count(folderName) == 0) { col2_matched_algo1_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo1_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
+  if(col2_matched_algo1_alljet_pt.count(folderName) == 0) { col2_matched_algo1_alljet_pt[folderName] = otherdir.make<TH1D>("col2_matched_algo1_alljet_pt",";p_{T} all jets matched;",1000, -0.5, 999.5); }
+  if(col2_matched_algo1_alljet_eta.count(folderName) == 0) { col2_matched_algo1_alljet_eta[folderName] = otherdir.make<TH1D>("col2_matched_algo1_alljet_eta",";eta all jets matched;",57, -0.5, 56.5); }
+  if(col2_matched_algo1_ptcorr.count(folderName) == 0) { col2_matched_algo1_ptcorr[folderName] = otherdir.make<TH2D>("col2_matched_algo1_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
 
-  if(col2_matched_algo1_ptres_profile.count(folderName) == 0) { col2_matched_algo1_ptres_profile[folderName] = dir.make<TProfile>("col2_matched_algo1_ptres_profile", ";col2 p_{T}; (col1 - col2) / col2 p_{T}", 1000, -0.5, 999.5); }
-  if(col2_matched_algo1_ptres.count(folderName) == 0) { col2_matched_algo1_ptres[folderName] = dir.make<TH2D>("col2_matched_algo1_ptres", ";col2 p_{T}; (col1 - col2) / col2 p_{T}", 1000, -0.5, 999.5, 200, -10.05, 10.95); }
+  if(col2_matched_algo1_ptres_profile.count(folderName) == 0) { col2_matched_algo1_ptres_profile[folderName] = otherdir.make<TProfile>("col2_matched_algo1_ptres_profile", ";col2 p_{T}; (col1 - col2) / col2 p_{T}", 1000, -0.5, 999.5); }
+  if(col2_matched_algo1_ptres.count(folderName) == 0) { col2_matched_algo1_ptres[folderName] = otherdir.make<TH2D>("col2_matched_algo1_ptres", ";col2 p_{T}; (col1 - col2) / col2 p_{T}", 1000, -0.5, 999.5, 200, -10.05, 10.95); }
 
-  if(col2_matched_algo1_ptratio.count(folderName) == 0) { col2_matched_algo1_ptratio[folderName] = dir.make<TH2D>("col2_matched_algo1_ptratio", ";col2 p_{T}; (col1) / col2 p_{T}", 1000, -0.5, 999.5, 200, -10.05, 10.95); }
-  if(col2_matched_algo1_jet1_pt.count(folderName) == 0) { col2_matched_algo1_jet1_pt[folderName] = dir.make<TH1D>("col2_matched_algo1_jet1_pt",";p_{T} jet1 matched;",1000, -0.5, 999.5); }
-  if(col2_matched_algo1_jet2_pt.count(folderName) == 0) { col2_matched_algo1_jet2_pt[folderName] = dir.make<TH1D>("col2_matched_algo1_jet2_pt",";p_{T} jet2 matched;",1000, -0.5, 999.5); }
-  if(col2_matched_algo1_jet3_pt.count(folderName) == 0) { col2_matched_algo1_jet3_pt[folderName] = dir.make<TH1D>("col2_matched_algo1_jet3_pt",";p_{T} jet3 matched;",1000, -0.5, 999.5); }
-  if(col2_matched_algo1_jet4_pt.count(folderName) == 0) { col2_matched_algo1_jet4_pt[folderName] = dir.make<TH1D>("col2_matched_algo1_jet4_pt",";p_{T} jet4 matched;",1000, -0.5, 999.5); }
-  if(col2_matched_algo1_jet1_eta.count(folderName) == 0) { col2_matched_algo1_jet1_eta[folderName] = dir.make<TH1D>("col2_matched_algo1_jet1_eta",";eta jet1 matched;",57, -0.5, 56.5); }
-  if(col2_matched_algo1_jet2_eta.count(folderName) == 0) { col2_matched_algo1_jet2_eta[folderName] = dir.make<TH1D>("col2_matched_algo1_jet2_eta",";eta jet2 matched;",57, -0.5, 56.5); }
-  if(col2_matched_algo1_jet3_eta.count(folderName) == 0) { col2_matched_algo1_jet3_eta[folderName] = dir.make<TH1D>("col2_matched_algo1_jet3_eta",";eta jet3 matched;",57, -0.5, 56.5); }
-  if(col2_matched_algo1_jet4_eta.count(folderName) == 0) { col2_matched_algo1_jet4_eta[folderName] = dir.make<TH1D>("col2_matched_algo1_jet4_eta",";eta jet4 matched;",57, -0.5, 56.5); }
-  if(col2_matched_algo1_jet1_ptcorr.count(folderName) == 0) { col2_matched_algo1_jet1_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo1_jet1_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
-  if(col2_matched_algo1_jet2_ptcorr.count(folderName) == 0) { col2_matched_algo1_jet2_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo1_jet2_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
-  if(col2_matched_algo1_jet3_ptcorr.count(folderName) == 0) { col2_matched_algo1_jet3_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo1_jet3_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
-  if(col2_matched_algo1_jet4_ptcorr.count(folderName) == 0) { col2_matched_algo1_jet4_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo1_jet4_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
-  if(col2_matched_algo2_alljet_pt.count(folderName) == 0) { col2_matched_algo2_alljet_pt[folderName] = dir.make<TH1D>("col2_matched_algo2_alljet_pt",";p_{T} all jets matched;",1000, -0.5, 999.5); }
-  if(col2_matched_algo2_alljet_eta.count(folderName) == 0) { col2_matched_algo2_alljet_eta[folderName] = dir.make<TH1D>("col2_matched_algo2_alljet_eta",";eta all jets matched;",57, -0.5, 56.5); }
-  if(col2_matched_algo2_ptcorr.count(folderName) == 0) { col2_matched_algo2_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo2_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
+  if(col2_matched_algo1_ptratio.count(folderName) == 0) { col2_matched_algo1_ptratio[folderName] = otherdir.make<TH2D>("col2_matched_algo1_ptratio", ";col2 p_{T}; (col1) / col2 p_{T}", 1000, -0.5, 999.5, 200, -10.05, 10.95); }
+  if(col2_matched_algo1_jet1_pt.count(folderName) == 0) { col2_matched_algo1_jet1_pt[folderName] = otherdir.make<TH1D>("col2_matched_algo1_jet1_pt",";p_{T} jet1 matched;",1000, -0.5, 999.5); }
+  if(col2_matched_algo1_jet2_pt.count(folderName) == 0) { col2_matched_algo1_jet2_pt[folderName] = otherdir.make<TH1D>("col2_matched_algo1_jet2_pt",";p_{T} jet2 matched;",1000, -0.5, 999.5); }
+  if(col2_matched_algo1_jet3_pt.count(folderName) == 0) { col2_matched_algo1_jet3_pt[folderName] = otherdir.make<TH1D>("col2_matched_algo1_jet3_pt",";p_{T} jet3 matched;",1000, -0.5, 999.5); }
+  if(col2_matched_algo1_jet4_pt.count(folderName) == 0) { col2_matched_algo1_jet4_pt[folderName] = otherdir.make<TH1D>("col2_matched_algo1_jet4_pt",";p_{T} jet4 matched;",1000, -0.5, 999.5); }
+  if(col2_matched_algo1_jet1_eta.count(folderName) == 0) { col2_matched_algo1_jet1_eta[folderName] = otherdir.make<TH1D>("col2_matched_algo1_jet1_eta",";eta jet1 matched;",57, -0.5, 56.5); }
+  if(col2_matched_algo1_jet2_eta.count(folderName) == 0) { col2_matched_algo1_jet2_eta[folderName] = otherdir.make<TH1D>("col2_matched_algo1_jet2_eta",";eta jet2 matched;",57, -0.5, 56.5); }
+  if(col2_matched_algo1_jet3_eta.count(folderName) == 0) { col2_matched_algo1_jet3_eta[folderName] = otherdir.make<TH1D>("col2_matched_algo1_jet3_eta",";eta jet3 matched;",57, -0.5, 56.5); }
+  if(col2_matched_algo1_jet4_eta.count(folderName) == 0) { col2_matched_algo1_jet4_eta[folderName] = otherdir.make<TH1D>("col2_matched_algo1_jet4_eta",";eta jet4 matched;",57, -0.5, 56.5); }
+  if(col2_matched_algo1_jet1_ptcorr.count(folderName) == 0) { col2_matched_algo1_jet1_ptcorr[folderName] = otherdir.make<TH2D>("col2_matched_algo1_jet1_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
+  if(col2_matched_algo1_jet2_ptcorr.count(folderName) == 0) { col2_matched_algo1_jet2_ptcorr[folderName] = otherdir.make<TH2D>("col2_matched_algo1_jet2_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
+  if(col2_matched_algo1_jet3_ptcorr.count(folderName) == 0) { col2_matched_algo1_jet3_ptcorr[folderName] = otherdir.make<TH2D>("col2_matched_algo1_jet3_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
+  if(col2_matched_algo1_jet4_ptcorr.count(folderName) == 0) { col2_matched_algo1_jet4_ptcorr[folderName] = otherdir.make<TH2D>("col2_matched_algo1_jet4_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
+  if(col2_matched_algo2_alljet_pt.count(folderName) == 0) { col2_matched_algo2_alljet_pt[folderName] = otherdir.make<TH1D>("col2_matched_algo2_alljet_pt",";p_{T} all jets matched;",1000, -0.5, 999.5); }
+  if(col2_matched_algo2_alljet_eta.count(folderName) == 0) { col2_matched_algo2_alljet_eta[folderName] = otherdir.make<TH1D>("col2_matched_algo2_alljet_eta",";eta all jets matched;",57, -0.5, 56.5); }
+  if(col2_matched_algo2_ptcorr.count(folderName) == 0) { col2_matched_algo2_ptcorr[folderName] = otherdir.make<TH2D>("col2_matched_algo2_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
 
-  if(col2_matched_algo2_ptres_profile.count(folderName) == 0) { col2_matched_algo2_ptres_profile[folderName] = dir.make<TProfile>("col2_matched_algo2_ptres_profile", ";col2 p_{T}; (col1 - col2) / col2 p_{T}", 1000, -0.5, 999.5); }
-  if(col2_matched_algo2_ptres.count(folderName) == 0) { col2_matched_algo2_ptres[folderName] = dir.make<TH2D>("col2_matched_algo2_ptres", ";col2 p_{T}; (col1 - col2) / col2 p_{T}", 1000, -0.5, 999.5, 200, -10.05, 10.95); }
+  if(col2_matched_algo2_ptres_profile.count(folderName) == 0) { col2_matched_algo2_ptres_profile[folderName] = otherdir.make<TProfile>("col2_matched_algo2_ptres_profile", ";col2 p_{T}; (col1 - col2) / col2 p_{T}", 1000, -0.5, 999.5); }
+  if(col2_matched_algo2_ptres.count(folderName) == 0) { col2_matched_algo2_ptres[folderName] = otherdir.make<TH2D>("col2_matched_algo2_ptres", ";col2 p_{T}; (col1 - col2) / col2 p_{T}", 1000, -0.5, 999.5, 200, -10.05, 10.95); }
 
-  if(col2_matched_algo2_ptratio.count(folderName) == 0) { col2_matched_algo2_ptratio[folderName] = dir.make<TH2D>("col2_matched_algo2_ptratio", ";col2 p_{T}; (col1) / col2 p_{T}", 1000, -0.5, 999.5, 200, -10.05, 10.95); }
-  if(col2_matched_algo2_jet1_pt.count(folderName) == 0) { col2_matched_algo2_jet1_pt[folderName] = dir.make<TH1D>("col2_matched_algo2_jet1_pt",";p_{T} jet1 matched;",1000, -0.5, 999.5); }
-  if(col2_matched_algo2_jet2_pt.count(folderName) == 0) { col2_matched_algo2_jet2_pt[folderName] = dir.make<TH1D>("col2_matched_algo2_jet2_pt",";p_{T} jet2 matched;",1000, -0.5, 999.5); }
-  if(col2_matched_algo2_jet3_pt.count(folderName) == 0) { col2_matched_algo2_jet3_pt[folderName] = dir.make<TH1D>("col2_matched_algo2_jet3_pt",";p_{T} jet3 matched;",1000, -0.5, 999.5); }
-  if(col2_matched_algo2_jet4_pt.count(folderName) == 0) { col2_matched_algo2_jet4_pt[folderName] = dir.make<TH1D>("col2_matched_algo2_jet4_pt",";p_{T} jet4 matched;",1000, -0.5, 999.5); }
-  if(col2_matched_algo2_jet1_eta.count(folderName) == 0) { col2_matched_algo2_jet1_eta[folderName] = dir.make<TH1D>("col2_matched_algo2_jet1_eta",";eta jet1 matched;",57, -0.5, 56.5); }
-  if(col2_matched_algo2_jet2_eta.count(folderName) == 0) { col2_matched_algo2_jet2_eta[folderName] = dir.make<TH1D>("col2_matched_algo2_jet2_eta",";eta jet2 matched;",57, -0.5, 56.5); }
-  if(col2_matched_algo2_jet3_eta.count(folderName) == 0) { col2_matched_algo2_jet3_eta[folderName] = dir.make<TH1D>("col2_matched_algo2_jet3_eta",";eta jet3 matched;",57, -0.5, 56.5); }
-  if(col2_matched_algo2_jet4_eta.count(folderName) == 0) { col2_matched_algo2_jet4_eta[folderName] = dir.make<TH1D>("col2_matched_algo2_jet4_eta",";eta jet4 matched;",57, -0.5, 56.5); }
-  if(col2_matched_algo2_jet1_ptcorr.count(folderName) == 0) { col2_matched_algo2_jet1_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo2_jet1_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
-  if(col2_matched_algo2_jet2_ptcorr.count(folderName) == 0) { col2_matched_algo2_jet2_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo2_jet2_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
-  if(col2_matched_algo2_jet3_ptcorr.count(folderName) == 0) { col2_matched_algo2_jet3_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo2_jet3_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
-  if(col2_matched_algo2_jet4_ptcorr.count(folderName) == 0) { col2_matched_algo2_jet4_ptcorr[folderName] = dir.make<TH2D>("col2_matched_algo2_jet4_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
-  if(col2_saved_algo2.count(folderName) == 0) { col2_saved_algo2[folderName] = dir.make<TH2D>("col2_saved_algo2",";col2 p_{T};Max Matched p_{T};", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
+  if(col2_matched_algo2_ptratio.count(folderName) == 0) { col2_matched_algo2_ptratio[folderName] = otherdir.make<TH2D>("col2_matched_algo2_ptratio", ";col2 p_{T}; (col1) / col2 p_{T}", 1000, -0.5, 999.5, 200, -10.05, 10.95); }
+  if(col2_matched_algo2_jet1_pt.count(folderName) == 0) { col2_matched_algo2_jet1_pt[folderName] = otherdir.make<TH1D>("col2_matched_algo2_jet1_pt",";p_{T} jet1 matched;",1000, -0.5, 999.5); }
+  if(col2_matched_algo2_jet2_pt.count(folderName) == 0) { col2_matched_algo2_jet2_pt[folderName] = otherdir.make<TH1D>("col2_matched_algo2_jet2_pt",";p_{T} jet2 matched;",1000, -0.5, 999.5); }
+  if(col2_matched_algo2_jet3_pt.count(folderName) == 0) { col2_matched_algo2_jet3_pt[folderName] = otherdir.make<TH1D>("col2_matched_algo2_jet3_pt",";p_{T} jet3 matched;",1000, -0.5, 999.5); }
+  if(col2_matched_algo2_jet4_pt.count(folderName) == 0) { col2_matched_algo2_jet4_pt[folderName] = otherdir.make<TH1D>("col2_matched_algo2_jet4_pt",";p_{T} jet4 matched;",1000, -0.5, 999.5); }
+  if(col2_matched_algo2_jet1_eta.count(folderName) == 0) { col2_matched_algo2_jet1_eta[folderName] = otherdir.make<TH1D>("col2_matched_algo2_jet1_eta",";eta jet1 matched;",57, -0.5, 56.5); }
+  if(col2_matched_algo2_jet2_eta.count(folderName) == 0) { col2_matched_algo2_jet2_eta[folderName] = otherdir.make<TH1D>("col2_matched_algo2_jet2_eta",";eta jet2 matched;",57, -0.5, 56.5); }
+  if(col2_matched_algo2_jet3_eta.count(folderName) == 0) { col2_matched_algo2_jet3_eta[folderName] = otherdir.make<TH1D>("col2_matched_algo2_jet3_eta",";eta jet3 matched;",57, -0.5, 56.5); }
+  if(col2_matched_algo2_jet4_eta.count(folderName) == 0) { col2_matched_algo2_jet4_eta[folderName] = otherdir.make<TH1D>("col2_matched_algo2_jet4_eta",";eta jet4 matched;",57, -0.5, 56.5); }
+  if(col2_matched_algo2_jet1_ptcorr.count(folderName) == 0) { col2_matched_algo2_jet1_ptcorr[folderName] = otherdir.make<TH2D>("col2_matched_algo2_jet1_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
+  if(col2_matched_algo2_jet2_ptcorr.count(folderName) == 0) { col2_matched_algo2_jet2_ptcorr[folderName] = otherdir.make<TH2D>("col2_matched_algo2_jet2_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
+  if(col2_matched_algo2_jet3_ptcorr.count(folderName) == 0) { col2_matched_algo2_jet3_ptcorr[folderName] = otherdir.make<TH2D>("col2_matched_algo2_jet3_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
+  if(col2_matched_algo2_jet4_ptcorr.count(folderName) == 0) { col2_matched_algo2_jet4_ptcorr[folderName] = otherdir.make<TH2D>("col2_matched_algo2_jet4_ptcorr", ";col1 p_{T};col2 p_{T}", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
+  if(col2_saved_algo2.count(folderName) == 0) { col2_saved_algo2[folderName] = otherdir.make<TH2D>("col2_saved_algo2",";col2 p_{T};Max Matched p_{T};", 1000, -0.5, 999.5, 1000, -0.5, 999.5); }
 
 
   //New plots
@@ -123,7 +124,7 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
   if(pMade.count(folderName) ==0)
   {
     //SEED
-    TFileDirectory seeddir=dir.mkdir("esums");
+    TFileDirectory seeddir=dir.mkdir("seed");
     col1_seed_alljet[folderName] = seeddir.make<TH1D>("col1_seed_alljet",";col1_seed p_{T};",500,-0.5,499.5);
     col1_seed_jet1[folderName] = seeddir.make<TH1D>("col1_seed_jet1",";col1_seed p_{T};",500,-0.5,499.5);
     col1_seed_jet2[folderName] = seeddir.make<TH1D>("col1_seed_jet2",";col1_seed p_{T};",500,-0.5,499.5);
@@ -182,11 +183,11 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
       //for(std::map<TString,std::pair<int,int> >::const_iterator ptCutIt=ptCut.begin(); ptCutIt != ptCut.end(); ptCutIt++)
     {
       std::cout << TString(folderName)+ptCutIt->first << std::endl;
-      col2_matched_algo1_alljet_cut[TString(folderName)+ptCutIt->first]=dir.make<TH1D>("col2_matched_algo1_alljet_cut_"+ptCutIt->first,";p_{T};",1000,-0.5,999.5);
-      col2_matched_algo1_jet1_cut[TString(folderName)+ptCutIt->first]=dir.make<TH1D>("col2_matched_algo1_jet1_cut_"+ptCutIt->first,";p_{T};",1000,-0.5,999.5);
-      col2_matched_algo1_jet2_cut[TString(folderName)+ptCutIt->first]=dir.make<TH1D>("col2_matched_algo1_jet2_cut_"+ptCutIt->first,";p_{T};",1000,-0.5,999.5);
-      col2_matched_algo1_jet3_cut[TString(folderName)+ptCutIt->first]=dir.make<TH1D>("col2_matched_algo1_jet3_cut_"+ptCutIt->first,";p_{T};",1000,-0.5,999.5);
-      col2_matched_algo1_jet4_cut[TString(folderName)+ptCutIt->first]=dir.make<TH1D>("col2_matched_algo1_jet4_cut_"+ptCutIt->first,";p_{T};",1000,-0.5,999.5);
+      col2_matched_algo1_alljet_cut[TString(folderName)+ptCutIt->first]=otherdir.make<TH1D>("col2_matched_algo1_alljet_cut_"+ptCutIt->first,";p_{T};",1000,-0.5,999.5);
+      col2_matched_algo1_jet1_cut[TString(folderName)+ptCutIt->first]=otherdir.make<TH1D>("col2_matched_algo1_jet1_cut_"+ptCutIt->first,";p_{T};",1000,-0.5,999.5);
+      col2_matched_algo1_jet2_cut[TString(folderName)+ptCutIt->first]=otherdir.make<TH1D>("col2_matched_algo1_jet2_cut_"+ptCutIt->first,";p_{T};",1000,-0.5,999.5);
+      col2_matched_algo1_jet3_cut[TString(folderName)+ptCutIt->first]=otherdir.make<TH1D>("col2_matched_algo1_jet3_cut_"+ptCutIt->first,";p_{T};",1000,-0.5,999.5);
+      col2_matched_algo1_jet4_cut[TString(folderName)+ptCutIt->first]=otherdir.make<TH1D>("col2_matched_algo1_jet4_cut_"+ptCutIt->first,";p_{T};",1000,-0.5,999.5);
 
     }
     std::cout << folderName << std::endl;
