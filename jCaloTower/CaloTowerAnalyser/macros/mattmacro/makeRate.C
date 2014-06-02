@@ -5,9 +5,10 @@ void makeRate()
  // TFile * f = TFile::Open("./batch/neutrino5/neutrino_out.root");
 
 //   TFile * f = TFile::Open("./neutrino_skim_run.root");
-   TFile * f = TFile::Open("./global_PUS_TEST.root");
+   TFile * f = TFile::Open("/afs/cern.ch/work/m/mcitron/public/TTBAR/140602/output_run0.root");
    std::vector<TString> PUSregime;
    PUSregime.push_back("5400_nopus");
+   PUSregime.push_back("5450_nopus");
 /*   PUSregime.push_back("4300_nopus");
    PUSregime.push_back("5400_donut");
    PUSregime.push_back("4300_donut");
@@ -30,7 +31,8 @@ void makeRate()
       for (auto iJet = jetnum.begin(); iJet!=jetnum.end(); iJet++)
       {
 	 //TH1D * origplot = f->Get(("demo/"+*iPUS+"_gen/col1_"+*iJet+"_pt").Data());
-	 TH1D * origplot = f->Get(("demo/"+*iPUS+"_gen/col1_seed_"+*iJet).Data());
+	 std::cout << "demo/"+*iPUS+"_gen/seed/col1_seed_"+*iJet+";1" << std::endl;
+	 TH1D * origplot = f->Get(("demo/"+*iPUS+"_gen/seed/col1_seed_"+*iJet+";1").Data());
 	 TH1D * cumuplot = makeCumu(origplot);
 	 cumuplot->Write();
       }
