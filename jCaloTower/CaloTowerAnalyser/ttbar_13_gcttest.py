@@ -26,7 +26,8 @@ process.source = cms.Source("PoolSource",
     skipEvents=cms.untracked.uint32(47000)
 )
 
-process.demo = cms.EDAnalyzer('CaloTowerAnalyser'
+process.demo = cms.EDAnalyzer('CaloTowerAnalyser',
+skim_name=cms.string("jadtest")
 )
 
 process.TFileService = cms.Service("TFileService",
