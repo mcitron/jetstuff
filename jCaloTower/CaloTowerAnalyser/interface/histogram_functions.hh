@@ -15,9 +15,17 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
   HTBins["HT_100"] = 100;
   HTBins["HT_200"] = 200;
 
+  std::map<TString,int> ETBins;
+  ETBins["ET_100"] = 100;
+  ETBins["ET_200"] = 200;
+
   std::map<TString,int> MHTBins;
   MHTBins["MHT_100"] = 100;
   MHTBins["MHT_200"] = 200;
+
+  std::map<TString,int> METBins;
+  METBins["MET_100"] = 100;
+  METBins["MET_200"] = 200;
 
   std::map<TString,int> etaBins_;
   etaBins_["eta_-28to-14"] = -14;
@@ -59,6 +67,12 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
   if(col1_jet2_pt.count(folderName) == 0) { col1_jet2_pt[folderName] = otherdir.make<TH1D>("col1_jet2_pt",";p_{T} jet2;",1000, -0.5, 999.5); }
   if(col1_jet3_pt.count(folderName) == 0) { col1_jet3_pt[folderName] = otherdir.make<TH1D>("col1_jet3_pt",";p_{T} jet3;",1000, -0.5, 999.5); }
   if(col1_jet4_pt.count(folderName) == 0) { col1_jet4_pt[folderName] = otherdir.make<TH1D>("col1_jet4_pt",";p_{T} jet4;",1000, -0.5, 999.5); }
+  if(col1_jet5_pt.count(folderName) == 0) { col1_jet5_pt[folderName] = otherdir.make<TH1D>("col1_jet5_pt",";p_{T} jet5;",1000, -0.5, 999.5); }
+  if(col1_jet6_pt.count(folderName) == 0) { col1_jet6_pt[folderName] = otherdir.make<TH1D>("col1_jet6_pt",";p_{T} jet6;",1000, -0.5, 999.5); }
+  if(col1_jet7_pt.count(folderName) == 0) { col1_jet7_pt[folderName] = otherdir.make<TH1D>("col1_jet7_pt",";p_{T} jet7;",1000, -0.5, 999.5); }
+  if(col1_jet8_pt.count(folderName) == 0) { col1_jet8_pt[folderName] = otherdir.make<TH1D>("col1_jet8_pt",";p_{T} jet8;",1000, -0.5, 999.5); }
+  if(col1_jet9_pt.count(folderName) == 0) { col1_jet9_pt[folderName] = otherdir.make<TH1D>("col1_jet9_pt",";p_{T} jet9;",1000, -0.5, 999.5); }
+  if(col1_jet10_pt.count(folderName) == 0) { col1_jet10_pt[folderName] = otherdir.make<TH1D>("col1_jet10_pt",";p_{T} jet10;",1000, -0.5, 999.5); }
 
   if(col1_alljet_pt_NPV.count(folderName) == 0) { col1_alljet_pt_NPV[folderName] = otherdir.make<TH2D>("col1_alljet_pt_NPV",";NPV;p_{T} jet1",100,-0.5,99.5,1000, -0.5, 999.5); }
   if(col1_jet1_pt_NPV.count(folderName) == 0) { col1_jet1_pt_NPV[folderName] = otherdir.make<TH2D>("col1_jet1_pt_NPV",";NPV;p_{T} jet1",100,-0.5,99.5,1000, -0.5, 999.5); }
@@ -70,6 +84,12 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
   if(col2_jet2_pt.count(folderName) == 0) { col2_jet2_pt[folderName] = otherdir.make<TH1D>("col2_jet2_pt",";p_{T} jet2;",1000, -0.5, 999.5); }
   if(col2_jet3_pt.count(folderName) == 0) { col2_jet3_pt[folderName] = otherdir.make<TH1D>("col2_jet3_pt",";p_{T} jet3;",1000, -0.5, 999.5); }
   if(col2_jet4_pt.count(folderName) == 0) { col2_jet4_pt[folderName] = otherdir.make<TH1D>("col2_jet4_pt",";p_{T} jet4;",1000, -0.5, 999.5); }
+  if(col2_jet5_pt.count(folderName) == 0) { col2_jet5_pt[folderName] = otherdir.make<TH1D>("col2_jet5_pt",";p_{T} jet5;",1000, -0.5, 999.5); }
+  if(col2_jet6_pt.count(folderName) == 0) { col2_jet6_pt[folderName] = otherdir.make<TH1D>("col2_jet6_pt",";p_{T} jet6;",1000, -0.5, 999.5); }
+  if(col2_jet7_pt.count(folderName) == 0) { col2_jet7_pt[folderName] = otherdir.make<TH1D>("col2_jet7_pt",";p_{T} jet7;",1000, -0.5, 999.5); }
+  if(col2_jet8_pt.count(folderName) == 0) { col2_jet8_pt[folderName] = otherdir.make<TH1D>("col2_jet8_pt",";p_{T} jet8;",1000, -0.5, 999.5); }
+  if(col2_jet9_pt.count(folderName) == 0) { col2_jet9_pt[folderName] = otherdir.make<TH1D>("col2_jet9_pt",";p_{T} jet9;",1000, -0.5, 999.5); }
+  if(col2_jet10_pt.count(folderName) == 0) { col2_jet10_pt[folderName] = otherdir.make<TH1D>("col2_jet10_pt",";p_{T} jet10;",1000, -0.5, 999.5); }
 
   if(col1_alljet_pt.count(folderName) == 0) { col1_alljet_pt[folderName] = otherdir.make<TH1D>("col1_alljet_pt",";p_{T} all jets;",1000, -0.5, 999.5); }
   if(col2_alljet_pt.count(folderName) == 0) { col2_alljet_pt[folderName] = otherdir.make<TH1D>("col2_alljet_pt",";p_{T} all jets;",1000, -0.5, 999.5); }
@@ -130,11 +150,37 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
     col1_seed_jet2[folderName] = seeddir.make<TH1D>("col1_seed_jet2",";col1_seed p_{T};",500,-0.5,499.5);
     col1_seed_jet3[folderName] = seeddir.make<TH1D>("col1_seed_jet3",";col1_seed p_{T};",500,-0.5,499.5);
     col1_seed_jet4[folderName] = seeddir.make<TH1D>("col1_seed_jet4",";col1_seed p_{T};",500,-0.5,499.5);
-    col1_NPV_seed_alljet[folderName] = seeddir.make<TH2D>("col1_seed_alljet",";NPV;col1_seed p_{T}",100,-0.5,99.5,500,-0.5,499.5);
-    col1_NPV_seed_jet1[folderName] = seeddir.make<TH2D>("col1_seed_jet1",";NPV;col1_seed p_{T}",100,-0.5,99.5,500,-0.5,499.5);
-    col1_NPV_seed_jet2[folderName] = seeddir.make<TH2D>("col1_seed_jet2",";NPV;col1_seed p_{T}",100,-0.5,99.5,500,-0.5,499.5);
-    col1_NPV_seed_jet3[folderName] = seeddir.make<TH2D>("col1_seed_jet3",";NPV;col1_seed p_{T}",100,-0.5,99.5,500,-0.5,499.5);
-    col1_NPV_seed_jet4[folderName] = seeddir.make<TH2D>("col1_seed_jet4",";NPV;col1_seed p_{T}",100,-0.5,99.5,500,-0.5,499.5);
+    col1_NPV_seed_alljet[folderName] = seeddir.make<TH2D>("col1_NPV_seed_alljet",";NPV;col1_seed p_{T}",100,-0.5,99.5,500,-0.5,499.5);
+    col1_NPV_seed_jet1[folderName] = seeddir.make<TH2D>("col1_NPV_seed_jet1",";NPV;col1_seed p_{T}",100,-0.5,99.5,500,-0.5,499.5);
+    col1_NPV_seed_jet2[folderName] = seeddir.make<TH2D>("col1_NPV_seed_jet2",";NPV;col1_seed p_{T}",100,-0.5,99.5,500,-0.5,499.5);
+    col1_NPV_seed_jet3[folderName] = seeddir.make<TH2D>("col1_NPV_seed_jet3",";NPV;col1_seed p_{T}",100,-0.5,99.5,500,-0.5,499.5);
+    col1_NPV_seed_jet4[folderName] = seeddir.make<TH2D>("col1_NPV_seed_jet4",";NPV;col1_seed p_{T}",100,-0.5,99.5,500,-0.5,499.5);
+
+    TFileDirectory superseeddir=dir.mkdir("superseed");
+    col1_rings_0_1_alljet[folderName] = superseeddir.make<TH1D>("col1_rings_0_1_alljet",";col1_rings_0_1 p_{T};",500,-0.5,499.5);
+    col1_rings_0_1_jet1[folderName] = superseeddir.make<TH1D>("col1_rings_0_1_jet1",";col1_rings_0_1 p_{T};",500,-0.5,499.5);
+    col1_rings_0_1_jet2[folderName] = superseeddir.make<TH1D>("col1_rings_0_1_jet2",";col1_rings_0_1 p_{T};",500,-0.5,499.5);
+    col1_rings_0_1_jet3[folderName] = superseeddir.make<TH1D>("col1_rings_0_1_jet3",";col1_rings_0_1 p_{T};",500,-0.5,499.5);
+    col1_rings_0_1_jet4[folderName] = superseeddir.make<TH1D>("col1_rings_0_1_jet4",";col1_rings_0_1 p_{T};",500,-0.5,499.5);
+
+    col1_NPV_rings_0_1_alljet[folderName] = superseeddir.make<TH2D>("col1_NPV_rings_0_1_alljet",";NPV;col1_rings_0_1 p_{T}",100,-0.5,99.5,500,-0.5,499.5);
+    col1_NPV_rings_0_1_jet1[folderName] = superseeddir.make<TH2D>("col1_NPV_rings_0_1_jet1",";NPV;col1_rings_0_1 p_{T}",100,-0.5,99.5,500,-0.5,499.5);
+    col1_NPV_rings_0_1_jet2[folderName] = superseeddir.make<TH2D>("col1_NPV_rings_0_1_jet2",";NPV;col1_rings_0_1 p_{T}",100,-0.5,99.5,500,-0.5,499.5);
+    col1_NPV_rings_0_1_jet3[folderName] = superseeddir.make<TH2D>("col1_NPV_rings_0_1_jet3",";NPV;col1_rings_0_1 p_{T}",100,-0.5,99.5,500,-0.5,499.5);
+    col1_NPV_rings_0_1_jet4[folderName] = superseeddir.make<TH2D>("col1_NPV_rings_0_1_jet4",";NPV;col1_rings_0_1 p_{T}",100,-0.5,99.5,500,-0.5,499.5);
+
+    TFileDirectory superseednormdir=dir.mkdir("superseednorm");
+    col1_rings_0_1_norm_alljet[folderName] = superseednormdir.make<TH1D>("col1_rings_0_1_norm_alljet",";col1_rings_0_1_norm p_{T};",500,-0.5,499.5);
+    col1_rings_0_1_norm_jet1[folderName] = superseednormdir.make<TH1D>("col1_rings_0_1_norm_jet1",";col1_rings_0_1_norm p_{T};",500,-0.5,499.5);
+    col1_rings_0_1_norm_jet2[folderName] = superseednormdir.make<TH1D>("col1_rings_0_1_norm_jet2",";col1_rings_0_1_norm p_{T};",500,-0.5,499.5);
+    col1_rings_0_1_norm_jet3[folderName] = superseednormdir.make<TH1D>("col1_rings_0_1_norm_jet3",";col1_rings_0_1_norm p_{T};",500,-0.5,499.5);
+    col1_rings_0_1_norm_jet4[folderName] = superseednormdir.make<TH1D>("col1_rings_0_1_norm_jet4",";col1_rings_0_1_norm p_{T};",500,-0.5,499.5);
+
+    col1_NPV_rings_0_1_norm_alljet[folderName] = superseednormdir.make<TH2D>("col1_NPV_rings_0_1_norm_alljet",";NPV;col1_rings_0_1_norm p_{T}",100,-0.5,99.5,500,-0.5,499.5);
+    col1_NPV_rings_0_1_norm_jet1[folderName] = superseednormdir.make<TH2D>("col1_NPV_rings_0_1_norm_jet1",";NPV;col1_rings_0_1_norm p_{T}",100,-0.5,99.5,500,-0.5,499.5);
+    col1_NPV_rings_0_1_norm_jet2[folderName] = superseednormdir.make<TH2D>("col1_NPV_rings_0_1_norm_jet2",";NPV;col1_rings_0_1_norm p_{T}",100,-0.5,99.5,500,-0.5,499.5);
+    col1_NPV_rings_0_1_norm_jet3[folderName] = superseednormdir.make<TH2D>("col1_NPV_rings_0_1_norm_jet3",";NPV;col1_rings_0_1_norm p_{T}",100,-0.5,99.5,500,-0.5,499.5);
+    col1_NPV_rings_0_1_norm_jet4[folderName] = superseednormdir.make<TH2D>("col1_NPV_rings_0_1_norm_jet4",";NPV;col1_rings_0_1_norm p_{T}",100,-0.5,99.5,500,-0.5,499.5);
     //ESums (no cut)
     TFileDirectory esumsdir=dir.mkdir("esums");
     col2_ht[folderName]  = esumsdir.make<TH1D>("col2_ht",";col2 H_{T};",3000,-0.5,2999.5);
@@ -156,6 +202,7 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
 
     mht_ht_col2[folderName]=esumsdir.make<TH2D>("col2_mht_ht",";col2_ht;col2_mht/col2_ht",3000,-0.5,2999.5,200,-1.005,0.995);
     mht_ht_col1[folderName]=esumsdir.make<TH2D>("col1_mht_ht",";col1_ht;col1_mht/col1_ht",3000,-0.5,2999.5,200,-1.005,0.995);
+    index_matched[folderName]=otherdir.make<TH2D>("index_matched",";col2_i;col1_i",100,-0.5,99.5,100,-0.5,99.5);
 
 
     for(auto iHTBins=HTBins.begin(); iHTBins!=HTBins.end(); iHTBins++){
@@ -163,6 +210,13 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
     }
     for(auto iMHTBins=MHTBins.begin(); iMHTBins!=MHTBins.end(); iMHTBins++){
       col2_mht_cut[folderName+iMHTBins->first] = esumsdir.make<TH1D>("col2_mht_col1_cut_"+iMHTBins->first,";col2 H_{T};",3000,-0.5,2999.5);
+    }
+
+    for(auto iETBins=ETBins.begin(); iETBins!=ETBins.end(); iETBins++){
+      col1_et_cut[folderName+iETBins->first] = esumsdir.make<TH1D>("col1_et_cut_"+iETBins->first,";col1 H_{T};",3000,-0.5,2999.5);
+    }
+    for(auto iMETBins=METBins.begin(); iMETBins!=METBins.end(); iMETBins++){
+      col1_met_cut[folderName+iMETBins->first] = esumsdir.make<TH1D>("col1_met_cut_"+iMETBins->first,";col1 H_{T};",3000,-0.5,2999.5);
     }
 
 
@@ -214,14 +268,17 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
       }
     }
   }
-  double HTcol2=calculateHT(col2,0);
-  double HTcol1=calculateHT(col2,0);
-  double MHTcol1_x=calculateMHT(col2,0)[0];
-  double MHTcol2_x=calculateMHT(col2,0)[0];
-  double MHTcol1_y=calculateMHT(col2,0)[1];
-  double MHTcol2_y=calculateMHT(col2,0)[1];
-  double MHTcol1=calculateMHT(col2,0)[2];
-  double MHTcol2=calculateMHT(col2,0)[2];
+  double HTcol1=calculateHT(col1,20);
+  double HTcol2=calculateHT(col2,20);
+
+  double MHTcol1_x=calculateMHT(col1,20)[0];
+  double MHTcol2_x=calculateMHT(col2,20)[0];
+
+  double MHTcol1_y=calculateMHT(col1,20)[1];
+  double MHTcol2_y=calculateMHT(col2,20)[1];
+
+  double MHTcol1=calculateMHT(col1,20)[2];
+  double MHTcol2=calculateMHT(col2,20)[2];
 
   col2_ht[folderName]->Fill(HTcol2);
   col1_ht[folderName]->Fill(HTcol1);
@@ -249,10 +306,25 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
       col2_ht_cut[folderName+iHTBins->first]->Fill(HTcol2);
     }
   }
+
   for(auto iMHTBins=MHTBins.begin(); iMHTBins!=MHTBins.end(); iMHTBins++){
     if(MHTcol1 > iMHTBins->second)
     {
       col2_mht_cut[folderName+iMHTBins->first]->Fill(MHTcol2);
+    }
+  }
+
+  for(auto iETBins=ETBins.begin(); iETBins!=ETBins.end(); iETBins++){
+    if(mET > iETBins->second)
+    {
+      col1_et_cut[folderName+iETBins->first]->Fill(HTcol1);
+    }
+  }
+
+  for(auto iMETBins=METBins.begin(); iMETBins!=METBins.end(); iMETBins++){
+    if(mMET[2] > iMETBins->second)
+    {
+      col1_met_cut[folderName+iMETBins->first]->Fill(MHTcol1);
     }
   }
 
@@ -261,6 +333,12 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
     if (col1[i].ringSums().size()!=0) 
     {
       col1_seed_alljet[folderName]->Fill(col1[i].ringSums().at(0));
+      col1_rings_0_1_alljet[folderName]->Fill(col1[i].ringSums().at(0)+col1[i].ringSums().at(1));
+      col1_NPV_rings_0_1_alljet[folderName]->Fill(mNPV,col1[i].ringSums().at(0)+col1[i].ringSums().at(1));
+
+      col1_rings_0_1_norm_alljet[folderName]->Fill(col1[i].ringSums().at(0)+(col1[i].ringSums().at(1))/8.);
+      col1_NPV_rings_0_1_norm_alljet[folderName]->Fill(mNPV,col1[i].ringSums().at(0)+col1[i].ringSums().at(1)/8.);
+
       col1_NPV_seed_alljet[folderName]->Fill(mNPV,col1[i].ringSums().at(0));
     }
     col1_alljet_pt_NPV[folderName]->Fill(mNPV,col1[i].pt());
@@ -269,30 +347,52 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
       if (col1[i].ringSums().size()!=0) 
       {
 	col1_seed_jet1[folderName]->Fill(col1[i].ringSums().at(0)); 
+	col1_rings_0_1_jet1[folderName]->Fill(col1[i].ringSums().at(0)+col1[i].ringSums().at(1));
+	col1_NPV_rings_0_1_jet1[folderName]->Fill(mNPV,col1[i].ringSums().at(0)+col1[i].ringSums().at(1));
 	col1_NPV_seed_jet1[folderName]->Fill(mNPV,col1[i].ringSums().at(0));
+	col1_rings_0_1_norm_jet1[folderName]->Fill(col1[i].ringSums().at(0)+(col1[i].ringSums().at(1))/8.);
+	col1_NPV_rings_0_1_norm_jet1[folderName]->Fill(mNPV,col1[i].ringSums().at(0)+col1[i].ringSums().at(1)/8.);
       }
     }
     if(i == 1) { col1_jet2_pt[folderName]->Fill(col1[i].pt()); col1_jet2_eta[folderName]->Fill(g.new_iEta(col1[i].iEta()));col1_jet2_pt_NPV[folderName]->Fill(mNPV,col1[i].pt());
       if (col1[i].ringSums().size()!=0) 
       {
 	col1_seed_jet2[folderName]->Fill(col1[i].ringSums().at(0)); 
+	col1_rings_0_1_jet2[folderName]->Fill(col1[i].ringSums().at(0)+col1[i].ringSums().at(1));
+	col1_NPV_rings_0_1_jet2[folderName]->Fill(mNPV,col1[i].ringSums().at(0)+col1[i].ringSums().at(1));
 	col1_NPV_seed_jet2[folderName]->Fill(mNPV,col1[i].ringSums().at(0));
+	col1_rings_0_1_norm_jet2[folderName]->Fill(col1[i].ringSums().at(0)+(col1[i].ringSums().at(1))/8.);
+	col1_NPV_rings_0_1_norm_jet2[folderName]->Fill(mNPV,col1[i].ringSums().at(0)+col1[i].ringSums().at(1)/8.);
       } 
     }
     if(i == 2) { col1_jet3_pt[folderName]->Fill(col1[i].pt()); col1_jet3_eta[folderName]->Fill(g.new_iEta(col1[i].iEta()));col1_jet3_pt_NPV[folderName]->Fill(mNPV,col1[i].pt());
       if (col1[i].ringSums().size()!=0)
       {
 	col1_seed_jet3[folderName]->Fill(col1[i].ringSums().at(0)); 
+	col1_rings_0_1_jet3[folderName]->Fill(col1[i].ringSums().at(0)+col1[i].ringSums().at(1));
+	col1_NPV_rings_0_1_jet3[folderName]->Fill(mNPV,col1[i].ringSums().at(0)+col1[i].ringSums().at(1));
 	col1_NPV_seed_jet3[folderName]->Fill(mNPV,col1[i].ringSums().at(0));
+	col1_rings_0_1_norm_jet3[folderName]->Fill(col1[i].ringSums().at(0)+(col1[i].ringSums().at(1))/8.);
+	col1_NPV_rings_0_1_norm_jet3[folderName]->Fill(mNPV,col1[i].ringSums().at(0)+col1[i].ringSums().at(1)/8.);
       }
     }
     if(i == 3) { col1_jet4_pt[folderName]->Fill(col1[i].pt()); col1_jet4_eta[folderName]->Fill(g.new_iEta(col1[i].iEta()));col1_jet4_pt_NPV[folderName]->Fill(mNPV,col1[i].pt());
       if (col1[i].ringSums().size()!=0) 
       {
 	col1_seed_jet4[folderName]->Fill(col1[i].ringSums().at(0)); 
+	col1_rings_0_1_jet4[folderName]->Fill(col1[i].ringSums().at(0)+col1[i].ringSums().at(1));
+	col1_NPV_rings_0_1_jet4[folderName]->Fill(mNPV,col1[i].ringSums().at(0)+col1[i].ringSums().at(1));
 	col1_NPV_seed_jet4[folderName]->Fill(mNPV,col1[i].ringSums().at(0));
+	col1_rings_0_1_norm_jet4[folderName]->Fill(col1[i].ringSums().at(0)+(col1[i].ringSums().at(1))/8.);
+	col1_NPV_rings_0_1_norm_jet4[folderName]->Fill(mNPV,col1[i].ringSums().at(0)+col1[i].ringSums().at(1)/8.);
       } 
     }
+    if(i == 4) col1_jet5_pt[folderName]->Fill(col1[i].pt());
+    if(i == 5) col1_jet6_pt[folderName]->Fill(col1[i].pt());
+    if(i == 6) col1_jet7_pt[folderName]->Fill(col1[i].pt());
+    if(i == 7) col1_jet8_pt[folderName]->Fill(col1[i].pt());
+    if(i == 8) col1_jet9_pt[folderName]->Fill(col1[i].pt());
+    if(i == 9) col1_jet10_pt[folderName]->Fill(col1[i].pt());
   }
   for(unsigned int i=0; i<col2.size(); i++) {
     col2_alljet_pt[folderName]->Fill(col2[i].pt());
@@ -301,13 +401,21 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
     if(i == 1) { col2_jet2_pt[folderName]->Fill(col2[i].pt()); col2_jet2_eta[folderName]->Fill(g.new_iEta(col2[i].iEta())); }
     if(i == 2) { col2_jet3_pt[folderName]->Fill(col2[i].pt()); col2_jet3_eta[folderName]->Fill(g.new_iEta(col2[i].iEta())); }
     if(i == 3) { col2_jet4_pt[folderName]->Fill(col2[i].pt()); col2_jet4_eta[folderName]->Fill(g.new_iEta(col2[i].iEta())); }
+    if(i == 4) { col2_jet5_pt[folderName]->Fill(col2[i].pt()); }
+    if(i == 5) { col2_jet6_pt[folderName]->Fill(col2[i].pt()); }
+    if(i == 6) { col2_jet7_pt[folderName]->Fill(col2[i].pt()); }
+    if(i == 7) { col2_jet8_pt[folderName]->Fill(col2[i].pt()); }
+    if(i == 8) { col2_jet9_pt[folderName]->Fill(col2[i].pt()); }
+    if(i == 9) { col2_jet10_pt[folderName]->Fill(col2[i].pt()); }
   }
   pairs = (isgct) ? make_gct_pairs(col1,col2) : make_pairs(col1, col2);
   std::vector<int> col2_matched_index = analyse_pairs_local(pairs, col2.size(), 33);
   //std::vector<int> col1_matched_index_local = analyse_pairs_global(pairs, col2.size(), 25);
+
   for(unsigned int i=0; i<col2_matched_index.size(); i++) {
     //std::cout << "ak4genjetp with index " << i << " is matched to ak4ttjet with index " << ak4tt_matched_index[i] << std::endl;
     if(col2_matched_index[i] != -1) {
+      index_matched[folderName]->Fill(i,col2_matched_index[i]);
       //New plots
       for(std::map<TString,int>::const_iterator etaBinIt=etaBins_.begin(); etaBinIt!=etaBins_.end(); etaBinIt++){
 
@@ -488,7 +596,7 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
     //	    break;
     }
     }
-     */ 
+    */ 
   }
 
   return;

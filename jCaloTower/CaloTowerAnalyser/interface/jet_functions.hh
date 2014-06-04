@@ -238,7 +238,7 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
       //now we have a jet candidate centred at i,j, with the ring energies and areas defined
 
       //now we have the L1 jet candidate:
-      if(numtowersaboveme == 0 && input[i][j] > seedthresh1) {
+      if(numtowersaboveme == 0 && input[i][j] >= seedthresh1) {
         double totalenergy=0.0;
         //std::cout << "iEta: " << g.old_iEta(i) << ", iPhi: " << g.old_iPhi(j) << ", r0: " << localsums[0] <<  ", r1: " << localsums[1] << ", r2: " << localsums[2] << ", r3: " << localsums[3] << ", r4: " << localsums[4] << std::endl;
         for(int ring=0; ring < (int)localsums.size(); ring++) { totalenergy += localsums[ring]; }

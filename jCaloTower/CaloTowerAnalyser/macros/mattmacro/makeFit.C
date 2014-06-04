@@ -2,20 +2,25 @@ makeFit(){
 
    //TFile* file = new TFile("global_PUS_all.root");
    //TFile * file = TFile::Open("./batch/ttbar2/ttbar_out.root");
-   TFile * f = TFile::Open("./batch/qcd_test/qcd_calib.root");
+   //TFile * f = TFile::Open("./batch/qcd_test/qcd_calib.root");
+   TFile * file = TFile::Open("/afs/cern.ch/work/m/mcitron/public/TTBAR/140602/output_run0.root");
    //TFile * file = TFile::Open("./batch/ttbar2/ttbar_out.root");
    std::vector<TString> PUSregime;
    PUSregime.push_back("5400_nopus");
    PUSregime.push_back("5400_calib_nopus");
-   PUSregime.push_back("4300_nopus");
-   PUSregime.push_back("5400_calib_donut");
    PUSregime.push_back("5400_donut");
-   //PUSregime.push_back("6550_nopus");
-   PUSregime.push_back("4300_donut");
+   PUSregime.push_back("5400_calib_donut");
+   PUSregime.push_back("5450_nopus");
+   PUSregime.push_back("5450_calib_nopus");
+   PUSregime.push_back("5450_donut");
+   PUSregime.push_back("5450_calib_donut");
    PUSregime.push_back("5400_calib_global");
    PUSregime.push_back("5400_global");
-   PUSregime.push_back("4300_global");
-   PUSregime.push_back("gct");
+   //PUSregime.push_back("4300_nopus");
+   //PUSregime.push_back("6550_nopus");
+   //PUSregime.push_back("4300_donut");
+   //PUSregime.push_back("4300_global");
+   //PUSregime.push_back("gct");
 
    TString njetsType = "alljet";
 

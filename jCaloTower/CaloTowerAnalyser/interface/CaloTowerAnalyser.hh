@@ -192,6 +192,7 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     TH2D * deltaGenL1_R4;
 
     std::string mskim;
+    bool mgct;
     TriggerTowerGeometry g; //to run the constructor -- could also make this static
 
     std::map<std::string, TH1D * > col1_jet1_eta;
@@ -206,10 +207,23 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     std::map<std::string, TH1D * > col1_jet2_pt;
     std::map<std::string, TH1D * > col1_jet3_pt;
     std::map<std::string, TH1D * > col1_jet4_pt;
+    std::map<std::string, TH1D * > col1_jet5_pt;
+    std::map<std::string, TH1D * > col1_jet6_pt;
+    std::map<std::string, TH1D * > col1_jet7_pt;
+    std::map<std::string, TH1D * > col1_jet8_pt;
+    std::map<std::string, TH1D * > col1_jet9_pt;
+    std::map<std::string, TH1D * > col1_jet10_pt;
+
     std::map<std::string, TH1D * > col2_jet1_pt;
     std::map<std::string, TH1D * > col2_jet2_pt;
     std::map<std::string, TH1D * > col2_jet3_pt;
     std::map<std::string, TH1D * > col2_jet4_pt;
+    std::map<std::string, TH1D * > col2_jet5_pt;
+    std::map<std::string, TH1D * > col2_jet6_pt;
+    std::map<std::string, TH1D * > col2_jet7_pt;
+    std::map<std::string, TH1D * > col2_jet8_pt;
+    std::map<std::string, TH1D * > col2_jet9_pt;
+    std::map<std::string, TH1D * > col2_jet10_pt;
     std::map<std::string, TH1D * > col1_alljet_pt;
     std::map<std::string, TH1D * > col2_alljet_pt;
     std::map<std::string, TH1D * > col1_alljet_eta;
@@ -253,6 +267,7 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     std::map<std::string, TH1D * > col2_matched_algo2_jet4_eta;
     //PLOTS FOR JAD
     std::map<std::string,TH2D * > col2_saved_algo2;
+    std::map<std::string,TH2D * > index_matched;
 
     std::map<TString, TH2D * > pt_ratio_nvts_algo1_alljet;
     std::map<TString, TProfile * > pt_ratio_nvts_algo1_alljet_profile;
@@ -302,6 +317,8 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
 
     std::map<TString,TH1D*> col2_ht_cut;
     std::map<TString,TH1D*> col2_mht_cut;
+    std::map<TString,TH1D*> col1_et_cut;
+    std::map<TString,TH1D*> col1_met_cut;
     std::map<TString,TH2D*> mht_ht_col2;
     std::map<TString,TH2D*> mht_ht_col1;
     std::map<TString,TH1D*> col1_seed_alljet;
@@ -315,6 +332,30 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     std::map<TString,TH2D*> col1_NPV_seed_jet2;
     std::map<TString,TH2D*> col1_NPV_seed_jet3;
     std::map<TString,TH2D*> col1_NPV_seed_jet4;
+
+    std::map<TString,TH1D*> col1_rings_0_1_alljet;
+    std::map<TString,TH1D*> col1_rings_0_1_jet1;
+    std::map<TString,TH1D*> col1_rings_0_1_jet2;
+    std::map<TString,TH1D*> col1_rings_0_1_jet3;
+    std::map<TString,TH1D*> col1_rings_0_1_jet4;
+
+    std::map<TString,TH2D*> col1_NPV_rings_0_1_alljet;
+    std::map<TString,TH2D*> col1_NPV_rings_0_1_jet1;
+    std::map<TString,TH2D*> col1_NPV_rings_0_1_jet2;
+    std::map<TString,TH2D*> col1_NPV_rings_0_1_jet3;
+    std::map<TString,TH2D*> col1_NPV_rings_0_1_jet4;
+
+    std::map<TString,TH1D*> col1_rings_0_1_norm_alljet;
+    std::map<TString,TH1D*> col1_rings_0_1_norm_jet1;
+    std::map<TString,TH1D*> col1_rings_0_1_norm_jet2;
+    std::map<TString,TH1D*> col1_rings_0_1_norm_jet3;
+    std::map<TString,TH1D*> col1_rings_0_1_norm_jet4;
+
+    std::map<TString,TH2D*> col1_NPV_rings_0_1_norm_alljet;
+    std::map<TString,TH2D*> col1_NPV_rings_0_1_norm_jet1;
+    std::map<TString,TH2D*> col1_NPV_rings_0_1_norm_jet2;
+    std::map<TString,TH2D*> col1_NPV_rings_0_1_norm_jet3;
+    std::map<TString,TH2D*> col1_NPV_rings_0_1_norm_jet4;
 
 };
 

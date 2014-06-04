@@ -19,6 +19,7 @@ CaloTowerAnalyser::CaloTowerAnalyser(const edm::ParameterSet& iConfig) {
   //edm::Service<TFileService> fs;
   edm::Service<TFileService> fs;
   mskim=iConfig.getParameter<std::string>("skim_name");
+  mgct=iConfig.getParameter<bool>("gctinfo");
   // std::string folderName = "Event_";
   // std::stringstream caseNumber;
   // caseNumber << eventNumber;
@@ -165,17 +166,17 @@ std::vector<double> CaloTowerAnalyser::calculateMHT(const std::vector<jJet> & je
   double mht_x=0.0;
   double mht_y=0.0;
   for(unsigned int i=0; i< jets.size(); i++) {
-    if (jets[i].pt() > thresh)
-    {
-      mht_x -= cos(g.phi(jets[i].iPhi()))*jets[i].pt();
-      mht_y -= sin(g.phi(jets[i].iPhi()))*jets[i].pt();
+      if (jets[i].pt() > thresh)
+      {
+	mht_x -= cos(g.phi(jets[i].iPhi()))*jets[i].pt();
+	mht_y -= sin(g.phi(jets[i].iPhi()))*jets[i].pt();
+      }
     }
-  }
-  std::vector<double> results;
-  results.push_back(mht_x);
-  results.push_back(mht_y);
-  results.push_back(sqrt((mht_x*mht_x) + (mht_y*mht_y)));
-  return results;
+    std::vector<double> results;
+    results.push_back(mht_x);
+    results.push_back(mht_y);
+    results.push_back(sqrt((mht_x*mht_x) + (mht_y*mht_y)));
+    return results;
 }
 //
 // member functions
@@ -187,42 +188,43 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   //std::cout <<"EVENT " << mEventNumber << std::endl;
   if (mEventNumber % 100 == 0) { std::cout << "starting event " << mEventNumber << std::endl; }
 
-
-
-  //    std::cout << "at event " << mEventNumber << std::endl;
-
-  // Get GCT jets (uncalib) collection
-  edm::Handle<L1GctJetCandCollection> GctUncalibCenJets;
-  //edm::InputTag gctUncalibCenJets("valGctDigis","cenJets","skimrun");
-  edm::InputTag gctUncalibCenJets("valGctDigis","cenJets",mskim);
-  iEvent.getByLabel(gctUncalibCenJets, GctUncalibCenJets);
   std::vector<jJet> gct_jJet_uncalib;
-  for(unsigned int i=0; i<GctUncalibCenJets->size(); i++) {
-    if (GctUncalibCenJets->at(i).bx()==0)
-    {
-      //std::cout << GctUncalibCenJets->at(i).rank() << ", " << GctUncalibCenJets->at(i).regionId().ieta() << ", " << GctUncalibCenJets->at(i).regionId().iphi() << std::endl;
-      gct_jJet_uncalib.push_back(jJet(GctUncalibCenJets->at(i).rank()*8,GctUncalibCenJets->at(i).regionId().ieta(),GctUncalibCenJets->at(i).regionId().iphi(),GctUncalibCenJets->at(i).bx()));
-    } 
-  }
-
-
-  // Get GCT jets (calib) collection
-  edm::Handle<L1GctJetCandCollection> GctCalibCenJets;
-  edm::InputTag gctCalibCenJets("gctDigis","cenJets",mskim);
-  //edm::InputTag gctCalibCenJets("gctDigis","cenJets","skimrun");
-  iEvent.getByLabel(gctCalibCenJets, GctCalibCenJets);
   std::vector<jJet> gct_jJet_calib;
+  if (mgct)
+  {
 
-  for(unsigned int i=0; i<GctCalibCenJets->size(); i++) {
-    //std::cout << GctCalibCenJets->at(i).rank() << ", " << GctCalibCenJets->at(i).regionId().ieta() << ", " << GctCalibCenJets->at(i).regionId().iphi() << std::endl;
-    if (GctUncalibCenJets->at(i).bx()==0)
-    {
-      //std::cout << GctUncalibCenJets->at(i).rank() << ", " << GctUncalibCenJets->at(i).regionId().ieta() << ", " << GctUncalibCenJets->at(i).regionId().iphi() << std::endl;
-      gct_jJet_calib.push_back(jJet(GctCalibCenJets->at(i).rank()*8,GctCalibCenJets->at(i).regionId().ieta(),GctCalibCenJets->at(i).regionId().iphi(),GctCalibCenJets->at(i).bx()));
-    } 
+    //    std::cout << "at event " << mEventNumber << std::endl;
+
+    // Get GCT jets (uncalib) collection
+    edm::Handle<L1GctJetCandCollection> GctUncalibCenJets;
+    //edm::InputTag gctUncalibCenJets("valGctDigis","cenJets","skimrun");
+    edm::InputTag gctUncalibCenJets("valGctDigis","cenJets",mskim);
+    iEvent.getByLabel(gctUncalibCenJets, GctUncalibCenJets);
+    for(unsigned int i=0; i<GctUncalibCenJets->size(); i++) {
+      if (GctUncalibCenJets->at(i).bx()==0)
+      {
+	//std::cout << GctUncalibCenJets->at(i).rank() << ", " << GctUncalibCenJets->at(i).regionId().ieta() << ", " << GctUncalibCenJets->at(i).regionId().iphi() << std::endl;
+	gct_jJet_uncalib.push_back(jJet(GctUncalibCenJets->at(i).rank()*8,GctUncalibCenJets->at(i).regionId().ieta(),GctUncalibCenJets->at(i).regionId().iphi(),GctUncalibCenJets->at(i).bx()));
+      } 
+    }
+
+
+    // Get GCT jets (calib) collection
+    edm::Handle<L1GctJetCandCollection> GctCalibCenJets;
+    edm::InputTag gctCalibCenJets("gctDigis","cenJets",mskim);
+    //edm::InputTag gctCalibCenJets("gctDigis","cenJets","skimrun");
+    iEvent.getByLabel(gctCalibCenJets, GctCalibCenJets);
+
+    for(unsigned int i=0; i<GctCalibCenJets->size(); i++) {
+      //std::cout << GctCalibCenJets->at(i).rank() << ", " << GctCalibCenJets->at(i).regionId().ieta() << ", " << GctCalibCenJets->at(i).regionId().iphi() << std::endl;
+      if (GctUncalibCenJets->at(i).bx()==0)
+      {
+	//std::cout << GctUncalibCenJets->at(i).rank() << ", " << GctUncalibCenJets->at(i).regionId().ieta() << ", " << GctUncalibCenJets->at(i).regionId().iphi() << std::endl;
+	gct_jJet_calib.push_back(jJet(GctCalibCenJets->at(i).rank()*8,GctCalibCenJets->at(i).regionId().ieta(),GctCalibCenJets->at(i).regionId().iphi(),GctCalibCenJets->at(i).bx()));
+      } 
+    }
+
   }
-
-
 
   edm::Handle<l1slhc::L1CaloTowerCollection> triggertowers;
   iEvent.getByLabel("L1CaloTowerProducer", triggertowers);
@@ -380,17 +382,18 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     ak4genjetsp_jJet.push_back(jJet(ak4genjetsp[i].pt(), g.iEta(ak4genjetsp[i].eta()), g.iPhi(ak4genjetsp[i].phi())));
   }
 
-  /*
+
   //an example on how to use the closestJetDistance function
-  std::vector<int> minDR2genp;
-  if(ak4genjetsp_jJet.size()>0) {
-  minDR2genp = closestJetDistance(ak4genjetsp_jJet);
-  for(unsigned int i=0; i<ak4genjetsp_jJet.size(); i++) {
-  if(minDR2genp[i] > 35) {
-  genjet_pt_nomunu_far->Fill(ak4genjetsp_jJet[i].pt());
-  }
-  }
-  }
+  /*  
+      std::vector<int> minDR2genp;
+      if(ak4genjetsp_jJet.size()>0) {
+      minDR2genp = closestJetDistance(ak4genjetsp_jJet);
+      for(unsigned int i=0; i<ak4genjetsp_jJet.size(); i++) {
+      if(minDR2genp[i] > 35) {
+      genjet_pt_nomunu_far->Fill(ak4genjetsp_jJet[i].pt());
+      }
+      }
+      }
    */
 
   //std::cout << "ak4tt:" << std::endl;
@@ -414,6 +417,9 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   //std::vector<jJet> L1_4350_jJet = getL1Jets(myarray, 4, 3, 5, 0);
   std::vector<jJet> L1_5400_jJet = getL1Jets(myarray, 5, 4, 0, 0);
   std::vector<jJet> L1_5450_jJet = getL1Jets(myarray, 5, 4, 5, 0);
+  std::vector<jJet> L1_5420_jJet = getL1Jets(myarray, 5, 4, 2, 0);
+  std::vector<jJet> L1_5430_jJet = getL1Jets(myarray, 5, 4, 3, 0);
+  std::vector<jJet> L1_5440_jJet = getL1Jets(myarray, 5, 4, 4, 0);
   std::vector<jJet> L1_6550_jJet = getL1Jets(myarray, 6, 5, 5, 0);
   std::vector<jJet> L1_4300_jJet = getL1Jets(myarray, 4, 3, 0, 0);
 
@@ -532,8 +538,14 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
   this->compareJetCollections(calibrated_L1_5450donut_jJet, ak4genjetsp_jJet,"5450_calib_donut_gen",false);
   this->compareJetCollections(calibrated_L1_5450_jJet, ak4genjetsp_jJet,"5450_calib_nopus_gen",false);
-  this->compareJetCollections(gct_jJet_calib, ak4genjetsp_jJet, "gct_calib_gen",true);
-  this->compareJetCollections(gct_jJet_uncalib, ak4genjetsp_jJet, "gct_uncalib_gen",true);
+  if(mgct)
+  {
+    this->compareJetCollections(gct_jJet_calib, ak4genjetsp_jJet, "gct_calib_gen",true);
+    this->compareJetCollections(gct_jJet_uncalib, ak4genjetsp_jJet, "gct_uncalib_gen",true);
+  }
+  this->compareJetCollections(L1_5420_jJet, ak4genjetsp_jJet,"5420_nopus_gen",false);
+  this->compareJetCollections(L1_5430_jJet, ak4genjetsp_jJet,"5430_nopus_gen",false);
+  this->compareJetCollections(L1_5440_jJet, ak4genjetsp_jJet,"5440_nopus_gen",false);
   /*
      this->compareJetCollections(L1_4300donut_jJet, ak4genjetsp_jJet,"4300_donut_gen",false);
      this->compareJetCollections(L1_4300_jJet, ak4genjetsp_jJet,"4300_nopus_gen",false);
