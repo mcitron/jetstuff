@@ -176,7 +176,7 @@ TString ROOTdir  = "";
 // Directory to store plots
 //  TString plotDirectory = "plots/Mk1Release/Presentation/8x8_PreFix/";
 int nEtaBins=8;
-double setPtBin=5;
+double setPtBin=2;
 double setPtMin=0;
 double setPtMax=300;
 TString plotDirectory = "qcd_0to300b5_";

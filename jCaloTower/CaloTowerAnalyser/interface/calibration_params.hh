@@ -29,7 +29,9 @@ enum jetType{
   l15400nopus20,
   l15400global20,
   l15450donut30,
-  l15450nopus40
+  l15450nopus40,
+  l15450donut20,
+  l15450nopus30
 };
 
 std::vector<jJet> calibrateL1Jets(const std::vector<jJet>& inJets, const jetType & type, double ptMin, double ptMax){
@@ -50,7 +52,9 @@ std::vector<jJet> calibrateL1Jets(const std::vector<jJet>& inJets, const jetType
     else if(type==jetType::l15400nopus10) lut.push_back(luts5400::nopusLut10[i]);
 
     else if(type==jetType::l15450donut30) lut.push_back(luts5450::donutLut30[i]);
+    else if(type==jetType::l15450donut20) lut.push_back(luts5450::donutLut20[i]);
     else if(type==jetType::l15450nopus40) lut.push_back(luts5450::nopusLut40[i]);
+    else if(type==jetType::l15450nopus30) lut.push_back(luts5450::nopusLut30[i]);
 
     else std::cout << "Invalid type to get lut" << std::endl;
 
