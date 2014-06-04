@@ -1,31 +1,22 @@
-void makeRate()
+void makeRateNvtx()
 {
 
-  int nvtxBin=5;
+  int nvtxBin=10;
 
   //   TFile * f = TFile::Open("./neutrino_skim_run.root");
   // TFile * f = TFile::Open("./batch/neutrino5/neutrino_out.root");
 
   //   TFile * f = TFile::Open("./neutrino_skim_run.root");
-  TFile * f = TFile::Open("./global_PUS_TEST.root");
+  TFile * f = TFile::Open("/afs/cern.ch/work/m/mcitron/public/NEUTRINO/140602/output_run0.root");
   std::vector<TString> PUSregime;
   PUSregime.push_back("5400_nopus");
-  PUSregime.push_back("5400_calib_nopus");
-  PUSregime.push_back("5450_nopus");
-  PUSregime.push_back("5450_calib_nopus");
+  //PUSregime.push_back("5400_calib_nopus");
+  //PUSregime.push_back("5450_nopus");
+  //PUSregime.push_back("5450_calib_nopus");
   
-  PUSregime.push_back("5400_donut");
-  PUSregime.push_back("5400_calib_donut");
-  PUSregime.push_back("5450_donut");
-  PUSregime.push_back("5450_calib_donut");
-  
-  PUSregime.push_back("5400_global");
-  PUSregime.push_back("5400_calib_global");
-  PUSregime.push_back("5450_global");
-  PUSregime.push_back("5450_calib_global");
 
-  PUSregime.push_back("gct");
-  PUSregime.push_back("gct_calib");
+  //PUSregime.push_back("gct");
+  //PUSregime.push_back("gct_calib");
 
   std::vector<TString> jetnum;
   jetnum.push_back("alljet");
@@ -43,14 +34,15 @@ void makeRate()
     for (auto iJet = jetnum.begin(); iJet!=jetnum.end(); iJet++)
     {
       //TH1D * origplot = f->Get(("demo/"+*iPUS+"_gen/col1_"+*iJet+"_pt").Data());
-      TH2D * rate_nvtx_plot = //f->Get(("demo/"+*iPUS+"_gen/col1_seed_"+*iJet).Data());
+      TH2D * rate_nvtx_plot=f->Get(("demo/"+*iPUS+"_gen/seed/col1_seed_"+*iJet+";2").Data());
 
-      for(int nvtx=30; nvtx<65; nvtx+=nvtxBin){
-        char buffer[10];
+      for(int nvtx=20; nvtx<65; nvtx+=nvtxBin){
+	std::cout << nvtx <<std::endl;
+        char buffer[100];
         sprintf(buffer,"Nvtx%dto%d",nvtx,nvtx+nvtxBin);
-        TH1D * origplot = rate_nvtx_plot->ProjectionX(*iPUS+"_"+*iJet+"_"+TString(buffer),nvtx,nvtx+nvtxBin);
-        TH1D * cumuplot = makeCumu(origplot);
-        cumuplot->Write();
+        TH1D * origplot = rate_nvtx_plot->ProjectionY(*iPUS+"_"+*iJet+"_"+TString(buffer),nvtx,nvtx+nvtxBin);
+        makeCumu(origplot);
+        origplot->Write();
       }
     }
   }
@@ -64,12 +56,12 @@ TH1D * makeCumu(TH1D * input)
   TH1D * output = new TH1D();
   output=input;
   int norm = input->GetEntries();
-  output->SetBinContent(0,1.);
+  //output->SetBinContent(0,0.);
   int dummy = 0;
   for (int bins = 0; bins != input->GetNbinsX()-1; bins++)
   {
     dummy += input->GetBinContent(bins);
-    output->SetBinContent(bins,(double)dummy/norm);
+    output->SetBinContent(bins,1-(double)dummy/norm);
   } 
   return output;
 }
