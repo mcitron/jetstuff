@@ -204,6 +204,7 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     std::map<std::string, TH1D * > col2_jet3_eta;
     std::map<std::string, TH1D * > col2_jet4_eta;
     std::map<std::string, TH1D * > col1_jet1_pt;
+    std::map<std::string, TH1D * > col1_lead_seed;
     std::map<std::string, TH1D * > col1_jet2_pt;
     std::map<std::string, TH1D * > col1_jet3_pt;
     std::map<std::string, TH1D * > col1_jet4_pt;
@@ -328,6 +329,9 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     std::map<TString,TH1D*> col2_mht_y;
 
 
+    std::map<TString,TH2D*> col1_seed_pt_corr;
+    std::map<TString,TH2D*> col1_ring01_pt_corr;
+    std::map<TString,TH2D*> col1_ring01norm_pt_corr;
 
     std::map<TString,TH2D*> ht_resolution;
     std::map<TString,TH2D*> mht_x_resolution;

@@ -523,9 +523,6 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   std::vector<jJet> calibrated_L1_5450donut_jJet = calibrateL1Jets(L1_5450donut_jJet,jetType::l15450donut20,20,9999);
   //this->mPrintMe = false;
 
-  this->compareJetCollections(L1_5400donut_jJet, ak4genjetsp_jJet,"5400_donut_gen",false);
-  this->compareJetCollections(L1_5400_jJet, ak4genjetsp_jJet,"5400_nopus_gen",false);
-  this->compareJetCollections(L1_5400global_jJet, ak4genjetsp_jJet, "5400_global_gen",false);
 
   this->compareJetCollections(calibrated_L1_5400donut_jJet, ak4genjetsp_jJet,"5400_calib_donut_gen",false);
   this->compareJetCollections(calibrated_L1_5400_jJet, ak4genjetsp_jJet,"5400_calib_nopus_gen",false);
@@ -534,6 +531,10 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   this->compareJetCollections(calibrated_L1_5400donut_jJet, L1_5400donut_jJet,"5400_donut_calib_uncalib",false);
   this->compareJetCollections(calibrated_L1_5400_jJet, ak4genjetsp_jJet,"5400_nopus_calib_uncalib",false);
   this->compareJetCollections(calibrated_L1_5400global_jJet, ak4genjetsp_jJet, "5400_global_calib_uncalib",false);
+
+  this->compareJetCollections(L1_5400donut_jJet, ak4genjetsp_jJet,"5400_donut_gen",false);
+  this->compareJetCollections(L1_5400_jJet, ak4genjetsp_jJet,"5400_nopus_gen",false);
+  this->compareJetCollections(L1_5400global_jJet, ak4genjetsp_jJet, "5400_global_gen",false);
 
   this->compareJetCollections(L1_5450donut_jJet, ak4genjetsp_jJet,"5450_donut_gen",false);
   this->compareJetCollections(L1_5450_jJet, ak4genjetsp_jJet,"5450_nopus_gen",false);
@@ -549,6 +550,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   this->compareJetCollections(L1_5420_jJet, ak4genjetsp_jJet,"5420_nopus_gen",false);
   this->compareJetCollections(L1_5430_jJet, ak4genjetsp_jJet,"5430_nopus_gen",false);
   this->compareJetCollections(L1_5440_jJet, ak4genjetsp_jJet,"5440_nopus_gen",false);
+
   /*
      this->compareJetCollections(L1_4300donut_jJet, ak4genjetsp_jJet,"4300_donut_gen",false);
      this->compareJetCollections(L1_4300_jJet, ak4genjetsp_jJet,"4300_nopus_gen",false);

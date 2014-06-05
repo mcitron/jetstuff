@@ -3,7 +3,7 @@ makeFit(){
    //TFile* file = new TFile("global_PUS_all.root");
    //TFile * file = TFile::Open("./batch/ttbar2/ttbar_out.root");
    //TFile * f = TFile::Open("./batch/qcd_test/qcd_calib.root");
-   TFile * file = TFile::Open("/afs/cern.ch/work/m/mcitron/public/TTBAR/140602/output_run0.root");
+   TFile * file = TFile::Open("/afs/cern.ch/work/m/mcitron/public/TTBAR/140604/ttbar_output.root");
    //TFile * file = TFile::Open("./batch/ttbar2/ttbar_out.root");
    std::vector<TString> PUSregime;
    PUSregime.push_back("5400_nopus");

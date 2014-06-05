@@ -11,3 +11,4 @@
 <use   name="rootcore"/>
 <use   name="rootinteractive"/>
 <flags EDM_PLUGIN="1"/>
+<flags CXXFLAGS="-g"/>

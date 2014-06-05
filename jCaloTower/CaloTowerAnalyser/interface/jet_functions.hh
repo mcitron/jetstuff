@@ -232,28 +232,36 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
             }
           }
 
-        }
+	}
       }
 
       //now we have a jet candidate centred at i,j, with the ring energies and areas defined
 
       //now we have the L1 jet candidate:
-      if(numtowersaboveme == 0 && input[i][j] >= seedthresh1) {
-        double totalenergy=0.0;
-        //std::cout << "iEta: " << g.old_iEta(i) << ", iPhi: " << g.old_iPhi(j) << ", r0: " << localsums[0] <<  ", r1: " << localsums[1] << ", r2: " << localsums[2] << ", r3: " << localsums[3] << ", r4: " << localsums[4] << std::endl;
-        for(int ring=0; ring < (int)localsums.size(); ring++) { totalenergy += localsums[ring]; }
-        //this is with PUS:
-        //for(int ring=0; ring < (int)localsums.size()-1; ring++) { totalenergy += localsums[ring]; }
-        //std::sort(outerstrips.begin(),outerstrips.end());
-        //totalenergy = totalenergy - (3.5 * (outerstrips[1] + outerstrips[2]));
+      if(numtowersaboveme == 0 )
+      {
+	//std::cout << input[i][j] << "  "  << localsums[0] << std::endl;
+	{
+	  if(input[i][j] > seedthresh1) 
+	  {
 
-        //this means we have a viable candidate
-        if(totalenergy > 0.0) {
-          L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetTower,jetarea, seedtower));
-        }
+	    double totalenergy=0.0;
+	    //std::cout << "iEta: " << g.old_iEta(i) << ", iPhi: " << g.old_iPhi(j) << ", r0: " << localsums[0] <<  ", r1: " << localsums[1] << ", r2: " << localsums[2] << ", r3: " << localsums[3] << ", r4: " << localsums[4] << std::endl;
+	    for(int ring=0; ring < (int)localsums.size(); ring++) { totalenergy += localsums[ring]; }
+	    //this is with PUS:
+	    //for(int ring=0; ring < (int)localsums.size()-1; ring++) { totalenergy += localsums[ring]; }
+	    //std::sort(outerstrips.begin(),outerstrips.end());
+	    //totalenergy = totalenergy - (3.5 * (outerstrips[1] + outerstrips[2]));
 
+	    //this means we have a viable candidate
+	    if(totalenergy > 0.0) {
+	      L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetTower,jetarea, seedtower));
+	    }
+	    //std::cout << localsums[0] << std::endl;
+	  }
+
+	} 
       }
-
     }
   }
 
@@ -280,7 +288,7 @@ std::vector<int> CaloTowerAnalyser::closestJetDistance(const std::vector<jJet> &
       //std::cout << i << " closest to " << distances[i] << std::endl;
 
       for(int j=0; j<(int)jJets.size(); j++) {
-        if(i!=j && jJets[i].DeltaR2(jJets[j]) < closestDR2) { closestDR2 = jJets[i].DeltaR2(jJets[j]); }
+	if(i!=j && jJets[i].DeltaR2(jJets[j]) < closestDR2) { closestDR2 = jJets[i].DeltaR2(jJets[j]); }
       }
       distances[i] = closestDR2;
       //std::cout << i << " closest distance " << closestDR2 << std::endl;
