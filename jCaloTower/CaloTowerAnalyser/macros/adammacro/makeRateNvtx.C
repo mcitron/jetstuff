@@ -7,7 +7,8 @@ void makeRateNvtx()
   // TFile * f = TFile::Open("./batch/neutrino5/neutrino_out.root");
 
   //   TFile * f = TFile::Open("./neutrino_skim_run.root");
-  TFile * f = TFile::Open("/afs/cern.ch/work/m/mcitron/public/NEUTRINO/140602/output_run0.root");
+   //TFile * f = TFile::Open("/afs/cern.ch/work/m/mcitron/public/NEUTRINO/140603/neutrino_out.root");
+  TFile * f = TFile::Open("/afs/cern.ch/work/m/mcitron/public/TTBAR/140603/ttbar_output.root");
   std::vector<TString> PUSregime;
   PUSregime.push_back("5400_nopus");
   //PUSregime.push_back("5400_calib_nopus");
@@ -26,7 +27,7 @@ void makeRateNvtx()
   jetnum.push_back("jet4");
 
 
-  TFile *top = new TFile("ratePlots_Nvtx.root","recreate");
+  TFile *top = new TFile("ratePlots_Nvtx_tt.root","recreate");
   for (auto iPUS = PUSregime.begin(); iPUS!=PUSregime.end(); iPUS++)
   {      
     TDirectory * dir = top->mkdir((*iPUS).Data());
@@ -34,7 +35,7 @@ void makeRateNvtx()
     for (auto iJet = jetnum.begin(); iJet!=jetnum.end(); iJet++)
     {
       //TH1D * origplot = f->Get(("demo/"+*iPUS+"_gen/col1_"+*iJet+"_pt").Data());
-      TH2D * rate_nvtx_plot=f->Get(("demo/"+*iPUS+"_gen/seed/col1_seed_"+*iJet+";2").Data());
+      TH2D * rate_nvtx_plot=f->Get(("demo/"+*iPUS+"_gen/other/col1_"+*iJet+"_pt_NPV").Data());
 
       for(int nvtx=20; nvtx<65; nvtx+=nvtxBin){
 	std::cout << nvtx <<std::endl;

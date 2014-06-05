@@ -214,6 +214,18 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     std::map<std::string, TH1D * > col1_jet9_pt;
     std::map<std::string, TH1D * > col1_jet10_pt;
 
+
+
+    std::map<TString, TH1D * > col1_pt_eta_bins_alljet;
+    std::map<TString, TH1D * > col1_pt_eta_bins_jet1;
+    std::map<TString, TH1D * > col1_pt_eta_bins_jet2;
+    std::map<TString, TH1D * > col1_pt_eta_bins_jet3;
+    std::map<TString, TH1D * > col1_pt_eta_bins_jet4;
+
+
+
+
+
     std::map<std::string, TH1D * > col2_jet1_pt;
     std::map<std::string, TH1D * > col2_jet2_pt;
     std::map<std::string, TH1D * > col2_jet3_pt;
@@ -287,6 +299,13 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     std::map<TString,TH1D*> col2_matched_algo1_jet2_cut;
     std::map<TString,TH1D*> col2_matched_algo1_jet3_cut;
     std::map<TString,TH1D*> col2_matched_algo1_jet4_cut;
+
+    std::map<TString,TH1D*> col2_matched_algo1_alljet_nvtx_cut;
+    std::map<TString,TH1D*> col2_matched_algo1_jet1_nvtx_cut;
+    std::map<TString,TH1D*> col2_matched_algo1_jet2_nvtx_cut;
+    std::map<TString,TH1D*> col2_matched_algo1_jet3_nvtx_cut;
+    std::map<TString,TH1D*> col2_matched_algo1_jet4_nvtx_cut;
+
 
     std::map<TString,TH2D*> col1_alljet_pt_NPV;
     std::map<TString,TH2D*> col1_jet1_pt_NPV;

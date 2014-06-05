@@ -15,6 +15,15 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
   HTBins["HT_100"] = 100;
   HTBins["HT_200"] = 200;
 
+  std::map<TString,std::pair<int,int>> NVTXBins;
+  NVTXBins["NVTX_0_to_10"] = std::make_pair(0,10);
+  NVTXBins["NVTX_11_to_20"] = std::make_pair(11,21);
+  NVTXBins["NVTX_21_to_30"] = std::make_pair(21,31);
+  NVTXBins["NVTX_31_to_40"] = std::make_pair(31,41);
+  NVTXBins["NVTX_41_to_50"] = std::make_pair(41,51);
+  NVTXBins["NVTX_51_to_60"] = std::make_pair(51,61);
+  NVTXBins["NVTX_61_to_70"] = std::make_pair(61,71);
+
   std::map<TString,int> ETBins;
   ETBins["ET_100"] = 100;
   ETBins["ET_200"] = 200;
@@ -222,6 +231,7 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
 
     //Calibration Plots
     TFileDirectory calibdir=dir.mkdir("calibration");
+    TFileDirectory rateetadir=dir.mkdir("rate_eta");
 
     //for(std::map<TString,std::pair<int,int> >::const_iterator etaBinIt=etaCalibBins_.begin(); etaBinIt!=etaCalibBins_.end(); etaBinIt++)
     for(auto etaBinIt=etaCalibBins_.begin(); etaBinIt!=etaCalibBins_.end(); etaBinIt++){
@@ -232,16 +242,35 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
       col2_calib_corr[TString(folderName)+etaBinIt->first]=calibdir.make<TH2D>("col2_calib_corr_"+etaBinIt->first,";col2 p_{T};col1 p_{T}",1000,-0.5,999.5,1000,-0.5,999.5);
       col2_calib_corr_profile[TString(folderName)+etaBinIt->first]=calibdir.make<TProfile>("col2_calib_corr_profile_"+etaBinIt->first,";col2 p_{T};col1 p_{T}",1000,-0.5,999.5);
 
+      col1_pt_eta_bins_alljet[TString(folderName)+etaBinIt->first]=rateetadir.make<TH1D>("col1_alljet_eta_bins_"+etaBinIt->first,";col1 p_{T};",1000,-0.5,999.5);
+      col1_pt_eta_bins_jet1[TString(folderName)+etaBinIt->first] = rateetadir.make<TH1D>("col1_jet1_eta_bins_"+etaBinIt->first,";col1 p_{T};",1000,-0.5,999.5);
+      col1_pt_eta_bins_jet2[TString(folderName)+etaBinIt->first] = rateetadir.make<TH1D>("col1_jet2_eta_bins_"+etaBinIt->first,";col1 p_{T};",1000,-0.5,999.5);
+      col1_pt_eta_bins_jet3[TString(folderName)+etaBinIt->first] = rateetadir.make<TH1D>("col1_jet3_eta_bins_"+etaBinIt->first,";col1 p_{T};",1000,-0.5,999.5);
+      col1_pt_eta_bins_jet4[TString(folderName)+etaBinIt->first] = rateetadir.make<TH1D>("col1_jet4_eta_bins_"+etaBinIt->first,";col1 p_{T};",1000,-0.5,999.5);
+
     }
+
+    TFileDirectory turnondir=dir.mkdir("turnon");
     for(auto ptCutIt=ptCut.begin(); ptCutIt != ptCut.end(); ptCutIt++)
       //for(std::map<TString,std::pair<int,int> >::const_iterator ptCutIt=ptCut.begin(); ptCutIt != ptCut.end(); ptCutIt++)
     {
       std::cout << TString(folderName)+ptCutIt->first << std::endl;
-      col2_matched_algo1_alljet_cut[TString(folderName)+ptCutIt->first]=otherdir.make<TH1D>("col2_matched_algo1_alljet_cut_"+ptCutIt->first,";p_{T};",1000,-0.5,999.5);
-      col2_matched_algo1_jet1_cut[TString(folderName)+ptCutIt->first]=otherdir.make<TH1D>("col2_matched_algo1_jet1_cut_"+ptCutIt->first,";p_{T};",1000,-0.5,999.5);
-      col2_matched_algo1_jet2_cut[TString(folderName)+ptCutIt->first]=otherdir.make<TH1D>("col2_matched_algo1_jet2_cut_"+ptCutIt->first,";p_{T};",1000,-0.5,999.5);
-      col2_matched_algo1_jet3_cut[TString(folderName)+ptCutIt->first]=otherdir.make<TH1D>("col2_matched_algo1_jet3_cut_"+ptCutIt->first,";p_{T};",1000,-0.5,999.5);
-      col2_matched_algo1_jet4_cut[TString(folderName)+ptCutIt->first]=otherdir.make<TH1D>("col2_matched_algo1_jet4_cut_"+ptCutIt->first,";p_{T};",1000,-0.5,999.5);
+      col2_matched_algo1_alljet_cut[TString(folderName)+ptCutIt->first]=turnondir.make<TH1D>("col2_matched_algo1_alljet_cut_"+ptCutIt->first,";p_{T};",1000,-0.5,999.5);
+      col2_matched_algo1_jet1_cut[TString(folderName)+ptCutIt->first]=turnondir.make<TH1D>("col2_matched_algo1_jet1_cut_"+ptCutIt->first,";p_{T};",1000,-0.5,999.5);
+      col2_matched_algo1_jet2_cut[TString(folderName)+ptCutIt->first]=turnondir.make<TH1D>("col2_matched_algo1_jet2_cut_"+ptCutIt->first,";p_{T};",1000,-0.5,999.5);
+      col2_matched_algo1_jet3_cut[TString(folderName)+ptCutIt->first]=turnondir.make<TH1D>("col2_matched_algo1_jet3_cut_"+ptCutIt->first,";p_{T};",1000,-0.5,999.5);
+      col2_matched_algo1_jet4_cut[TString(folderName)+ptCutIt->first]=turnondir.make<TH1D>("col2_matched_algo1_jet4_cut_"+ptCutIt->first,";p_{T};",1000,-0.5,999.5);
+
+      for(auto NVTXIt=NVTXBins.begin(); NVTXIt != NVTXBins.end(); NVTXIt++)
+      {
+	TFileDirectory nvtxdir=turnondir.mkdir(("nvtxdir"+NVTXIt->first).Data());
+	col2_matched_algo1_alljet_nvtx_cut[TString(folderName)+ptCutIt->first+NVTXIt->first]=nvtxdir.make<TH1D>("col2_matched_algo1_alljet_cut_"+ptCutIt->first+NVTXIt->first,";p_{T};",1000,-0.5,999.5);
+	col2_matched_algo1_jet1_nvtx_cut[TString(folderName)+ptCutIt->first+NVTXIt->first]=nvtxdir.make<TH1D>("col2_matched_algo1_jet1_cut_"+ptCutIt->first+NVTXIt->first,";p_{T};",1000,-0.5,999.5);
+	col2_matched_algo1_jet2_nvtx_cut[TString(folderName)+ptCutIt->first+NVTXIt->first]=nvtxdir.make<TH1D>("col2_matched_algo1_jet2_cut_"+ptCutIt->first+NVTXIt->first,";p_{T};",1000,-0.5,999.5);
+	col2_matched_algo1_jet3_nvtx_cut[TString(folderName)+ptCutIt->first+NVTXIt->first]=nvtxdir.make<TH1D>("col2_matched_algo1_jet3_cut_"+ptCutIt->first+NVTXIt->first,";p_{T};",1000,-0.5,999.5);
+	col2_matched_algo1_jet4_nvtx_cut[TString(folderName)+ptCutIt->first+NVTXIt->first]=nvtxdir.make<TH1D>("col2_matched_algo1_jet4_cut_"+ptCutIt->first+NVTXIt->first,";p_{T};",1000,-0.5,999.5);
+
+      }
 
     }
     std::cout << folderName << std::endl;
@@ -330,6 +359,14 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
 
   for(unsigned int i=0; i<col1.size(); i++) {
     col1_alljet_pt[folderName]->Fill(col1[i].pt());
+    for(auto etaBinIt = etaCalibBins_.begin();etaBinIt!=etaCalibBins_.end();etaBinIt++)
+    {
+      if (col1[i].iEta() >= etaBinIt->second.first && col1[i].iEta() < etaBinIt->second.second)
+      {
+	col1_pt_eta_bins_alljet[TString(folderName)+etaBinIt->first]->Fill(col1[i].pt());
+      }
+
+    }
     if (col1[i].ringSums().size()!=0) 
     {
       col1_seed_alljet[folderName]->Fill(col1[i].ringSums().at(0));
@@ -353,6 +390,14 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
 	col1_rings_0_1_norm_jet1[folderName]->Fill(col1[i].ringSums().at(0)+(col1[i].ringSums().at(1))/8.);
 	col1_NPV_rings_0_1_norm_jet1[folderName]->Fill(mNPV,col1[i].ringSums().at(0)+col1[i].ringSums().at(1)/8.);
       }
+      for(auto etaBinIt = etaCalibBins_.begin();etaBinIt!=etaCalibBins_.end();etaBinIt++)
+      {
+	if (col1[i].iEta() >= etaBinIt->second.first && col1[i].iEta() < etaBinIt->second.second)
+	{
+	  col1_pt_eta_bins_jet1[TString(folderName)+etaBinIt->first]->Fill(col1[i].pt());
+	}
+
+      }
     }
     if(i == 1) { col1_jet2_pt[folderName]->Fill(col1[i].pt()); col1_jet2_eta[folderName]->Fill(g.new_iEta(col1[i].iEta()));col1_jet2_pt_NPV[folderName]->Fill(mNPV,col1[i].pt());
       if (col1[i].ringSums().size()!=0) 
@@ -364,6 +409,15 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
 	col1_rings_0_1_norm_jet2[folderName]->Fill(col1[i].ringSums().at(0)+(col1[i].ringSums().at(1))/8.);
 	col1_NPV_rings_0_1_norm_jet2[folderName]->Fill(mNPV,col1[i].ringSums().at(0)+col1[i].ringSums().at(1)/8.);
       } 
+      for(auto etaBinIt = etaCalibBins_.begin();etaBinIt!=etaCalibBins_.end();etaBinIt++)
+
+      {
+	if (col1[i].iEta() >= etaBinIt->second.first && col1[i].iEta() < etaBinIt->second.second)
+	{
+	  col1_pt_eta_bins_jet2[TString(folderName)+etaBinIt->first]->Fill(col1[i].pt());
+	}
+
+      }
     }
     if(i == 2) { col1_jet3_pt[folderName]->Fill(col1[i].pt()); col1_jet3_eta[folderName]->Fill(g.new_iEta(col1[i].iEta()));col1_jet3_pt_NPV[folderName]->Fill(mNPV,col1[i].pt());
       if (col1[i].ringSums().size()!=0)
@@ -374,6 +428,14 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
 	col1_NPV_seed_jet3[folderName]->Fill(mNPV,col1[i].ringSums().at(0));
 	col1_rings_0_1_norm_jet3[folderName]->Fill(col1[i].ringSums().at(0)+(col1[i].ringSums().at(1))/8.);
 	col1_NPV_rings_0_1_norm_jet3[folderName]->Fill(mNPV,col1[i].ringSums().at(0)+col1[i].ringSums().at(1)/8.);
+      }
+      for(auto etaBinIt = etaCalibBins_.begin();etaBinIt!=etaCalibBins_.end();etaBinIt++)
+      {
+	if (col1[i].iEta() >= etaBinIt->second.first && col1[i].iEta() < etaBinIt->second.second)
+	{
+	  col1_pt_eta_bins_jet3[TString(folderName)+etaBinIt->first]->Fill(col1[i].pt());
+	}
+
       }
     }
     if(i == 3) { col1_jet4_pt[folderName]->Fill(col1[i].pt()); col1_jet4_eta[folderName]->Fill(g.new_iEta(col1[i].iEta()));col1_jet4_pt_NPV[folderName]->Fill(mNPV,col1[i].pt());
@@ -386,6 +448,14 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
 	col1_rings_0_1_norm_jet4[folderName]->Fill(col1[i].ringSums().at(0)+(col1[i].ringSums().at(1))/8.);
 	col1_NPV_rings_0_1_norm_jet4[folderName]->Fill(mNPV,col1[i].ringSums().at(0)+col1[i].ringSums().at(1)/8.);
       } 
+      for(auto etaBinIt = etaCalibBins_.begin();etaBinIt!=etaCalibBins_.end();etaBinIt++)
+      {
+	if (col1[i].iEta() >= etaBinIt->second.first && col1[i].iEta() < etaBinIt->second.second)
+	{
+	  col1_pt_eta_bins_jet4[TString(folderName)+etaBinIt->first]->Fill(col1[i].pt());
+	}
+
+      }
     }
     if(i == 4) col1_jet5_pt[folderName]->Fill(col1[i].pt());
     if(i == 5) col1_jet6_pt[folderName]->Fill(col1[i].pt());
@@ -433,6 +503,15 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
 	if (col1[col2_matched_index[i]].pt() > ptCutIt->second)
 	{
 	  col2_matched_algo1_alljet_cut[TString(folderName)+ptCutIt->first]->Fill(col2[i].pt());
+
+	  for(auto NVTXIt=NVTXBins.begin(); NVTXIt!=NVTXBins.end(); NVTXIt++)
+	  {
+	    if (mNPV >= NVTXIt->second.first && mNPV < NVTXIt->second.second)
+	    {
+	      col2_matched_algo1_alljet_nvtx_cut[TString(folderName)+ptCutIt->first+NVTXIt->first]->Fill(col2[i].pt());
+	    }
+	  }
+
 	}
       }
       //std::cout << col2[i].pt() << std::endl;
@@ -477,6 +556,13 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
 	  if (col1[col2_matched_index[i]].pt() > ptCutIt->second)
 	  {
 	    col2_matched_algo1_jet1_cut[TString(folderName)+ptCutIt->first]->Fill(col2[i].pt());
+	    for(auto NVTXIt=NVTXBins.begin(); NVTXIt!=NVTXBins.end(); NVTXIt++)
+	    {
+	      if (mNPV >= NVTXIt->second.first && mNPV < NVTXIt->second.second)
+	      {
+		col2_matched_algo1_jet1_nvtx_cut[TString(folderName)+ptCutIt->first+NVTXIt->first]->Fill(col2[i].pt());
+	      }
+	    }
 	  }
 	}
 
@@ -499,6 +585,13 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
 	  if (col1[col2_matched_index[i]].pt() > ptCutIt->second)
 	  {
 	    col2_matched_algo1_jet2_cut[TString(folderName)+ptCutIt->first]->Fill(col2[i].pt());
+	    for(auto NVTXIt=NVTXBins.begin(); NVTXIt!=NVTXBins.end(); NVTXIt++)
+	    {
+	      if (mNPV >= NVTXIt->second.first && mNPV < NVTXIt->second.second)
+	      {
+		col2_matched_algo1_jet2_nvtx_cut[TString(folderName)+ptCutIt->first+NVTXIt->first]->Fill(col2[i].pt());
+	      }
+	    }
 	  }
 	}
 
@@ -525,6 +618,13 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
 	  if (col1[col2_matched_index[i]].pt() > ptCutIt->second)
 	  {
 	    col2_matched_algo1_jet3_cut[TString(folderName)+ptCutIt->first]->Fill(col2[i].pt());
+	    for(auto NVTXIt=NVTXBins.begin(); NVTXIt!=NVTXBins.end(); NVTXIt++)
+	    {
+	      if (mNPV >= NVTXIt->second.first && mNPV < NVTXIt->second.second)
+	      {
+		col2_matched_algo1_jet3_nvtx_cut[TString(folderName)+ptCutIt->first+NVTXIt->first]->Fill(col2[i].pt());
+	      }
+	    }
 	  }
 	}
 
@@ -550,6 +650,13 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
 	  if (col1[col2_matched_index[i]].pt() > ptCutIt->second)
 	  {
 	    col2_matched_algo1_jet4_cut[TString(folderName)+ptCutIt->first]->Fill(col2[i].pt());
+	    for(auto NVTXIt=NVTXBins.begin(); NVTXIt!=NVTXBins.end(); NVTXIt++)
+	    {
+	      if (mNPV >= NVTXIt->second.first && mNPV < NVTXIt->second.second)
+	      {
+		col2_matched_algo1_jet4_nvtx_cut[TString(folderName)+ptCutIt->first+NVTXIt->first]->Fill(col2[i].pt());
+	      }
+	    }
 	  }
 	}
 
@@ -596,7 +703,7 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
     //	    break;
     }
     }
-    */ 
+     */ 
   }
 
   return;
