@@ -167,7 +167,7 @@ double ptStep = 5;
 //=======================
 
 
-TString filename = "qcd_new_calib_140528.root";
+TString filename = "../output/qcd_output_2014-06-09.root";
 
 
 // Directory inside ROOT file
@@ -179,7 +179,7 @@ int nEtaBins=8;
 double setPtBin=2;
 double setPtMin=0;
 double setPtMax=300;
-TString plotDirectory = "qcd_0to300b5_";
+TString plotDirectory = "qcd_new_0to300b2_";
 
 
 
