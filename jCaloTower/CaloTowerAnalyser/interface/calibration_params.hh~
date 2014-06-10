@@ -2,6 +2,7 @@
 #define CALIBRATIONPARAMS_HH
 
 #include "jCaloTower/CaloTowerAnalyser/interface/calibrationLuts.hh"
+#include "jCaloTower/CaloTowerAnalyser/interface/calibrationLutsGeV.hh"
 
 double calibFit( Double_t *v, Double_t *par ){
 
@@ -31,7 +32,13 @@ enum jetType{
   l15450donut30,
   l15450nopus40,
   l15450donut20,
-  l15450nopus30
+  l15450nopus30,
+
+  l15400donutGeV,
+  l15400globalGeV,
+  l15400nopusGeV,
+  l15450donutGeV,
+  l15450nopusGeV,
 };
 
 std::vector<jJet> calibrateL1Jets(const std::vector<jJet>& inJets, const jetType & type, double ptMin, double ptMax){
@@ -56,6 +63,12 @@ std::vector<jJet> calibrateL1Jets(const std::vector<jJet>& inJets, const jetType
     else if(type==jetType::l15450nopus40) lut.push_back(luts5450::nopusLut40[i]);
     else if(type==jetType::l15450nopus30) lut.push_back(luts5450::nopusLut30[i]);
 
+    else if(type==jetType::l15400donutGeV) lut.push_back(luts5400GeV::donutLut[i]);
+    else if(type==jetType::l15400globalGeV) lut.push_back(luts5400GeV::globalLut[i]);
+    else if(type==jetType::l15400nopusGeV) lut.push_back(luts5400GeV::nopusLut[i]);
+    else if(type==jetType::l15450donutGeV) lut.push_back(luts5450GeV::donutLut[i]);
+    else if(type==jetType::l15450nopusGeV) lut.push_back(luts5450GeV::nopusLut[i]);
+  
     else std::cout << "Invalid type to get lut" << std::endl;
 
   }

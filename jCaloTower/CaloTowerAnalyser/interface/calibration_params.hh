@@ -2,6 +2,7 @@
 #define CALIBRATIONPARAMS_HH
 
 #include "jCaloTower/CaloTowerAnalyser/interface/calibrationLuts.hh"
+#include "jCaloTower/CaloTowerAnalyser/interface/calibrationLutsGeV.hh"
 
 double calibFit( Double_t *v, Double_t *par ){
 
@@ -31,7 +32,13 @@ enum jetType{
   l15450donut30,
   l15450nopus40,
   l15450donut20,
-  l15450nopus30
+  l15450nopus30,
+
+  l15400donutGeV,
+  l15400globalGeV,
+  l15400nopusGeV,
+  l15450donutGeV,
+  l15450nopusGeV,
 };
 
 std::vector<jJet> calibrateL1Jets(const std::vector<jJet>& inJets, const jetType & type, double ptMin, double ptMax){
@@ -56,6 +63,12 @@ std::vector<jJet> calibrateL1Jets(const std::vector<jJet>& inJets, const jetType
     else if(type==jetType::l15450nopus40) lut.push_back(luts5450::nopusLut40[i]);
     else if(type==jetType::l15450nopus30) lut.push_back(luts5450::nopusLut30[i]);
 
+    else if(type==jetType::l15400donutGeV) lut.push_back(luts5400GeV::donutLut[i]);
+    else if(type==jetType::l15400globalGeV) lut.push_back(luts5400GeV::globalLut[i]);
+    else if(type==jetType::l15400nopusGeV) lut.push_back(luts5400GeV::nopusLut[i]);
+    else if(type==jetType::l15450donutGeV) lut.push_back(luts5450GeV::donutLut[i]);
+    else if(type==jetType::l15450nopusGeV) lut.push_back(luts5450GeV::nopusLut[i]);
+  
     else std::cout << "Invalid type to get lut" << std::endl;
 
   }
@@ -74,61 +87,61 @@ std::vector<jJet> calibrateL1Jets(const std::vector<jJet>& inJets, const jetType
 
       //Load the lut based on the correct eta bin
       if(iJet->iEta()>=-28 && iJet->iEta()<-21){
-	p[0]=lut[0];
-	p[1]=lut[1];
-	p[2]=lut[2];
-	p[3]=lut[3];
-	p[4]=lut[4];
-	p[5]=lut[5];
+        p[0]=lut[0];
+        p[1]=lut[1];
+        p[2]=lut[2];
+        p[3]=lut[3];
+        p[4]=lut[4];
+        p[5]=lut[5];
       }else if(iJet->iEta()>=-21 && iJet->iEta()<-14){
-	p[0]=lut[6];
-	p[1]=lut[7];
-	p[2]=lut[8];
-	p[3]=lut[9];
-	p[4]=lut[10];
-	p[5]=lut[11];
+        p[0]=lut[6];
+        p[1]=lut[7];
+        p[2]=lut[8];
+        p[3]=lut[9];
+        p[4]=lut[10];
+        p[5]=lut[11];
       }else if(iJet->iEta()>=-14 && iJet->iEta()<7){
-	p[0]=lut[12];
-	p[1]=lut[13];
-	p[2]=lut[14];
-	p[3]=lut[15];
-	p[4]=lut[16];
-	p[5]=lut[17];
+        p[0]=lut[12];
+        p[1]=lut[13];
+        p[2]=lut[14];
+        p[3]=lut[15];
+        p[4]=lut[16];
+        p[5]=lut[17];
       }else if(iJet->iEta()>=7 && iJet->iEta()<0){
-	p[0]=lut[18];
-	p[1]=lut[19];
-	p[2]=lut[20];
-	p[3]=lut[21];
-	p[4]=lut[22];
-	p[5]=lut[23];
+        p[0]=lut[18];
+        p[1]=lut[19];
+        p[2]=lut[20];
+        p[3]=lut[21];
+        p[4]=lut[22];
+        p[5]=lut[23];
       }else if(iJet->iEta()>0 && iJet->iEta()<=7){
-	p[0]=lut[24];
-	p[1]=lut[25];
-	p[2]=lut[26];
-	p[3]=lut[27];
-	p[4]=lut[28];
-	p[5]=lut[29];
+        p[0]=lut[24];
+        p[1]=lut[25];
+        p[2]=lut[26];
+        p[3]=lut[27];
+        p[4]=lut[28];
+        p[5]=lut[29];
       }else if(iJet->iEta()>7 && iJet->iEta()<=14){
-	p[0]=lut[30];
-	p[1]=lut[31];
-	p[2]=lut[32];
-	p[3]=lut[33];
-	p[4]=lut[34];
-	p[5]=lut[35];
+        p[0]=lut[30];
+        p[1]=lut[31];
+        p[2]=lut[32];
+        p[3]=lut[33];
+        p[4]=lut[34];
+        p[5]=lut[35];
       }else if(iJet->iEta()>14 && iJet->iEta()<=21){
-	p[0]=lut[36];
-	p[1]=lut[37];
-	p[2]=lut[38];
-	p[3]=lut[39];
-	p[4]=lut[40];
-	p[5]=lut[41];
+        p[0]=lut[36];
+        p[1]=lut[37];
+        p[2]=lut[38];
+        p[3]=lut[39];
+        p[4]=lut[40];
+        p[5]=lut[41];
       }else if(iJet->iEta()>21 && iJet->iEta()<=28){
-	p[0]=lut[42];
-	p[1]=lut[43];
-	p[2]=lut[44];
-	p[3]=lut[45];
-	p[4]=lut[46];
-	p[5]=lut[47];
+        p[0]=lut[42];
+        p[1]=lut[43];
+        p[2]=lut[44];
+        p[3]=lut[45];
+        p[4]=lut[46];
+        p[5]=lut[47];
       }
       v[0]=iJet->pt();
       double correction=1.0*calibFit(v,p);
