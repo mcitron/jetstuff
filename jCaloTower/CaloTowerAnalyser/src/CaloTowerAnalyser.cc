@@ -541,13 +541,13 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   //this->mPrintMe = false;
 
 
-  //  this->compareJetCollections(calibrated_L1_5400donut_jJet, ak4genjetsp_jJet,"5400_calib_donut_gen",false);
-  //  this->compareJetCollections(calibrated_L1_5400_jJet, ak4genjetsp_jJet,"5400_calib_nopus_gen",false);
-  //  this->compareJetCollections(calibrated_L1_5400global_jJet, ak4genjetsp_jJet, "5400_calib_global_gen",false);
+  this->compareJetCollections(calibrated_L1_5400donut_jJet, ak4genjetsp_jJet,"5400_calib_donut_gen",false);
+  this->compareJetCollections(calibrated_L1_5400_jJet, ak4genjetsp_jJet,"5400_calib_nopus_gen",false);
+  this->compareJetCollections(calibrated_L1_5400global_jJet, ak4genjetsp_jJet, "5400_calib_global_gen",false);
 
-  //this->compareJetCollections(calibrated_L1_5400donut_jJet, L1_5400donut_jJet,"5400_donut_calib_uncalib",false);
-  //this->compareJetCollections(calibrated_L1_5400_jJet, ak4genjetsp_jJet,"5400_nopus_calib_uncalib",false);
-  //this->compareJetCollections(calibrated_L1_5400global_jJet, ak4genjetsp_jJet, "5400_global_calib_uncalib",false);
+  this->compareJetCollections(calibrated_L1_5400donut_jJet, L1_5400donut_jJet,"5400_donut_calib_uncalib",false);
+  this->compareJetCollections(calibrated_L1_5400_jJet, ak4genjetsp_jJet,"5400_nopus_calib_uncalib",false);
+  this->compareJetCollections(calibrated_L1_5400global_jJet, ak4genjetsp_jJet, "5400_global_calib_uncalib",false);
 
   this->compareJetCollections(L1_5400donut_jJet, ak4genjetsp_jJet,"5400_donut_gen",false);
   this->compareJetCollections(L1_5400_jJet, ak4genjetsp_jJet,"5400_nopus_gen",false);
@@ -557,8 +557,8 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   this->compareJetCollections(L1_5450_jJet, ak4genjetsp_jJet,"5450_nopus_gen",false);
   this->compareJetCollections(L1_5450global_jJet, ak4genjetsp_jJet, "5450_global_gen",false);
 
-  //  this->compareJetCollections(calibrated_L1_5450donut_jJet, ak4genjetsp_jJet,"5450_calib_donut_gen",false);
-  //  this->compareJetCollections(calibrated_L1_5450_jJet, ak4genjetsp_jJet,"5450_calib_nopus_gen",false);
+  this->compareJetCollections(calibrated_L1_5450donut_jJet, ak4genjetsp_jJet,"5450_calib_donut_gen",false);
+  this->compareJetCollections(calibrated_L1_5450_jJet, ak4genjetsp_jJet,"5450_calib_nopus_gen",false);
   if(mgct)
   {
     this->compareJetCollections(gct_jJet_calib, ak4genjetsp_jJet, "gct_calib_gen",true);
