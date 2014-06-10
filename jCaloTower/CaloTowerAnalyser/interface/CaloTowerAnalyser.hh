@@ -133,10 +133,8 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     TH1D * median_energy_per_event;
 
     TH1D * median_jet_5400_energy_per_event;
-    TH2D * median_energy_5400_jet_tower_per_event;
+    TH2D * median_rho_nvtx;
 
-    TH1D * median_jet_4300_energy_per_event;
-    TH2D * median_energy_4300_jet_tower_per_event;
 
     std::map<TString, TH1F*> pusHists1d_;
     std::map<TString, TH2F*> pusHists2d_;

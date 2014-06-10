@@ -11,9 +11,6 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
   ptBins_["pt_100to120"] = 120;
   ptBins_["pt_above120"] = 999;
 
-  std::map<TString,int> HTBins;
-  HTBins["HT_100"] = 100;
-  HTBins["HT_200"] = 200;
 
   std::map<TString,std::pair<int,int>> NVTXBins;
   NVTXBins["NVTX_0_to_10"] = std::make_pair(0,10);
@@ -23,6 +20,10 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
   NVTXBins["NVTX_41_to_50"] = std::make_pair(41,51);
   NVTXBins["NVTX_51_to_60"] = std::make_pair(51,61);
   NVTXBins["NVTX_61_to_70"] = std::make_pair(61,71);
+
+  std::map<TString,int> HTBins;
+  HTBins["HT_100"] = 100;
+  HTBins["HT_200"] = 200;
 
   std::map<TString,int> ETBins;
   ETBins["ET_100"] = 100;
@@ -50,7 +51,7 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
   etaCalibBins_["iEta_01_to_07"] = std::make_pair(0,8);
   etaCalibBins_["iEta_08_to_14"] = std::make_pair(8,15);
   etaCalibBins_["iEta_15_to_21"] = std::make_pair(15,22);
-  etaCalibBins_["iEta_21_to_28"] = std::make_pair(22,29);
+  etaCalibBins_["iEta_22_to_28"] = std::make_pair(22,29);
   std::map<TString,int> jetnum;
   jetnum["alljet"] = 999;
   jetnum["jet1"] = 0;
@@ -58,10 +59,11 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
   jetnum["jet3"] = 2;
   jetnum["jet4"] = 3;
   std::map<TString,int> ptCut;
-  ptCut["pt20"] = 20;
-  ptCut["pt40"] = 40;
   ptCut["pt60"] = 60;
   ptCut["pt80"] = 80;
+  ptCut["pt100"] = 100;
+  ptCut["pt120"] = 120;
+  ptCut["pt200"] = 200;
   edm::Service<TFileService> fs;
   TFileDirectory dir = fs->mkdir(folderName);
 
@@ -325,14 +327,14 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
   col2_ht[folderName]->Fill(HTcol2);
   col1_ht[folderName]->Fill(HTcol1);
 
-  col1_mht[folderName]->Fill(MHTcol2);
-  col2_mht[folderName]->Fill(MHTcol1);
+  col1_mht[folderName]->Fill(MHTcol1);
+  col2_mht[folderName]->Fill(MHTcol2);
 
-  col1_mht_x[folderName]->Fill(MHTcol2_x);
-  col2_mht_x[folderName]->Fill(MHTcol1_x);
+  col1_mht_x[folderName]->Fill(MHTcol1_x);
+  col2_mht_x[folderName]->Fill(MHTcol2_x);
 
-  col1_mht_y[folderName]->Fill(MHTcol2_y);
-  col2_mht_y[folderName]->Fill(MHTcol1_y);
+  col1_mht_y[folderName]->Fill(MHTcol1_y);
+  col2_mht_y[folderName]->Fill(MHTcol2_y);
 
   if(HTcol2 != 0) ht_resolution[folderName]->Fill(HTcol1/HTcol2-1,HTcol2);
   if(MHTcol2_x != 0) mht_x_resolution[folderName]->Fill(MHTcol1_x/MHTcol2_x-1,MHTcol2_x);
@@ -377,7 +379,7 @@ void CaloTowerAnalyser::compareJetCollections(const std::vector<jJet> & col1, co
     if(col1[i].ringSums().size()!=0)
     {
       double dummyseed = col1[i].ringSums().at(0);
-      hseed = hseed > dummyseed ? hseed : dummyseed;
+      hseed = (hseed > dummyseed) ? hseed : dummyseed;
     } 
     for(auto etaBinIt = etaCalibBins_.begin();etaBinIt!=etaCalibBins_.end();etaBinIt++)
     {

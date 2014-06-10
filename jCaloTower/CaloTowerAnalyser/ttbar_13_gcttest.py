@@ -29,7 +29,7 @@ process.source = cms.Source("PoolSource",
 
 process.demo = cms.EDAnalyzer('CaloTowerAnalyser',
 skim_name=cms.string("jadtest"),
-gctinfo=cms.bool(False)
+gctinfo=cms.bool(True)
 )
 
 process.TFileService = cms.Service("TFileService",

@@ -44,10 +44,8 @@ CaloTowerAnalyser::CaloTowerAnalyser(const edm::ParameterSet& iConfig) {
   //genjet_pt_nomunu_far_match_L1 = dir.make<TH1D>("genjet_pt_nomunu_far_match_L1",";p_{T};",1000, -0.5, 999.5);
   median_energy_per_event = dir.make<TH1D>("median_energy_per_event",";median energy per event;",100, -0.5, 99.5);
   median_jet_5400_energy_per_event = dir.make<TH1D>("median_jet_energy_per_event",";median energy per event;",100, -0.5, 99.5);
-  median_energy_5400_jet_tower_per_event = dir.make<TH2D>("median_energy_jet_tower_per_event",";median tower;median jet",100, -0.5, 99.5,100,-0.5,99.5);
+  median_rho_nvtx = dir.make<TH2D>("median_energy_jet_tower_per_event",";nvtx;median rho",100, -0.5, 99.5,1000,-0.5,999.5);
 
-  median_jet_4300_energy_per_event = dir.make<TH1D>("median_jet_energy_per_event",";median energy per event;",100, -0.5, 99.5);
-  median_energy_4300_jet_tower_per_event = dir.make<TH2D>("median_energy_jet_tower_per_event",";median tower;median jet",100, -0.5, 99.5,100,-0.5,99.5);
 
   num_tops_per_event = dir.make<TH1D>("Number_of_tops",";Num;",100, -0.5, 99.5);
   mean_top_pt_hist = dir.make<TH1D>("mean_top",";median_top;",1000, -0.5, 999.5);
@@ -197,14 +195,13 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
     // Get GCT jets (uncalib) collection
     edm::Handle<L1GctJetCandCollection> GctUncalibCenJets;
-    //edm::InputTag gctUncalibCenJets("valGctDigis","cenJets","skimrun");
     edm::InputTag gctUncalibCenJets("valGctDigis","cenJets",mskim);
     iEvent.getByLabel(gctUncalibCenJets, GctUncalibCenJets);
     for(unsigned int i=0; i<GctUncalibCenJets->size(); i++) {
       if (GctUncalibCenJets->at(i).bx()==0)
       {
 	//std::cout << GctUncalibCenJets->at(i).rank() << ", " << GctUncalibCenJets->at(i).regionId().ieta() << ", " << GctUncalibCenJets->at(i).regionId().iphi() << std::endl;
-	gct_jJet_uncalib.push_back(jJet(GctUncalibCenJets->at(i).rank()*8,GctUncalibCenJets->at(i).regionId().ieta(),GctUncalibCenJets->at(i).regionId().iphi(),GctUncalibCenJets->at(i).bx()));
+	gct_jJet_uncalib.push_back(jJet(GctUncalibCenJets->at(i).rank()*4,GctUncalibCenJets->at(i).regionId().ieta(),GctUncalibCenJets->at(i).regionId().iphi(),GctUncalibCenJets->at(i).bx()));
       } 
     }
 
@@ -212,7 +209,6 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     // Get GCT jets (calib) collection
     edm::Handle<L1GctJetCandCollection> GctCalibCenJets;
     edm::InputTag gctCalibCenJets("gctDigis","cenJets",mskim);
-    //edm::InputTag gctCalibCenJets("gctDigis","cenJets","skimrun");
     iEvent.getByLabel(gctCalibCenJets, GctCalibCenJets);
 
     for(unsigned int i=0; i<GctCalibCenJets->size(); i++) {
@@ -220,7 +216,18 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       if (GctUncalibCenJets->at(i).bx()==0)
       {
 	//std::cout << GctUncalibCenJets->at(i).rank() << ", " << GctUncalibCenJets->at(i).regionId().ieta() << ", " << GctUncalibCenJets->at(i).regionId().iphi() << std::endl;
-	gct_jJet_calib.push_back(jJet(GctCalibCenJets->at(i).rank()*8,GctCalibCenJets->at(i).regionId().ieta(),GctCalibCenJets->at(i).regionId().iphi(),GctCalibCenJets->at(i).bx()));
+	gct_jJet_calib.push_back(jJet(GctCalibCenJets->at(i).rank()*4,GctCalibCenJets->at(i).regionId().ieta(),GctCalibCenJets->at(i).regionId().iphi(),GctCalibCenJets->at(i).bx()));
+      } 
+    }
+    // Get GCT HT jets (calib) collection
+    edm::Handle<L1GctEtHadCollection> GctHadTotal;
+    edm::InputTag gctHadT("gctDigis","",mskim);
+    iEvent.getByLabel(gctHadT, GctHadTotal);
+
+    for(unsigned int i=0; i<GctHadTotal->size(); i++) {
+      if (GctHadTotal->at(i).bx()==0)
+      {
+	//std::cout << GctHadTotal->at(i).et() << std::endl;
       } 
     }
 
@@ -442,11 +449,9 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
   double median_jet_5400 = getMedian(L1_5400_jJet);
   double median_jet_5450 = getMedian(L1_5450_jJet);
-  double median_jet_4300 = getMedian(L1_4300_jJet);
+  //double median_jet_4300 = getMedian(L1_4300_jJet);
   median_jet_5400_energy_per_event->Fill(median_jet_5400);
-  median_jet_4300_energy_per_event->Fill(median_jet_5400);
-  median_energy_5400_jet_tower_per_event->Fill(median_tower,median_jet_5400);
-  median_energy_4300_jet_tower_per_event->Fill(median_tower,median_jet_4300);
+  median_rho_nvtx->Fill(mNPV,median_jet_5400);
 
   std::map <TString,std::vector<jJet> > jJetMap;
   std::map <TString,std::vector<fastjet::PseudoJet> > ak4Map;
@@ -512,6 +517,18 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
     }
   }
+
+  for (auto jet = L1_5450_jJet.begin();jet != L1_5450_jJet.end(); jet++) jet->setPt(jet->pt()*0.5);
+  for (auto jet = L1_5440_jJet.begin();jet != L1_5440_jJet.end(); jet++) jet->setPt(jet->pt()*0.5);
+  for (auto jet = L1_5430_jJet.begin();jet != L1_5430_jJet.end(); jet++) jet->setPt(jet->pt()*0.5);
+  for (auto jet = L1_5420_jJet.begin();jet != L1_5420_jJet.end(); jet++) jet->setPt(jet->pt()*0.5);
+  for (auto jet = L1_5400_jJet.begin();jet != L1_5400_jJet.end(); jet++) jet->setPt(jet->pt()*0.5);
+  for (auto jet = L1_5400donut_jJet.begin();jet != L1_5400donut_jJet.end(); jet++) jet->setPt(jet->pt()*0.5);
+  for (auto jet = L1_5400global_jJet.begin();jet != L1_5400global_jJet.end(); jet++) jet->setPt(jet->pt()*0.5);
+  for (auto jet = L1_5450donut_jJet.begin();jet != L1_5450donut_jJet.end(); jet++) jet->setPt(jet->pt()*0.5);
+  for (auto jet = L1_5450global_jJet.begin();jet != L1_5450global_jJet.end(); jet++) jet->setPt(jet->pt()*0.5);
+
+
   //Calibration
   //std::vector<jJet> calibrated_L1_5400_jJet = calibrateL1Jets(L1_5400_jJet,jetType::l15400nopus20,20,9999);
   std::vector<jJet> calibrated_L1_5400_jJet = calibrateL1Jets(L1_5400_jJet,jetType::l15400nopus10,10,9999);
@@ -524,13 +541,13 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   //this->mPrintMe = false;
 
 
-  this->compareJetCollections(calibrated_L1_5400donut_jJet, ak4genjetsp_jJet,"5400_calib_donut_gen",false);
-  this->compareJetCollections(calibrated_L1_5400_jJet, ak4genjetsp_jJet,"5400_calib_nopus_gen",false);
-  this->compareJetCollections(calibrated_L1_5400global_jJet, ak4genjetsp_jJet, "5400_calib_global_gen",false);
+  //  this->compareJetCollections(calibrated_L1_5400donut_jJet, ak4genjetsp_jJet,"5400_calib_donut_gen",false);
+  //  this->compareJetCollections(calibrated_L1_5400_jJet, ak4genjetsp_jJet,"5400_calib_nopus_gen",false);
+  //  this->compareJetCollections(calibrated_L1_5400global_jJet, ak4genjetsp_jJet, "5400_calib_global_gen",false);
 
-  this->compareJetCollections(calibrated_L1_5400donut_jJet, L1_5400donut_jJet,"5400_donut_calib_uncalib",false);
-  this->compareJetCollections(calibrated_L1_5400_jJet, ak4genjetsp_jJet,"5400_nopus_calib_uncalib",false);
-  this->compareJetCollections(calibrated_L1_5400global_jJet, ak4genjetsp_jJet, "5400_global_calib_uncalib",false);
+  //this->compareJetCollections(calibrated_L1_5400donut_jJet, L1_5400donut_jJet,"5400_donut_calib_uncalib",false);
+  //this->compareJetCollections(calibrated_L1_5400_jJet, ak4genjetsp_jJet,"5400_nopus_calib_uncalib",false);
+  //this->compareJetCollections(calibrated_L1_5400global_jJet, ak4genjetsp_jJet, "5400_global_calib_uncalib",false);
 
   this->compareJetCollections(L1_5400donut_jJet, ak4genjetsp_jJet,"5400_donut_gen",false);
   this->compareJetCollections(L1_5400_jJet, ak4genjetsp_jJet,"5400_nopus_gen",false);
@@ -540,8 +557,8 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   this->compareJetCollections(L1_5450_jJet, ak4genjetsp_jJet,"5450_nopus_gen",false);
   this->compareJetCollections(L1_5450global_jJet, ak4genjetsp_jJet, "5450_global_gen",false);
 
-  this->compareJetCollections(calibrated_L1_5450donut_jJet, ak4genjetsp_jJet,"5450_calib_donut_gen",false);
-  this->compareJetCollections(calibrated_L1_5450_jJet, ak4genjetsp_jJet,"5450_calib_nopus_gen",false);
+  //  this->compareJetCollections(calibrated_L1_5450donut_jJet, ak4genjetsp_jJet,"5450_calib_donut_gen",false);
+  //  this->compareJetCollections(calibrated_L1_5450_jJet, ak4genjetsp_jJet,"5450_calib_nopus_gen",false);
   if(mgct)
   {
     this->compareJetCollections(gct_jJet_calib, ak4genjetsp_jJet, "gct_calib_gen",true);
@@ -563,7 +580,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
      this->compareJetCollections(top_jJet, ak4tt_jJet, "top_tt_gen",false);
 
 
-   */  
+*/  
   double mean_top_pt=0.;
   for (auto iTop = top_jJet.begin();iTop != top_jJet.end(); iTop++)
   {
@@ -698,7 +715,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
      }
      }
      }
-   */
+     */
   /*
      this->compareJetCollections(L1_4300_jJet, ak4genjetsp_jJet, "L14300_ak4genjetsp");
      this->compareJetCollections(L1_4300donut_jJet, ak4genjetsp_jJet, "L14300donut_ak4genjetsp");
@@ -731,7 +748,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
      this->compareJetCollections(L1_4300_jJet, ak4tt_jJet, "L14300_ak4tt");
      this->compareJetCollections(L1_4300donut_jJet, ak4tt_jJet, "L14300donut_ak4tt");
      this->compareJetCollections(L1_5400_jJet, ak4tt_jJet, "L15400_ak4tt");
-   */  
+     */  
   //  printOneEvent(triggertowers, L1_jJet, ak4ttjets, genJetCol, ak4genjetsp); 
 
 
@@ -763,7 +780,7 @@ CaloTowerAnalyser::endJob()
    CaloTowerAnalyser::beginRun(edm::Run const&, edm::EventSetup const&)
    {
    }
- */
+   */
 
 // ------------ method called when ending the processing of a run  ------------
 /*
@@ -771,7 +788,7 @@ CaloTowerAnalyser::endJob()
    CaloTowerAnalyser::endRun(edm::Run const&, edm::EventSetup const&)
    {
    }
- */
+   */
 
 // ------------ method called when starting to processes a luminosity block  ------------
 /*
@@ -779,7 +796,7 @@ CaloTowerAnalyser::endJob()
    CaloTowerAnalyser::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
    {
    }
- */
+   */
 
 // ------------ method called when ending the processing of a luminosity block  ------------
 /*
@@ -787,7 +804,7 @@ CaloTowerAnalyser::endJob()
    CaloTowerAnalyser::endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
    {
    }
- */
+   */
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
 void
