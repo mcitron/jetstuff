@@ -1,84 +1,126 @@
 #ifndef HISTOGRAM_FUNCTIONS_HH
 #define HISTOGRAM_FUNCTIONS_HH
 
-void CaloTowerAnalyser::MakeL1Trees(const std::vector<jJet> & col1) {
-  if(!pMade[folderName])
+void CaloTowerAnalyser::MakeJetTree(const std::vector<jJet> & col1,TString folderName) {
+
+  if(!pMade[folderName+"_jet"])
   {
     std::cout << folderName <<std::endl;
-    L1jetPt_[folderName] = new std::vector<Float_t>();
-    L1jetPhi_[folderName] = new std::vector<Float_t>();
-    L1jetEta_[folderName] = new std::vector<Float_t>();
-    L1jetRing_[folderName] = new std::vector<Float_t>();
-    tree->Branch("L1jetPt_"+TString(folderName), "std::vector<float>", &L1jetPt_[folderName]);
-    tree->Branch("L1jetPhi_"+TString(folderName), "std::vector<float>", &L1jetPhi_[folderName]);
-    tree->Branch("L1jetEta_"+TString(folderName), "std::vector<float>", &L1jetEta_[folderName]);
-    tree->Branch("L1jetRing_"+TString(folderName), "std::vector<float>", &L1jetRing_[folderName]);
-    pMade[folderName]=true;
+    jetPt_[folderName+"_jet"] = new std::vector<Float_t>();
+    jetPhi_[folderName+"_jet"] = new std::vector<Float_t>();
+    jetEta_[folderName+"_jet"] = new std::vector<Float_t>();
+    jetRing_[folderName+"_jet"] = new std::vector<Float_t>();
+    tree->Branch("jetPt_"+TString(folderName), "std::vector<float>", &jetPt_[folderName+"_jet"]);
+    tree->Branch("jetPhi_"+TString(folderName), "std::vector<float>", &jetPhi_[folderName+"_jet"]);
+    tree->Branch("jetEta_"+TString(folderName), "std::vector<float>", &jetEta_[folderName+"_jet"]);
+    tree->Branch("jetRing_"+TString(folderName), "std::vector<float>", &jetRing_[folderName+"_jet"]);
+    pMade[folderName+"_jet"]=true;
   }
 
-  //  std::vector <Float_t> * L1jetPhi_[folderName] = new std::vector<Float_t>();
-  //  std::vector <Float_t> *  L1jetEta_[folderName] = new std::vector<Float_t>();
+  jetPt_[folderName+"_jet"]->clear();
+  jetPhi_[folderName+"_jet"]->clear();
+  jetEta_[folderName+"_jet"]->clear();
+  jetRing_[folderName+"_jet"]->clear();
+
+  //  std::vector <Float_t> * jetPhi_[folderName+"_jet"] = new std::vector<Float_t>();
+  //  std::vector <Float_t> *  jetEta_[folderName+"_jet"] = new std::vector<Float_t>();
   for (auto jet = col1.begin(); jet != col1.end(); jet++)
   {
-    L1jetPt_[folderName]->push_back(jet->pt());
-    L1jetPhi_[folderName]->push_back(jet->phi());
-    L1jetEta_[folderName]->push_back(jet->eta());
+    jetPt_[folderName+"_jet"]->push_back(jet->pt());
+    jetPhi_[folderName+"_jet"]->push_back(g.phi(jet->iPhi()));
+    jetEta_[folderName+"_jet"]->push_back(g.eta(jet->iEta()));
     if (jet->ringSums().size()!=0)
     {
-      L1jetRing_[folderName]->push_back(jet->ringSums().at(0));
+      jetRing_[folderName+"_jet"]->push_back(jet->ringSums().at(0));
     }
   }
 
-  tree->Fill();
-  L1jetPt_[folderName]->clear();
-  L1jetPhi_[folderName]->clear();
-  L1jetEta_[folderName]->clear();
-  L1jetRing_[folderName]->clear();
 
   return;
 }
 
-void CaloTowerAnalyser::MakeGenTrees(const std::vector<jJet> & col1,const std::vector<jJet> & col2) {
-  if(!pMade[folderName])
+void CaloTowerAnalyser::MakeMatchTree(const std::vector<jJet> & col1,const std::vector<jJet> & col2, TString folderName,bool isgct) {
+
+
+  if(!pMade[folderName+"_match"])
   {
     std::cout << folderName <<std::endl;
-    GenjetPt_[folderName] = new std::vector<Float_t>();
-    GenjetPhi_[folderName] = new std::vector<Float_t>();
-    GenjetEta_[folderName] = new std::vector<Float_t>();
-    GenjetRing_[folderName] = new std::vector<Float_t>();
-    tree->Branch("GenjetPt_"+TString(folderName), "std::vector<float>", &GenjetPt_[folderName]);
-    tree->Branch("GenjetPhi_"+TString(folderName), "std::vector<float>", &GenjetPhi_[folderName]);
-    tree->Branch("GenjetEta_"+TString(folderName), "std::vector<float>", &GenjetEta_[folderName]);
-    tree->Branch("GenjetRing_"+TString(folderName), "std::vector<float>", &GenjetRing_[folderName]);
-    pMade[folderName]=true;
+    genJetMatchAlgo1_[folderName+"_match"] = new std::vector<Int_t>();
+    genJetMatchAlgo2_[folderName+"_match"] = new std::vector<Int_t>();
+    tree->Branch("genJetMatchAlgo1_"+TString(folderName), "std::vector<int>", &genJetMatchAlgo1_[folderName+"_match"]);
+    tree->Branch("genJetMatchAlgo2_"+TString(folderName), "std::vector<int>", &genJetMatchAlgo2_[folderName+"_match"]);
+    pMade[folderName+"_match"]=true;
   }
 
-  //  std::vector <Float_t> * GenjetPhi_[folderName] = new std::vector<Float_t>();
-  //  std::vector <Float_t> *  GenjetEta_[folderName] = new std::vector<Float_t>();
-  for (auto jet = col2.begin(); jet != col2.end(); jet++)
+  genJetMatchAlgo1_[folderName+"_match"]->clear();
+  genJetMatchAlgo2_[folderName+"_match"]->clear();
+
+  pairs = (isgct) ? make_gct_pairs(col1,col2) : make_pairs(col1, col2);
+  std::vector<int> col2_matched_index_algo1 = analyse_pairs_local(pairs, col2.size(), 33);
+  std::vector<int> col2_matched_index_algo2 = analyse_pairs_global(pairs, col2.size(), 33);
+
+
+  for (unsigned int i = 0; i < col2.size(); i++)
   {
-    GenjetPt_[folderName]->push_back(jet->pt());
-    GenjetPhi_[folderName]->push_back(jet->phi());
-    GenjetEta_[folderName]->push_back(jet->eta());
-    if (jet->ringSums().size()!=0)
-    {
-      GenjetRing_[folderName]->push_back(jet->ringSums().at(0));
-    }
+    genJetMatchAlgo1_[folderName+"_match"]->push_back(col2_matched_index_algo1[i]);
+    genJetMatchAlgo2_[folderName+"_match"]->push_back(col2_matched_index_algo2[i]);
   }
 
-  tree->Fill();
-  GenjetPt_[folderName]->clear();
-  GenjetPhi_[folderName]->clear();
-  GenjetEta_[folderName]->clear();
-  GenjetRing_[folderName]->clear();
 
   return;
 }
 
-void CaloTowerAnalyser::bookPusHists(TString folderName){
+void CaloTowerAnalyser::MakeSumTree(const std::vector<jJet> & col1,TString folderName) {
+
+  if(!pMade[folderName+"_sum"])
+  {
+    std::cout << folderName+"_sum" <<std::endl;
+    sums_[folderName+"_sum"] = new std::vector<Float_t>();
+    tree->Branch("sums_"+TString(folderName+"_sum"), "std::vector<float>", &sums_[folderName+"_sum"]);
+    pMade[folderName+"_sum"]=true;
+  }
+
+  sums_[folderName+"_sum"]->clear();
+
+  //  std::vector <Float_t> * jetPhi_[folderName+"_sum"] = new std::vector<Float_t>();
+  //  std::vector <Float_t> *  jetEta_[folderName+"_sum"] = new std::vector<Float_t>();
+  double HTcol1;
+  double MHTcol1;
+  double MHTcol1_x;
+  double MHTcol1_y;
+  if (!isgct)
+  {
+    HTcol1=calculateHT(col1,20);
+    MHTcol1_x=calculateMHT(col1,20)[0];
+    MHTcol1_y=calculateMHT(col1,20)[1];
+    MHTcol1=calculateMHT(col1,20)[2];
+  }
+  else if(iscalibgct)
+  {
+    HTcol1=mGctHtCalib;
+    MHTcol1=mGctHtMissCalib;
+    MHTcol1_x=0;
+    MHTcol1_y=0;
+  }
+  else
+  {
+    HTcol1=mGctHtUncalib;
+    MHTcol1=mGctHtMissUncalib;
+    MHTcol1_x=0;
+    MHTcol1_y=0;
+  }
+  sums_[folderName+"_sum"].push_back(HTcol1);
+  sums_[folderName+"_sum"].push_back(MHTcol1);
+  sums_[folderName+"_sum"].push_back(MHTcol1_x);
+  sums_[folderName+"_sum"].push_back(MHTcol1_y);
+
+  return;
+}
+
+void CaloTowerAnalyser::bookPusHists(TString folderName+"_sum"){
 
   edm::Service<TFileService> fs;
-  TFileDirectory dir = fs->mkdir(folderName.Data());
+  TFileDirectory dir = fs->mkdir(folderName+"_sum".Data());
 
   for(std::vector<TString>::const_iterator gVIt=globalPusVars_.begin(); gVIt!=globalPusVars_.end(); gVIt++){
 

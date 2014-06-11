@@ -22,7 +22,9 @@ CaloTowerAnalyser::CaloTowerAnalyser(const edm::ParameterSet& iConfig) {
   mgct=iConfig.getParameter<bool>("gctinfo");
 
   tree = fs->make<TTree>("L1Tree","L1Tree");
-  // std::string folderName = "Event_";
+
+  tree->Branch("mNPV", &mNPV, "mNPV/I");  
+// std::string folderName = "Event_";
   // std::stringstream caseNumber;
   // caseNumber << eventNumber;
   // folderName.append(caseNumber.str());
@@ -505,8 +507,19 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   //this->mPrintMe = false;
 
 
-  this->compareJetCollections(calibrated_L1_5400donut_jJet, ak4genjetsp_jJet,"5400_calib_donut_gen",false);
-  this->compareJetCollections(calibrated_L1_5400_jJet, ak4genjetsp_jJet,"5400_calib_nopus_gen",false);
+  this->MakeJetTree(calibrated_L1_5400donut_jJet,"5400_calib_donut");
+  this->MakeJetTree(calibrated_L1_5400_jJet,"5400_calib_nopus");
+  this->MakeJetTree(L1_5400_jJet,"5400_nopus_gen");
+  this->MakeJetTree(ak4genjetsp_jJet,"ak4_gen");
+
+  this->MakeMatchTree(calibrated_L1_5400donut_jJet,ak4genjetsp_jJet,"5400_calib_donut",false);
+  this->MakeMatchTree(calibrated_L1_5400_jJet,ak4genjetsp_jJet,"5400_calib_nopus",false);
+  this->MakeMatchTree(L1_5400_jJet,ak4genjetsp_jJet,"5400_nopus",false);
+
+  this->MakeSumTree(calibrated_L1_5400donut_jJet,"5400_calib_donut");
+  this->MakeSumTree(calibrated_L1_5400_jJet,"5400_calib_nopus");
+  this->MakeSumTree(L1_5400_jJet,"5400_nopus_gen");
+  this->MakeSumTree(ak4genjetsp_jJet,"ak4_gen");
   /*  this->compareJetCollections(calibrated_L1_5400global_jJet, ak4genjetsp_jJet, "5400_calib_global_gen",false);
 
       this->compareJetCollections(calibrated_L1_5400donut_jJet, L1_5400donut_jJet,"5400_donut_calib_uncalib",false);
@@ -570,6 +583,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   //CALIBRATE!!!
 
 
+  tree->Fill();
   mEventNumber++;
   //std::cout << "reached end of event loop" << std::endl;
 }
