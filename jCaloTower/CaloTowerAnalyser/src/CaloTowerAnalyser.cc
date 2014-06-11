@@ -20,6 +20,8 @@ CaloTowerAnalyser::CaloTowerAnalyser(const edm::ParameterSet& iConfig) {
   edm::Service<TFileService> fs;
   mskim=iConfig.getParameter<std::string>("skim_name");
   mgct=iConfig.getParameter<bool>("gctinfo");
+
+  tree = fs->make<TTree>("L1Tree","L1Tree");
   // std::string folderName = "Event_";
   // std::stringstream caseNumber;
   // caseNumber << eventNumber;
@@ -420,8 +422,6 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   std::vector<jJet> L1_4300_pu_jJet;
 
   //make a container for the L1 jets
-  //std::vector<jJet> L1_4300_jJet = getL1Jets(myarray, 4, 3, 0, 0);
-  //std::vector<jJet> L1_4350_jJet = getL1Jets(myarray, 4, 3, 5, 0);
   std::vector<jJet> L1_5400_jJet = getL1Jets(myarray, 5, 4, 0, 0);
   std::vector<jJet> L1_5450_jJet = getL1Jets(myarray, 5, 4, 5, 0);
   std::vector<jJet> L1_5420_jJet = getL1Jets(myarray, 5, 4, 2, 0);
@@ -430,11 +430,6 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   std::vector<jJet> L1_6550_jJet = getL1Jets(myarray, 6, 5, 5, 0);
   std::vector<jJet> L1_4300_jJet = getL1Jets(myarray, 4, 3, 0, 0);
 
-  //std::vector<std::vector<int> > mask=mask_square_9by9();
-  //std::vector<std::vector<int> > mask_donut=mask_donut_11by11();
-
-  //std::vector<jJet> L1_5400_jJet_mask = getL1JetsMask(myarray, mask, mask_donut, 0, 0);
-  //std::vector<jJet> L1_5400donut_jJet_mask; 
   std::vector<jJet> L1_4300donut_jJet;
   std::vector<jJet> L1_4350donut_jJet;
   std::vector<jJet> L1_5400donut_jJet;
@@ -457,13 +452,6 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   std::map <TString,std::vector<fastjet::PseudoJet> > ak4Map;
   std::map <TString,const reco::GenJetCollection * > genMap;
 
-  jJetMap["L1_5400"] = L1_5400_jJet;
-  //jJetMap["L1_5400_mask"] = L1_5400_jJet_mask;
-
-  ak4Map["ak4tt"] = ak4ttjets; 
-  ak4Map["ak4gen"] = ak4genjetsp; 
-
-  genMap["genp"] = genJetCol;
 
   for(unsigned int i=0; i<L1_5400_jJet.size(); i++) {
     double newenergydonut5400=L1_5400_jJet[i].eatDonut();
@@ -481,30 +469,6 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
     }
   }
-  /*   for(unsigned int i=0; i<L1_5400_jJet_mask.size(); i++) {
-       double newenergydonut5400=L1_5400_jJet_mask[i].eatDonut();
-
-       if(newenergydonut5400 >= 0.0) { 
-       L1_5400donut_jJet_mask.push_back(jJet(newenergydonut5400, L1_5400_jJet_mask[i].iEta(), L1_5400_jJet_mask[i].iPhi()));
-       }
-       }*/
-  /*
-     for(unsigned int i=0; i<L1_4300_jJet.size(); i++) {
-     double newenergydonut4300=L1_4300_jJet[i].eatDonut();
-     double newenergyglobal4300=L1_4300_jJet[i].eatGlobe(median_jet_4300);
-     if(newenergydonut4300 >= 0.0) { 
-     L1_4300donut_jJet.push_back(jJet(newenergydonut4300, L1_4300_jJet[i].iEta(), L1_4300_jJet[i].iPhi()));
-     L1_4300_real_jJet.push_back(L1_4300_jJet[i]);
-     }
-     else
-     {
-     L1_4300_pu_jJet.push_back(L1_4300_jJet[i]);
-     }
-     if(newenergyglobal4300 >= 0.0) {
-     L1_4300global_jJet.push_back(jJet(newenergyglobal4300, L1_4300_jJet[i].iEta(), L1_4300_jJet[i].iPhi())); 
-
-     }
-     }*/
   for(unsigned int i=0; i<L1_5450_jJet.size(); i++) {
     double newenergydonut5450=L1_5450_jJet[i].eatDonut();
     double newenergyglobal5450=L1_5450_jJet[i].eatGlobe(median_jet_5450);
@@ -543,44 +507,31 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
   this->compareJetCollections(calibrated_L1_5400donut_jJet, ak4genjetsp_jJet,"5400_calib_donut_gen",false);
   this->compareJetCollections(calibrated_L1_5400_jJet, ak4genjetsp_jJet,"5400_calib_nopus_gen",false);
-  this->compareJetCollections(calibrated_L1_5400global_jJet, ak4genjetsp_jJet, "5400_calib_global_gen",false);
+  /*  this->compareJetCollections(calibrated_L1_5400global_jJet, ak4genjetsp_jJet, "5400_calib_global_gen",false);
 
-  this->compareJetCollections(calibrated_L1_5400donut_jJet, L1_5400donut_jJet,"5400_donut_calib_uncalib",false);
-  this->compareJetCollections(calibrated_L1_5400_jJet, ak4genjetsp_jJet,"5400_nopus_calib_uncalib",false);
-  this->compareJetCollections(calibrated_L1_5400global_jJet, ak4genjetsp_jJet, "5400_global_calib_uncalib",false);
+      this->compareJetCollections(calibrated_L1_5400donut_jJet, L1_5400donut_jJet,"5400_donut_calib_uncalib",false);
+      this->compareJetCollections(calibrated_L1_5400_jJet, ak4genjetsp_jJet,"5400_nopus_calib_uncalib",false);
+      this->compareJetCollections(calibrated_L1_5400global_jJet, ak4genjetsp_jJet, "5400_global_calib_uncalib",false);
 
-  this->compareJetCollections(L1_5400donut_jJet, ak4genjetsp_jJet,"5400_donut_gen",false);
-  this->compareJetCollections(L1_5400_jJet, ak4genjetsp_jJet,"5400_nopus_gen",false);
-  this->compareJetCollections(L1_5400global_jJet, ak4genjetsp_jJet, "5400_global_gen",false);
+      this->compareJetCollections(L1_5400donut_jJet, ak4genjetsp_jJet,"5400_donut_gen",false);
+      this->compareJetCollections(L1_5400_jJet, ak4genjetsp_jJet,"5400_nopus_gen",false);
+      this->compareJetCollections(L1_5400global_jJet, ak4genjetsp_jJet, "5400_global_gen",false);
 
-  this->compareJetCollections(L1_5450donut_jJet, ak4genjetsp_jJet,"5450_donut_gen",false);
-  this->compareJetCollections(L1_5450_jJet, ak4genjetsp_jJet,"5450_nopus_gen",false);
-  this->compareJetCollections(L1_5450global_jJet, ak4genjetsp_jJet, "5450_global_gen",false);
+      this->compareJetCollections(L1_5450donut_jJet, ak4genjetsp_jJet,"5450_donut_gen",false);
+      this->compareJetCollections(L1_5450_jJet, ak4genjetsp_jJet,"5450_nopus_gen",false);
+      this->compareJetCollections(L1_5450global_jJet, ak4genjetsp_jJet, "5450_global_gen",false);
 
-  this->compareJetCollections(calibrated_L1_5450donut_jJet, ak4genjetsp_jJet,"5450_calib_donut_gen",false);
-  this->compareJetCollections(calibrated_L1_5450_jJet, ak4genjetsp_jJet,"5450_calib_nopus_gen",false);
-  if(mgct)
-  {
-    this->compareJetCollections(gct_jJet_calib, ak4genjetsp_jJet, "gct_calib_gen",true);
-    this->compareJetCollections(gct_jJet_uncalib, ak4genjetsp_jJet, "gct_uncalib_gen",true);
-  }
-  this->compareJetCollections(L1_5420_jJet, ak4genjetsp_jJet,"5420_nopus_gen",false);
-  this->compareJetCollections(L1_5430_jJet, ak4genjetsp_jJet,"5430_nopus_gen",false);
-  this->compareJetCollections(L1_5440_jJet, ak4genjetsp_jJet,"5440_nopus_gen",false);
-
-  /*
-     this->compareJetCollections(L1_4300donut_jJet, ak4genjetsp_jJet,"4300_donut_gen",false);
-     this->compareJetCollections(L1_4300_jJet, ak4genjetsp_jJet,"4300_nopus_gen",false);
-     this->compareJetCollections(L1_4300global_jJet, ak4genjetsp_jJet, "4300_global_gen",false);
-
-
-     this->compareJetCollections(L1_6550_jJet, ak4genjetsp_jJet,"6550_nopus_gen",false);
-
-     this->compareJetCollections(top_jJet, ak4genjetsp_jJet, "top_gen",false);
-     this->compareJetCollections(top_jJet, ak4tt_jJet, "top_tt_gen",false);
-
-
-*/  
+      this->compareJetCollections(calibrated_L1_5450donut_jJet, ak4genjetsp_jJet,"5450_calib_donut_gen",false);
+      this->compareJetCollections(calibrated_L1_5450_jJet, ak4genjetsp_jJet,"5450_calib_nopus_gen",false);
+      if(mgct)
+      {
+      this->compareJetCollections(gct_jJet_calib, ak4genjetsp_jJet, "gct_calib_gen",true);
+      this->compareJetCollections(gct_jJet_uncalib, ak4genjetsp_jJet, "gct_uncalib_gen",true);
+      }
+      this->compareJetCollections(L1_5420_jJet, ak4genjetsp_jJet,"5420_nopus_gen",false);
+      this->compareJetCollections(L1_5430_jJet, ak4genjetsp_jJet,"5430_nopus_gen",false);
+      this->compareJetCollections(L1_5440_jJet, ak4genjetsp_jJet,"5440_nopus_gen",false);
+      */
   double mean_top_pt=0.;
   for (auto iTop = top_jJet.begin();iTop != top_jJet.end(); iTop++)
   {
@@ -613,149 +564,12 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   if(this->mPrintMe)
   {
     std::cout << "Event Printed" << std::endl;
-    //printOneEvent(triggertowers, L1_5400_jJet,ak4ttjets, genJetCol, ak4genjetsp);
     printOneEvent(triggertowers, jJetMap,ak4Map,genMap);
   }
   this->mPrintMe = false;
   //CALIBRATE!!!
 
 
-
-  int maxtower; 
-  for (std::vector<jJet>::const_iterator jet = L1_5400_real_jJet.begin();jet!=L1_5400_real_jJet.end();++jet)
-  {
-    std::vector<int> towers=jet->getTowers();
-    auto it = max_element(std::begin(towers), std::end(towers));
-    maxtower = *it;
-    int nbins = tower_pt_real->GetXaxis()->FindBin(maxtower);
-    int nbinsy = tower_pt_real_jetpt->GetYaxis()->FindBin(jet->pt());
-    //int nbinsx = tower_pt_real_jetpt->GetXaxis()->FindBin(maxtower);
-    for (int bins = 0; bins < nbins; bins++)
-    {
-      int numt = 0;
-      for (auto tower = towers.begin(); tower != towers.end(); tower++)
-      {
-	if (*tower >= (tower_pt_real->GetBinCenter(bins)))
-	{
-	  numt++;
-	}
-      }
-      tower_pt_real->AddBinContent(bins,1);
-      num_tower_pt_real->AddBinContent(bins,numt);
-      tower_pt_real_jetpt->SetBinContent(bins,nbinsy,tower_pt_real_jetpt->GetBinContent(bins,nbinsy)+1);
-      num_tower_pt_real_jetpt->SetBinContent(bins,nbinsy,num_tower_pt_real_jetpt->GetBinContent(bins,nbinsy)+numt);
-    }
-  }
-  for (std::vector<jJet>::const_iterator jet = L1_5400_pu_jJet.begin();jet!=L1_5400_pu_jJet.end();++jet)
-  {
-    std::vector<int> towers=jet->getTowers();
-    auto it = max_element(std::begin(towers), std::end(towers));
-    maxtower = *it;
-    int nbins = tower_pt_pu->GetXaxis()->FindBin(maxtower);
-    int nbinsy = tower_pt_pu_jetpt->GetYaxis()->FindBin(jet->pt());
-    //int nbinsx = tower_pt_pu_jetpt->GetXaxis()->FindBin(maxtower);
-    for (int bins = 0; bins < nbins; bins++)
-    {
-      int numt = 0;
-      for (auto tower = towers.begin(); tower != towers.end(); tower++)
-      {
-	if (*tower >= (tower_pt_pu->GetBinCenter(bins)))
-	{
-	  numt++;
-	}
-      }
-      tower_pt_pu->AddBinContent(bins,1);
-      num_tower_pt_pu->AddBinContent(bins,numt);
-      tower_pt_pu_jetpt->SetBinContent(bins,nbinsy,tower_pt_pu_jetpt->GetBinContent(bins,nbinsy)+1);
-      num_tower_pt_pu_jetpt->SetBinContent(bins,nbinsy,num_tower_pt_pu_jetpt->GetBinContent(bins,nbinsy)+numt);
-    }
-  }
-
-  /*
-     for(std::vector<TString>::const_iterator gVIt=globalPusVars_.begin(); gVIt!=globalPusVars_.end(); gVIt++){
-     pusHists1d_[*gVIt]->Fill(globalPusVarsMap[*gVIt]);
-     for(std::vector<TString>::const_iterator gVIt2=gVIt+1; gVIt2!=globalPusVars_.end(); gVIt2++){
-     pusHists2d_[*gVIt+"_"+*gVIt2]->Fill(globalPusVarsMap[*gVIt],globalPusVarsMap[*gVIt2]);
-     }
-     }
-
-     for(std::vector<TString>::const_iterator l1SIt=l1Sizes_.begin(); l1SIt!=l1Sizes_.end(); l1SIt++){
-     for(unsigned i=0; i<L1_jJet_map[*l1SIt+"_out1"].size(); i++){
-     pusHists1d_[*l1SIt+"_strip1"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0]);
-     pusHists1d_[*l1SIt+"_strip2"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1]);
-     pusHists1d_[*l1SIt+"_strip3"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[2]);
-     pusHists1d_[*l1SIt+"_strip4"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[3]);
-     pusHists1d_[*l1SIt+"_out1_middle2"]->Fill(L1_jJet_map[*l1SIt+"_out1"][i].PUE());
-     }
-     for(unsigned i=0; i<L1_jJet_map[*l1SIt+"_out2"].size(); i++){
-     pusHists1d_[*l1SIt+"_strip5"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0]);
-     pusHists1d_[*l1SIt+"_strip6"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1]);
-     pusHists1d_[*l1SIt+"_strip7"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[2]);
-     pusHists1d_[*l1SIt+"_strip8"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[3]);
-     pusHists1d_[*l1SIt+"_out2_middle2"]->Fill(L1_jJet_map[*l1SIt+"_out2"][i].PUE());
-     }
-     }
-
-     for(std::vector<TString>::const_iterator gVIt=globalPusVars_.begin(); gVIt!=globalPusVars_.end(); gVIt++){
-     for(std::vector<TString>::const_iterator l1SIt=l1Sizes_.begin(); l1SIt!=l1Sizes_.end(); l1SIt++){
-
-     for(unsigned i=0; i<L1_jJet_map[*l1SIt+"_out1"].size(); i++){
-     pusHists2d_[*gVIt+"_"+*l1SIt+"_strip1"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[0]);
-     pusHists2d_[*gVIt+"_"+*l1SIt+"_strip2"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[1]);
-     pusHists2d_[*gVIt+"_"+*l1SIt+"_strip3"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[2]);
-     pusHists2d_[*gVIt+"_"+*l1SIt+"_strip4"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].getOuterStrips()[3]);
-     pusHists2d_[*gVIt+"_"+*l1SIt+"_out1_middle2"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out1"][i].PUE());
-     }
-     for(unsigned i=0; i<L1_jJet_map[*l1SIt+"_out2"].size(); i++){
-     pusHists2d_[*gVIt+"_"+*l1SIt+"_strip5"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[0]);
-     pusHists2d_[*gVIt+"_"+*l1SIt+"_strip6"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[1]);
-     pusHists2d_[*gVIt+"_"+*l1SIt+"_strip7"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[2]);
-     pusHists2d_[*gVIt+"_"+*l1SIt+"_strip8"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].getOuterStrips()[3]);
-     pusHists2d_[*gVIt+"_"+*l1SIt+"_out2_middle2"]->Fill(globalPusVarsMap[*gVIt],L1_jJet_map[*l1SIt+"_out2"][i].PUE());
-     }
-     }
-     }
-     */
-  /*
-     this->compareJetCollections(L1_4300_jJet, ak4genjetsp_jJet, "L14300_ak4genjetsp");
-     this->compareJetCollections(L1_4300donut_jJet, ak4genjetsp_jJet, "L14300donut_ak4genjetsp");
-     this->compareJetCollections(L1_4350_jJet, ak4genjetsp_jJet, "L14350_ak4genjetsp");
-     this->compareJetCollections(L1_4350donut_jJet, ak4genjetsp_jJet, "L14350donut_ak4genjetsp");
-     this->compareJetCollections(L1_5400_jJet, ak4genjetsp_jJet, "L15400_ak4genjetsp");
-
-     if(this->GetNPV() > 30 && this->GetNPV() <=35) { 
-     this->compareJetCollections(L1_4300_jJet, ak4genjetsp_jJet, "L14300_ak4genjetsp_npv3035"); 
-     this->compareJetCollections(L1_4300donut_jJet, ak4genjetsp_jJet, "L14300donut_ak4genjetsp_npv3035");
-     this->compareJetCollections(L1_4350_jJet, ak4genjetsp_jJet, "L14350_ak4genjetsp_npv3035"); 
-     this->compareJetCollections(L1_4350donut_jJet, ak4genjetsp_jJet, "L14350donut_ak4genjetsp_npv3035");
-     } else if(this->GetNPV() > 35 && this->GetNPV() <=40) { 
-     this->compareJetCollections(L1_4300_jJet, ak4genjetsp_jJet, "L14300_ak4genjetsp_npv3540"); 
-     this->compareJetCollections(L1_4300donut_jJet, ak4genjetsp_jJet, "L14300donut_ak4genjetsp_npv3540");
-     this->compareJetCollections(L1_4350_jJet, ak4genjetsp_jJet, "L14350_ak4genjetsp_npv3540"); 
-     this->compareJetCollections(L1_4350donut_jJet, ak4genjetsp_jJet, "L14350donut_ak4genjetsp_npv3540");
-     } else if(this->GetNPV() > 40 && this->GetNPV() <=45) { 
-     this->compareJetCollections(L1_4300_jJet, ak4genjetsp_jJet, "L14300_ak4genjetsp_npv4045"); 
-     this->compareJetCollections(L1_4300donut_jJet, ak4genjetsp_jJet, "L14300donut_ak4genjetsp_npv4045"); 
-     this->compareJetCollections(L1_4350_jJet, ak4genjetsp_jJet, "L14350_ak4genjetsp_npv4045"); 
-     this->compareJetCollections(L1_4350donut_jJet, ak4genjetsp_jJet, "L14350donut_ak4genjetsp_npv4045");
-     } else if(this->GetNPV() > 45 && this->GetNPV() <=50) { 
-     this->compareJetCollections(L1_4300_jJet, ak4genjetsp_jJet, "L14300_ak4genjetsp_npv4550"); 
-     this->compareJetCollections(L1_4300donut_jJet, ak4genjetsp_jJet, "L14300donut_ak4genjetsp_npv4550");
-     this->compareJetCollections(L1_4350_jJet, ak4genjetsp_jJet, "L14350_ak4genjetsp_npv4550"); 
-     this->compareJetCollections(L1_4350donut_jJet, ak4genjetsp_jJet, "L14350donut_ak4genjetsp_npv4550");
-     }
-
-     this->compareJetCollections(L1_4300_jJet, ak4tt_jJet, "L14300_ak4tt");
-     this->compareJetCollections(L1_4300donut_jJet, ak4tt_jJet, "L14300donut_ak4tt");
-     this->compareJetCollections(L1_5400_jJet, ak4tt_jJet, "L15400_ak4tt");
-     */  
-  //  printOneEvent(triggertowers, L1_jJet, ak4ttjets, genJetCol, ak4genjetsp); 
-
-
-
-
-
-  //if(mEventNumber == 18 || mEventNumber == 80 || mEventNumber == 94) { printOneEvent(triggertowers, L1_5400_jJet, ak4ttjets, genJetCol, ak4genjetsp); }
   mEventNumber++;
   //std::cout << "reached end of event loop" << std::endl;
 }
@@ -765,6 +579,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   void 
 CaloTowerAnalyser::beginJob()
 {
+
 
 }
 

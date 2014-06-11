@@ -155,7 +155,8 @@ std::vector<jJet> CaloTowerAnalyser::getL1JetsMask(const std::vector< std::vecto
           //areas.at(areas.size()-1)=pusarea;
 
           //TEMP
-          L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetTower,jetarea));
+          //L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetTower,jetarea));
+          L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetarea));
         }
 
       }

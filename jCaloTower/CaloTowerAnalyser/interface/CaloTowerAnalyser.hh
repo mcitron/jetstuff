@@ -71,6 +71,7 @@ Implementation:
 #include "TH1.h"
 #include "TString.h"
 #include "TH2.h"
+#include "TTree.h"
 #include "TROOT.h"
 #include "TCanvas.h"
 #include "TProfile.h"
@@ -111,6 +112,8 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
 
 
   private:
+    TTree* tree;
+    std::map<TString, std::vector<Float_t> *> L1jetPt_;
     bool mPrintMe=false;
     virtual void beginJob() ;
     virtual void analyze(const edm::Event&, const edm::EventSetup&);
