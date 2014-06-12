@@ -231,7 +231,36 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     for(unsigned int i=0; i<GctHadTotal->size(); i++) {
       if (GctHadTotal->at(i).bx()==0)
       {
-	//std::cout << GctHadTotal->at(i).et() << std::endl;
+	mGctHtCalib=GctHadTotal->at(i).et();
+      } 
+    }
+    edm::Handle<L1GctEtHadCollection> GctValHadTotal;
+    edm::InputTag gctValHadT("valGctDigis","",mskim);
+    iEvent.getByLabel(gctValHadT, GctValHadTotal);
+
+    for(unsigned int i=0; i<GctValHadTotal->size(); i++) {
+      if (GctValHadTotal->at(i).bx()==0)
+      {
+	mGctHtUncalib=GctValHadTotal->at(i).et();
+      } 
+    }
+    edm::Handle<L1GctHtMissCollection> GctHtMiss;
+    edm::InputTag gctMHT("gctDigis","",mskim);
+    iEvent.getByLabel(gctMHT, GctHtMiss);
+
+    for(unsigned int i=0; i<GctHtMiss->size(); i++) {
+      if (GctHtMiss->at(i).bx()==0)
+      {
+	mGctHtMissCalib=GctHtMiss->at(i).et();
+      } 
+    }
+    edm::Handle<L1GctHtMissCollection> GctValHtMiss;
+    edm::InputTag gctValMHT("valGctDigis","",mskim);
+    iEvent.getByLabel(gctValMHT, GctValHtMiss);
+    for(unsigned int i=0; i<GctValHtMiss->size(); i++) {
+      if (GctValHtMiss->at(i).bx()==0)
+      {
+	mGctHtMissUncalib=GctValHtMiss->at(i).et();
       } 
     }
 
@@ -393,7 +422,6 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     ak4genjetsp_jJet.push_back(jJet(ak4genjetsp[i].pt(), g.iEta(ak4genjetsp[i].eta()), g.iPhi(ak4genjetsp[i].phi())));
   }
 
-
   //an example on how to use the closestJetDistance function
   /*  
       std::vector<int> minDR2genp;
@@ -505,21 +533,42 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   //std::vector<jJet> calibrated_L1_5450donut_jJet = calibrateL1Jets(L1_5450donut_jJet,jetType::l15450donut30,30,9999);
   std::vector<jJet> calibrated_L1_5450donut_jJet = calibrateL1Jets(L1_5450donut_jJet,jetType::l15450donutGeV,10,9999);
   //this->mPrintMe = false;
+  this->MakeJetTree(ak4genjetsp_jJet,ak4genjetsp_jJet,"ak4_gen",false);
+  this->MakeSumTree(ak4genjetsp_jJet,"ak4_gen",false);
+  this->MakeMatchTree(ak4genjetsp_jJet,ak4genjetsp_jJet,"ak4_gen",false);
+  std::map <TString,std::vector<jJet> > jJetComp;
 
+  jJetComp["5400_nopus"]=L1_5400_jJet;
+  jJetComp["5400_donut"]=L1_5400donut_jJet;
+  jJetComp["5400_global"]=L1_5400global_jJet;
+  jJetComp["5400_calib_nopus"]=calibrated_L1_5400_jJet;
+  jJetComp["5400_calib_donut"]=calibrated_L1_5400donut_jJet;
+  jJetComp["5400_calib_global"]=calibrated_L1_5400global_jJet;
 
-  this->MakeJetTree(calibrated_L1_5400donut_jJet,"5400_calib_donut");
-  this->MakeJetTree(calibrated_L1_5400_jJet,"5400_calib_nopus");
-  this->MakeJetTree(L1_5400_jJet,"5400_nopus_gen");
-  this->MakeJetTree(ak4genjetsp_jJet,"ak4_gen");
+  jJetComp["5450_nopus"]=L1_5450_jJet;
+  jJetComp["5450_donut"]=L1_5450donut_jJet;
+  jJetComp["5450_global"]=L1_5450global_jJet;
+  jJetComp["5450_calib_nopus"]=calibrated_L1_5450_jJet;
+  jJetComp["5450_calib_donut"]=calibrated_L1_5450donut_jJet;
 
-  this->MakeMatchTree(calibrated_L1_5400donut_jJet,ak4genjetsp_jJet,"5400_calib_donut",false);
-  this->MakeMatchTree(calibrated_L1_5400_jJet,ak4genjetsp_jJet,"5400_calib_nopus",false);
-  this->MakeMatchTree(L1_5400_jJet,ak4genjetsp_jJet,"5400_nopus",false);
+  for (auto jet = jJetComp.begin();jet != jJetComp.end(); jet++)
+  {
+    this->MakeJetTree(jet->second,ak4genjetsp_jJet,jet->first,false);
+    this->MakeMatchTree(jet->second,ak4genjetsp_jJet,jet->first,false);
+    this->MakeSumTree(jet->second,jet->first,false);
+  } 
 
-  this->MakeSumTree(calibrated_L1_5400donut_jJet,"5400_calib_donut");
-  this->MakeSumTree(calibrated_L1_5400_jJet,"5400_calib_nopus");
-  this->MakeSumTree(L1_5400_jJet,"5400_nopus_gen");
-  this->MakeSumTree(ak4genjetsp_jJet,"ak4_gen");
+  if(mgct)
+  {
+    this->MakeJetTree(gct_jJet_calib,ak4genjetsp_jJet, "gct_calib_gen",true);
+    this->MakeMatchTree(gct_jJet_calib,ak4genjetsp_jJet,"gct_calib_gen",true);
+    this->MakeSumTree(gct_jJet_calib,"gct_calib_gen",true,true);
+
+    this->MakeJetTree(gct_jJet_uncalib,ak4genjetsp_jJet,  "gct_uncalib_gen",true);
+    this->MakeMatchTree(gct_jJet_uncalib,ak4genjetsp_jJet,"gct_uncalib_gen",true);
+    this->MakeSumTree(gct_jJet_uncalib,"gct_uncalib_gen",true,false);
+  }
+
   /*  this->compareJetCollections(calibrated_L1_5400global_jJet, ak4genjetsp_jJet, "5400_calib_global_gen",false);
 
       this->compareJetCollections(calibrated_L1_5400donut_jJet, L1_5400donut_jJet,"5400_donut_calib_uncalib",false);
@@ -536,31 +585,10 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
       this->compareJetCollections(calibrated_L1_5450donut_jJet, ak4genjetsp_jJet,"5450_calib_donut_gen",false);
       this->compareJetCollections(calibrated_L1_5450_jJet, ak4genjetsp_jJet,"5450_calib_nopus_gen",false);
-      if(mgct)
-      {
-      this->compareJetCollections(gct_jJet_calib, ak4genjetsp_jJet, "gct_calib_gen",true);
-      this->compareJetCollections(gct_jJet_uncalib, ak4genjetsp_jJet, "gct_uncalib_gen",true);
-      }
       this->compareJetCollections(L1_5420_jJet, ak4genjetsp_jJet,"5420_nopus_gen",false);
       this->compareJetCollections(L1_5430_jJet, ak4genjetsp_jJet,"5430_nopus_gen",false);
       this->compareJetCollections(L1_5440_jJet, ak4genjetsp_jJet,"5440_nopus_gen",false);
       */
-  double mean_top_pt=0.;
-  for (auto iTop = top_jJet.begin();iTop != top_jJet.end(); iTop++)
-  {
-    mean_top_pt += double(iTop->pt())/top_jJet.size();
-  }
-  //Means,xi, for i jets
-  int x1 = 196;
-  int x2 = 125;
-  int x3 = 79;
-  int x4 = 52;
-
-  if (L1_5400donut_jJet.size() > 0 && L1_5400donut_jJet.at(0).pt() > x1) eff_over_x1_top->Fill(mean_top_pt);
-  if (L1_5400donut_jJet.size() > 1 && L1_5400donut_jJet.at(1).pt() > x2) eff_over_x2_top->Fill(mean_top_pt);
-  if (L1_5400donut_jJet.size() > 2 && L1_5400donut_jJet.at(2).pt() > x3) eff_over_x3_top->Fill(mean_top_pt);
-  if (L1_5400donut_jJet.size() > 3 && L1_5400donut_jJet.at(3).pt() > x4) eff_over_x4_top->Fill(mean_top_pt);
-  mean_top_pt_hist->Fill(mean_top_pt);
   //this->compareJetCollections(L1_5400donut_jJet, top_jJet,"5400_donut_top",false);
   //this->compareJetCollections(L1_5400_jJet, top_jJet,"5400_nopus_top",false);
   //this->compareJetCollections(L1_5400global_jJet, top_jJet,"5400_global_top",false);

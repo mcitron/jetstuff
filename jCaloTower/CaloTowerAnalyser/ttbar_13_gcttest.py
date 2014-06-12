@@ -11,7 +11,7 @@ process.MessageLogger.cerr.INFO = cms.untracked.PSet(
 #process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(2000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
                                                                     
 process.source = cms.Source("PoolSource",
     # replace 'myfile.root' with the source file you want to use
@@ -24,7 +24,7 @@ process.source = cms.Source("PoolSource",
       'file:/afs/cern.ch/work/a/aelwood/public/TriggerTowers_TTbar_13TeV_PU40_50ns_1-10_skimmed_v3.root'
       #'file:/afs/cern.ch/work/j/jad/public/TriggerTowers_TTbar_13TeV_noPU_skimmed_v2.root'
     ),
-    #skipEvents=cms.untracked.uint32(5700)
+    skipEvents=cms.untracked.uint32(0)
 )
 
 process.demo = cms.EDAnalyzer('CaloTowerAnalyser',
@@ -33,7 +33,7 @@ gctinfo=cms.bool(True)
 )
 
 process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string('global_PUS_TEST2.root')
+                                   fileName = cms.string('global_PUS_TEST_tree2.root')
                                    #fileName = cms.string('histograms-ttbar_13TeV_PU40_50ns_test_v3.root')
                                    )
 

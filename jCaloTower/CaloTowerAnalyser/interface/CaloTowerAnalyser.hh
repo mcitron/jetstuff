@@ -93,8 +93,8 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     std::vector<jJet> getL1Jets(const std::vector< std::vector<int> > & input, int jetsize, int vetowindowsize, int seedthresh1, int seedthresh2); 
     std::vector<jJet> getL1JetsMask(const std::vector< std::vector<int> > & input, std::vector<std::vector <int> > mask, std::vector<std::vector <int > > donut_mask, int seedthresh1, int seedthresh2);
     //void compareJetCollections(const std::vector<jJet> & col1, const std::vector<jJet> & col2, std::string folderName, bool isgct);
-    void MakeJetTree(const std::vector<jJet> & col1,TString folderName);
-    void MakeSumTree(const std::vector<jJet> & col1,TString folderName);
+    void MakeJetTree(const std::vector<jJet> & col1,const std::vector<jJet> & col2,TString folderName, bool isgct);
+    void MakeSumTree(const std::vector<jJet> & col1,TString folderName,bool isgct, bool iscalibgct=false);
     void MakeMatchTree(const std::vector<jJet> & col1,const std::vector<jJet> & col2,TString folderName,bool isgct);
     void printOneEvent(const edm::Handle<l1slhc::L1CaloTowerCollection> triggertowers, const std::vector<jJet> & L1jets, const std::vector<fastjet::PseudoJet> & ak4ttjets, const reco::GenJetCollection * ak4genjets, std::vector<fastjet::PseudoJet> & ak4genjetsp);
     void printOneEvent(const edm::Handle<l1slhc::L1CaloTowerCollection> triggertowers, const std::map <TString,std::vector<jJet> > & L1jets, const std::map<TString,std::vector<fastjet::PseudoJet>> & ak4jets,std::map<TString,const reco::GenJetCollection *> ak4genjets);
@@ -115,15 +115,20 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
 
 
   private:
+    double mGctHtMissUncalib;
+    double mGctHtMissCalib;
+    double mGctHtCalib;
+    double mGctHtUncalib;
     TTree* tree;
     std::map<TString, std::vector<Float_t> *> jetPt_;
     std::map<TString, std::vector<Float_t> *> jetPhi_;
     std::map<TString, std::vector<Float_t> *> jetEta_;
     std::map<TString, std::vector<Float_t> *> jetRing_;
+    std::map<TString, std::vector<Float_t> *> jetMatchedPt_;
+    std::map<TString, std::vector<Float_t> *> sums_;
 
     std::map<TString, std::vector<Int_t> *> genJetMatchAlgo1_;
     std::map<TString, std::vector<Int_t> *> genJetMatchAlgo2_;
-    std::map<TString, std::vector<Int_t> *> sums_;
     bool mPrintMe=false;
     virtual void beginJob() ;
     virtual void analyze(const edm::Event&, const edm::EventSetup&);
