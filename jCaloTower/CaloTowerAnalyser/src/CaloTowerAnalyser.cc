@@ -554,6 +554,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   for (auto jet = jJetComp.begin();jet != jJetComp.end(); jet++)
   {
     this->MakeJetTree(jet->second,ak4genjetsp_jJet,jet->first,false);
+    this->MakeJetTree(ak4genjetsp_jJet,jet->second,TString("gen_")+jet->first,false);
     this->MakeMatchTree(jet->second,ak4genjetsp_jJet,jet->first,false);
     this->MakeSumTree(jet->second,jet->first,false);
   } 
@@ -561,10 +562,12 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   if(mgct)
   {
     this->MakeJetTree(gct_jJet_calib,ak4genjetsp_jJet, "gct_calib_gen",true);
+    this->MakeJetTree(ak4genjetsp_jJet,gct_jJet_calib,"gen_gct_calib",true);
     this->MakeMatchTree(gct_jJet_calib,ak4genjetsp_jJet,"gct_calib_gen",true);
     this->MakeSumTree(gct_jJet_calib,"gct_calib_gen",true,true);
 
     this->MakeJetTree(gct_jJet_uncalib,ak4genjetsp_jJet,  "gct_uncalib_gen",true);
+    this->MakeJetTree(ak4genjetsp_jJet,gct_jJet_uncalib,"gen_gct_uncalib",true);
     this->MakeMatchTree(gct_jJet_uncalib,ak4genjetsp_jJet,"gct_uncalib_gen",true);
     this->MakeSumTree(gct_jJet_uncalib,"gct_uncalib_gen",true,false);
   }
