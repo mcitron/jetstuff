@@ -33,7 +33,7 @@ gctinfo=cms.bool(True)
 )
 
 process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string('global_PUS_TEST_full.root')
+                                   fileName = cms.string('global_PUS_TEST.root'),
                                    #fileName = cms.string('histograms-ttbar_13TeV_PU40_50ns_test_v3.root')
                                    )
 

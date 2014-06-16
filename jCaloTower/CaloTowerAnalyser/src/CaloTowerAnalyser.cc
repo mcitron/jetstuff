@@ -14,6 +14,7 @@
 //
 // constructors and destructor
 //
+
 CaloTowerAnalyser::CaloTowerAnalyser(const edm::ParameterSet& iConfig) {
 
   //edm::Service<TFileService> fs;
@@ -39,6 +40,8 @@ CaloTowerAnalyser::CaloTowerAnalyser(const edm::ParameterSet& iConfig) {
   tower_pt_real_jetpt= dir.make<TH2D>("towers_real_jet_pt", ";pt;jetpt", 100, -0.5, 99.5,100,-0.5,99.5);
   num_tower_pt_real_jetpt= dir.make<TH2D>("num_towers_real_jet_pt", ";pt;jetpt", 100, -0.5, 99.5,100,-0.5,99.5);
 
+  number_jet_median= dir.make<TH1D>("prop_median", ";pt;", 1000, -0.0005, 0.9995);
+  number_jet_seed= dir.make<TH1D>("prop_seed", ";pt;", 1000, -0.0005, 0.9995);
   tower_pt_pu= dir.make<TH1D>("towers_pu", ";pt;", 100, -0.5, 99.5);
   num_tower_pt_pu= dir.make<TH1D>("num_towers_pu", ";pt;", 100, -0.5, 99.5);
   tower_pt_pu_jetpt= dir.make<TH2D>("towers_pu_jet_pt", ";pt;jetpt", 100, -0.5, 99.5,100,-0.5,99.5);
@@ -47,8 +50,11 @@ CaloTowerAnalyser::CaloTowerAnalyser(const edm::ParameterSet& iConfig) {
   //genjet_pt_nomunu_far = dir.make<TH1D>("genjet_pt_nomunu_far",";p_{T};",1000, -0.5, 999.5);
   //genjet_pt_nomunu_far_match_L1 = dir.make<TH1D>("genjet_pt_nomunu_far_match_L1",";p_{T};",1000, -0.5, 999.5);
   median_energy_per_event = dir.make<TH1D>("median_energy_per_event",";median energy per event;",100, -0.5, 99.5);
-  median_jet_5400_energy_per_event = dir.make<TH1D>("median_jet_energy_per_event",";median energy per event;",100, -0.5, 99.5);
-  median_rho_nvtx = dir.make<TH2D>("median_energy_jet_tower_per_event",";nvtx;median rho",100, -0.5, 99.5,1000,-0.5,999.5);
+  median_jet_5400_energy_per_event = dir.make<TH1D>("median_jet_energy_per_event",";median energy per event;",100, -0.5, 0.95);
+  donut_jet_5450_energy_per_event = dir.make<TH1D>("donut_jet_energy_per_jet",";median energy per event;",200, -0.5,199.5);
+  donut_jet_iso_5450_energy_per_event = dir.make<TH1D>("donut_jet_energy_per_jet",";median energy per event;",200, -0.5,199.5);
+  median_rho_nvtx = dir.make<TH2D>("median_energy_jet_tower_per_event",";nvtx;median rho",100, -0.5, 99.5,100, -0.5, 0.95);
+  median_rho_seed = dir.make<TH2D>("median_seed_rho",";nvtx;median rho",100, -0.5, 99.5,100, -0.5, 0.95);
 
 
   num_tops_per_event = dir.make<TH1D>("Number_of_tops",";Num;",100, -0.5, 99.5);
@@ -465,6 +471,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   std::vector<jJet> L1_5400donut_jJet;
   std::vector<jJet> L1_5400global_jJet;
   std::vector<jJet> L1_5450donut_jJet;
+  std::vector<jJet> L1_5450donut_iso_jJet;
   std::vector<jJet> L1_5450global_jJet;
 
   //std::vector<jJet> L1_4300donut_jJet;
@@ -473,20 +480,20 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   makePusHists(myarray, L1_4300_jJet, L1_5450_jJet);
 
   double median_jet_5400 = getMedian(L1_5400_jJet);
-  double median_jet_5450 = getMedian(L1_5450_jJet);
+  int median_seed = getMedianSeed(L1_5400_jJet);
+  //double median_jet_5450 = getMedian(L1_5450_jJet);
   //double median_jet_4300 = getMedian(L1_4300_jJet);
-  median_jet_5400_energy_per_event->Fill(median_jet_5400);
-  median_rho_nvtx->Fill(mNPV,median_jet_5400);
-
+  median_jet_5400_energy_per_event->Fill(81*median_jet_5400);
+  median_rho_nvtx->Fill(mNPV,81*median_jet_5400);
+  median_rho_seed->Fill(median_seed,81*median_jet_5400);
   std::map <TString,std::vector<jJet> > jJetMap;
   std::map <TString,std::vector<fastjet::PseudoJet> > ak4Map;
   std::map <TString,const reco::GenJetCollection * > genMap;
 
-
   for(unsigned int i=0; i<L1_5400_jJet.size(); i++) {
     double newenergydonut5400=L1_5400_jJet[i].eatDonut();
     double newenergyglobal5400=L1_5400_jJet[i].eatGlobe(median_jet_5400);
-    if(newenergydonut5400 >= 0.0) { 
+    if(newenergydonut5400 >= 1.) { 
       L1_5400donut_jJet.push_back(jJet(newenergydonut5400, L1_5400_jJet[i].iEta(), L1_5400_jJet[i].iPhi()));
       L1_5400_real_jJet.push_back(L1_5400_jJet[i]);
     }
@@ -494,23 +501,33 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     {
       L1_5400_pu_jJet.push_back(L1_5400_jJet[i]);
     }
-    if(newenergyglobal5400 >= 0.0) {
+    if(newenergyglobal5400 >= 1.) {
       L1_5400global_jJet.push_back(jJet(newenergyglobal5400, L1_5400_jJet[i].iEta(), L1_5400_jJet[i].iPhi())); 
 
     }
   }
+  double donut_energy=0;
+  double donut_energy_iso=0;
   for(unsigned int i=0; i<L1_5450_jJet.size(); i++) {
     double newenergydonut5450=L1_5450_jJet[i].eatDonut();
-    double newenergyglobal5450=L1_5450_jJet[i].eatGlobe(median_jet_5450);
+    double newenergyglobal5450=L1_5450_jJet[i].eatGlobe(median_jet_5400);
     //Fill Real and pu jjet vectors
-    if(newenergydonut5450 >= 0.0) { 
+    donut_energy+=(L1_5450_jJet.at(i).pt()-newenergydonut5450)/L1_5450_jJet.size();
+    if(L1_5450_jJet.at(i).isolatedJet(L1_5450_jJet,81)) donut_energy_iso+=(L1_5450_jJet.at(i).pt()-newenergydonut5450)/L1_5450_jJet.size();
+    if(newenergydonut5450 >= 1.) { 
       L1_5450donut_jJet.push_back(jJet(newenergydonut5450, L1_5450_jJet[i].iEta(), L1_5450_jJet[i].iPhi()));
+      if(L1_5450_jJet.at(i).isolatedJet(L1_5450_jJet,81))
+      {
+	L1_5450donut_iso_jJet.push_back(jJet(newenergydonut5450, L1_5450_jJet[i].iEta(), L1_5450_jJet[i].iPhi()));
+      }
     }
-    if(newenergyglobal5450 >= 0.0) {
+    if(newenergyglobal5450 >= 1.) {
       L1_5450global_jJet.push_back(jJet(newenergyglobal5450, L1_5450_jJet[i].iEta(), L1_5450_jJet[i].iPhi())); 
 
     }
   }
+  donut_jet_5450_energy_per_event->Fill(donut_energy);
+  donut_jet_iso_5450_energy_per_event->Fill(donut_energy_iso);
 
   for (auto jet = L1_5450_jJet.begin();jet != L1_5450_jJet.end(); jet++) jet->setPt(jet->pt()*0.5);
   for (auto jet = L1_5440_jJet.begin();jet != L1_5440_jJet.end(); jet++) jet->setPt(jet->pt()*0.5);
@@ -521,8 +538,10 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   for (auto jet = L1_5400global_jJet.begin();jet != L1_5400global_jJet.end(); jet++) jet->setPt(jet->pt()*0.5);
   for (auto jet = L1_5450donut_jJet.begin();jet != L1_5450donut_jJet.end(); jet++) jet->setPt(jet->pt()*0.5);
   for (auto jet = L1_5450global_jJet.begin();jet != L1_5450global_jJet.end(); jet++) jet->setPt(jet->pt()*0.5);
+  //gROOT->ProcessLine(".L /afs/cern.ch/work/m/mcitron/jadjets/CMSSW_6_2_0/src/jCaloTower/CaloTowerAnalyser/jad_jet_class.cc+");
 
-
+  number_jet_median->Fill(1.-(double)L1_5400global_jJet.size()/L1_5400_jJet.size());
+  number_jet_seed->Fill(1.-(double)L1_5450_jJet.size()/L1_5400_jJet.size());
   //Calibration
   //std::vector<jJet> calibrated_L1_5400_jJet = calibrateL1Jets(L1_5400_jJet,jetType::l15400nopus20,20,9999);
   std::vector<jJet> calibrated_L1_5400_jJet = calibrateL1Jets(L1_5400_jJet,jetType::l15400nopusGeV,8,9999);

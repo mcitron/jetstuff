@@ -1,6 +1,11 @@
 #ifndef JET_FUNCTIONS_HH
 #define JET_FUNCTIONS_HH
 
+bool sortbypt(const jJet &a, const jJet &b) { return a.pt() > b.pt(); }
+
+bool sortbyrho(const jJet &a, const jJet &b) { 
+   return a.pt()/a.area() > b.pt()/b.area();
+}
 void CaloTowerAnalyser::getJets(std::vector < fastjet::PseudoJet > &constits,std::vector < fastjet::PseudoJet > &jets) { 
 
   double rParam = 0.4;
@@ -33,6 +38,24 @@ double CaloTowerAnalyser::getMedian(const std::vector<jJet> & jets)
     }
   }
   return median_energy;
+
+}
+int CaloTowerAnalyser::getMedianSeed(const std::vector<jJet> & jets)
+{
+  //std::sort(jets.begin(),jets.end(),sortbyrho);
+  std::vector<jJet> jetSort=jets;
+  std::sort(jetSort.begin(),jetSort.end(), sortbyrho);  
+  int seed=0;
+  if(jetSort.size() > 2) {
+    if(jetSort.size() % 2 == 0 ) {
+      int index1 = jetSort.size() / 2;
+      seed=jetSort.at(index1).ringSums().at(0);
+    } else {
+      int index1 = jetSort.size() / 2;
+      seed=jetSort.at(index1).ringSums().at(0);
+    }
+  }
+  return seed;
 
 }
 ///MASK VERSION
@@ -69,95 +92,95 @@ std::vector<jJet> CaloTowerAnalyser::getL1JetsMask(const std::vector< std::vecto
       int jetarea = 1;
       //int pusarea=0;
       for(int l=(j-phisizedonut); l<=(j+phisizedonut); l++) {
-        for(int k=(i-etasizedonut); k<=(i+etasizedonut); k++) {
-          if(k < 0 || k > 55) continue; //i.e. out of bounds of eta<3
-          //std::cout << " k = " << k << ", l = " << l << ", i =" << i << ", j = " << j << std::endl;
-          unsigned int dk = k-i+etasizedonut;
-          unsigned int dl = l-j+phisizedonut;
+	for(int k=(i-etasizedonut); k<=(i+etasizedonut); k++) {
+	  if(k < 0 || k > 55) continue; //i.e. out of bounds of eta<3
+	  //std::cout << " k = " << k << ", l = " << l << ", i =" << i << ", j = " << j << std::endl;
+	  unsigned int dk = k-i+etasizedonut;
+	  unsigned int dl = l-j+phisizedonut;
 
 
-          //	       std::cout << dk << std::endl;
-          //	       std::cout << dl << std::endl;
-          //make a co-ordinate transform at the phi boundary
-          int newl;
-          if(l < 0) { newl = l+72; } 
-          else if (l > 71) { newl = l-72; } 
-          else { newl = l; }
+	  //	       std::cout << dk << std::endl;
+	  //	       std::cout << dl << std::endl;
+	  //make a co-ordinate transform at the phi boundary
+	  int newl;
+	  if(l < 0) { newl = l+72; } 
+	  else if (l > 71) { newl = l-72; } 
+	  else { newl = l; }
 
-          if (l != j && k != i)
-          {
-            jetTower.push_back(input[k][newl]);
-          }
-          if(input[k][newl] > seedthresh2) { numtowersabovethresh++; }
-          if(dl < mask_donut.size() && dk < mask_donut.at(0).size())
-          {
-            if(mask_donut[dl][dk] != 0)
-            {
-              outerstrips[mask_donut[dl][dk]-1].first+=input[k][newl];
-              outerstrips[mask_donut[dl][dk]-1].second++;
-              //	     std::cout << mask_donut[dl][dk];
-            }
-          }
+	  if (l != j && k != i)
+	  {
+	    jetTower.push_back(input[k][newl]);
+	  }
+	  if(input[k][newl] > seedthresh2) { numtowersabovethresh++; }
+	  if(dl < mask_donut.size() && dk < mask_donut.at(0).size())
+	  {
+	    if(mask_donut[dl][dk] != 0)
+	    {
+	      outerstrips[mask_donut[dl][dk]-1].first+=input[k][newl];
+	      outerstrips[mask_donut[dl][dk]-1].second++;
+	      //	     std::cout << mask_donut[dl][dk];
+	    }
+	  }
 
-        }
-        //std::cout << std::endl;
+	}
+	//std::cout << std::endl;
       }
       //std::cout << std::endl;
       for(int l=(j-phisize); l<=(j+phisize); l++) {
-        for(int k=(i-etasize); k<=(i+etasize); k++) {
-          unsigned int dk = k-i+etasize;
-          unsigned int dl = l-j+phisize;
-          if(k < 0 || k > 55) continue; //i.e. out of bounds of eta<3
-          //std::cout << " k = " << k << ", l = " << l << ", i =" << i << ", j = " << j << std::endl;
-          //	       std::cout << dk << std::endl;
-          //	       std::cout << dl << std::endl;
-          //make a co-ordinate transform at the phi boundary
-          int newl;
-          if(l < 0) { newl = l+72; } 
-          else if (l > 71) { newl = l-72; } 
-          else { newl = l; }
+	for(int k=(i-etasize); k<=(i+etasize); k++) {
+	  unsigned int dk = k-i+etasize;
+	  unsigned int dl = l-j+phisize;
+	  if(k < 0 || k > 55) continue; //i.e. out of bounds of eta<3
+	  //std::cout << " k = " << k << ", l = " << l << ", i =" << i << ", j = " << j << std::endl;
+	  //	       std::cout << dk << std::endl;
+	  //	       std::cout << dl << std::endl;
+	  //make a co-ordinate transform at the phi boundary
+	  int newl;
+	  if(l < 0) { newl = l+72; } 
+	  else if (l > 71) { newl = l-72; } 
+	  else { newl = l; }
 
-          if (l != j && k != i)
-          {
-            jetTower.push_back(input[k][newl]);
-          }
-          if(input[k][newl] > seedthresh2) { numtowersabovethresh++; }
-          if(dl < mask.size() && dk < mask.at(0).size())
-          {
-            if (mask[dl][dk] == 2){if(input[k][newl]>input[i][j]) {numtowersaboveme++;}}
-            else if (mask[dl][dk] == 1){if(input[k][newl]>=input[i][j]) {numtowersaboveme++;}}
-            /*
-               if((k+l) > (i+j) ) { if(input[k][newl] > input[i][j]) { numtowersaboveme++; } }
-               else if( ((k+l) == (i+j)) && (k-i) > (l-j)) { if(input[k][newl] > input[i][j]) { numtowersaboveme++; } } //this line is to break the degeneracy along the diagonal treating top left different to bottom right
-               else { if(input[k][newl] >= input[i][j]) { numtowersaboveme++; } }
-               */
-            for( int m=0; m<nringsveto+1;m++) { //+1 for centre of jet (n steps is n+1 rings!)
-              if((abs(i-k) == m && abs(j-l) <= m) || (abs(i-k) <= m && abs(j-l) == m)) { 
-                //i.e. we are now in ring m
-                localsums[m] += input[k][newl]; 
-                if (mask[dl][dk] != 0) {areas[m] += 1; jetarea++;}
-                break; //no point continuining since can only be a member of one ring
-              }
-            }
-          }
+	  if (l != j && k != i)
+	  {
+	    jetTower.push_back(input[k][newl]);
+	  }
+	  if(input[k][newl] > seedthresh2) { numtowersabovethresh++; }
+	  if(dl < mask.size() && dk < mask.at(0).size())
+	  {
+	    if (mask[dl][dk] == 2){if(input[k][newl]>input[i][j]) {numtowersaboveme++;}}
+	    else if (mask[dl][dk] == 1){if(input[k][newl]>=input[i][j]) {numtowersaboveme++;}}
+	    /*
+	       if((k+l) > (i+j) ) { if(input[k][newl] > input[i][j]) { numtowersaboveme++; } }
+	       else if( ((k+l) == (i+j)) && (k-i) > (l-j)) { if(input[k][newl] > input[i][j]) { numtowersaboveme++; } } //this line is to break the degeneracy along the diagonal treating top left different to bottom right
+	       else { if(input[k][newl] >= input[i][j]) { numtowersaboveme++; } }
+	       */
+	    for( int m=0; m<nringsveto+1;m++) { //+1 for centre of jet (n steps is n+1 rings!)
+	      if((abs(i-k) == m && abs(j-l) <= m) || (abs(i-k) <= m && abs(j-l) == m)) { 
+		//i.e. we are now in ring m
+		localsums[m] += input[k][newl]; 
+		if (mask[dl][dk] != 0) {areas[m] += 1; jetarea++;}
+		break; //no point continuining since can only be a member of one ring
+	      }
+	    }
+	  }
 
-        }
+	}
       }
       //now we have a jet candidate centred at i,j, with the ring energies and areas defined
       //now we have the L1 jet candidate:
       if(numtowersaboveme == 0 && input[i][j] > seedthresh1) {
-        double totalenergy=0.0;
-        //std::cout << "iEta: " << g.old_iEta(i) << ", iPhi: " << g.old_iPhi(j) << ", r0: " << localsums[0] <<  ", r1: " << localsums[1] << ", r2: " << localsums[2] << ", r3: " << localsums[3] << ", r4: " << localsums[4] << std::endl;
-        for(int ring=0; ring < (int)localsums.size(); ring++) { totalenergy += localsums[ring]; }
-        //this is with PUS:
-        if(totalenergy > 0.0) {
-          //TEMP
-          //areas.at(areas.size()-1)=pusarea;
+	double totalenergy=0.0;
+	//std::cout << "iEta: " << g.old_iEta(i) << ", iPhi: " << g.old_iPhi(j) << ", r0: " << localsums[0] <<  ", r1: " << localsums[1] << ", r2: " << localsums[2] << ", r3: " << localsums[3] << ", r4: " << localsums[4] << std::endl;
+	for(int ring=0; ring < (int)localsums.size(); ring++) { totalenergy += localsums[ring]; }
+	//this is with PUS:
+	if(totalenergy > 0.0) {
+	  //TEMP
+	  //areas.at(areas.size()-1)=pusarea;
 
-          //TEMP
-          //L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetTower,jetarea));
-          L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetarea));
-        }
+	  //TEMP
+	  //L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetTower,jetarea));
+	  L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetarea));
+	}
 
       }
 
@@ -194,44 +217,44 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
       int jetarea = 1;
       //int pusarea = 0;
       for(int k=(i-jetsize); k<=(i+jetsize); k++) {
-        for(int l=(j-jetsize); l<=(j+jetsize); l++) {
-          if(k < 0 || k > 55) continue; //i.e. out of bounds of eta<3
-          //std::cout << " k = " << k << ", l = " << l << ", i =" << i << ", j = " << j << std::endl;
+	for(int l=(j-jetsize); l<=(j+jetsize); l++) {
+	  if(k < 0 || k > 55) continue; //i.e. out of bounds of eta<3
+	  //std::cout << " k = " << k << ", l = " << l << ", i =" << i << ", j = " << j << std::endl;
 
-          //make a co-ordinate transform at the phi boundary
-          int newl;
-          if(l < 0) { newl = l+72; } 
-          else if (l > 71) { newl = l-72; } 
-          else { newl = l; }
-          if (l != j && k != i)
-          {
-            jetTower.push_back(input[k][newl]);
-          }
-          if(input[k][newl] > seedthresh2) { numtowersabovethresh++; }
+	  //make a co-ordinate transform at the phi boundary
+	  int newl;
+	  if(l < 0) { newl = l+72; } 
+	  else if (l > 71) { newl = l-72; } 
+	  else { newl = l; }
+	  if (l != j && k != i)
+	  {
+	    jetTower.push_back(input[k][newl]);
+	  }
+	  if(input[k][newl] > seedthresh2) { numtowersabovethresh++; }
 
-          //to decide which ring to assign energy to
-          for( int m=0; m<jetsize+1;m++) { //+1 for centre of jet (n steps is n+1 rings!)
-            if((abs(i-k) == m && abs(j-l) <= m) || (abs(i-k) <= m && abs(j-l) == m)) { 
-              //i.e. we are now in ring m
-              if (m <= vetowindowsize) localsums[m] += input[k][newl]; 
-              areas[m]+=1;
-              if(m == jetsize) { //i.e. we are in the outer ring and want to parameterise PU
-                if( (k-i) == m && abs(j-l) <= (m-1) ) { outerstrips[0].first += input[k][newl];outerstrips[0].second+=1;}
-                if( (i-k) == m && abs(j-l) <= (m-1) ) { outerstrips[1].first += input[k][newl];outerstrips[1].second+=1;}
-                if( (l-j) == m && abs(i-k) <= (m-1) ) { outerstrips[2].first += input[k][newl];outerstrips[2].second+=1;}
-                if( (j-l) == m && abs(i-k) <= (m-1) ) { outerstrips[3].first += input[k][newl];outerstrips[3].second+=1;}
-              }
+	  //to decide which ring to assign energy to
+	  for( int m=0; m<jetsize+1;m++) { //+1 for centre of jet (n steps is n+1 rings!)
+	    if((abs(i-k) == m && abs(j-l) <= m) || (abs(i-k) <= m && abs(j-l) == m)) { 
+	      //i.e. we are now in ring m
+	      if (m <= vetowindowsize) localsums[m] += input[k][newl]; 
+	      areas[m]+=1;
+	      if(m == jetsize) { //i.e. we are in the outer ring and want to parameterise PU
+		if( (k-i) == m && abs(j-l) <= (m-1) ) { outerstrips[0].first += input[k][newl];outerstrips[0].second+=1;}
+		if( (i-k) == m && abs(j-l) <= (m-1) ) { outerstrips[1].first += input[k][newl];outerstrips[1].second+=1;}
+		if( (l-j) == m && abs(i-k) <= (m-1) ) { outerstrips[2].first += input[k][newl];outerstrips[2].second+=1;}
+		if( (j-l) == m && abs(i-k) <= (m-1) ) { outerstrips[3].first += input[k][newl];outerstrips[3].second+=1;}
+	      }
 
-              if(m > 0 && m <= vetowindowsize) { //i.e. don't compare the central tower or towers outside vetowindowsize
-                jetarea++;
-                if((k+l) > (i+j) ) { if(input[k][newl] > input[i][j]) { numtowersaboveme++; } }
-                else if( ((k+l) == (i+j)) && (k-i) > (l-j)) { if(input[k][newl] > input[i][j]) { numtowersaboveme++; } } //this line is to break the degeneracy along the diagonal treating top left different to bottom right
-                else { if(input[k][newl] >= input[i][j]) { numtowersaboveme++; } }
+	      if(m > 0 && m <= vetowindowsize) { //i.e. don't compare the central tower or towers outside vetowindowsize
+		jetarea++;
+		if((k+l) > (i+j) ) { if(input[k][newl] > input[i][j]) { numtowersaboveme++; } }
+		else if( ((k+l) == (i+j)) && (k-i) > (l-j)) { if(input[k][newl] > input[i][j]) { numtowersaboveme++; } } //this line is to break the degeneracy along the diagonal treating top left different to bottom right
+		else { if(input[k][newl] >= input[i][j]) { numtowersaboveme++; } }
 
-              }
-              break; //no point continuining since can only be a member of one ring
-            }
-          }
+	      }
+	      break; //no point continuining since can only be a member of one ring
+	    }
+	  }
 
 	}
       }

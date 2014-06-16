@@ -18,14 +18,14 @@ void plotRates(){
        TGraph* nopus = f->Get(*iType+"_nopus/rate_efficiency_"+*iJet);
        TGraph* donut = f->Get(*iType+"_donut/rate_efficiency_"+*iJet);
        TGraph* global = f->Get(*iType+"_global/rate_efficiency_"+*iJet);
-       TGraph* gct = f->Get("gct/rate_efficiency_"+*iJet);
+  //     TGraph* gct = f->Get("gct/rate_efficiency_"+*iJet);
 
        TLegend* leg = new TLegend(0.2,0.2,0.48,0.5);
        leg->SetFillColor(0);
        leg->AddEntry(nopus,"No PUS","lep");
        leg->AddEntry(donut,"Donut Sub","lep");
        leg->AddEntry(global,"Global Sub","lep");
-       if(*iJet!="alljet") leg->AddEntry(gct,"GCT","lep");
+//       if(*iJet!="alljet") leg->AddEntry(gct,"GCT","lep");
 
        TCanvas * c = new TCanvas("c","",600,600);
 
@@ -36,7 +36,7 @@ void plotRates(){
        donut->Draw("lp same");
        global->SetMarkerColor(1);
        global->Draw("lp same");
-       gct->SetMarkerColor(8);
+       //gct->SetMarkerColor(8);
        if(*iJet!="alljet") gct->Draw("lp same");
 
        leg->Draw();

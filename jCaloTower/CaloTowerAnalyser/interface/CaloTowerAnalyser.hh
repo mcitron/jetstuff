@@ -110,6 +110,7 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     void bookPusHists(TString folderName);
     void makePusHists(const std::vector< std::vector<int> >& myarray,const std::vector<jJet>& L1_4300_jJet,const std::vector<jJet>& L1_5450_jJet);
     double getMedian(const std::vector<jJet> & jets);
+    int getMedianSeed(const std::vector<jJet> & jets);
     double calculateHT(const std::vector<jJet> & jets,const int & thresh);
     std::vector<double> calculateMHT(const std::vector<jJet> & jets,const int & thresh);
 
@@ -151,7 +152,12 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     TH1D * median_energy_per_event;
 
     TH1D * median_jet_5400_energy_per_event;
+    TH1D * donut_jet_5450_energy_per_event;
+    TH1D * donut_jet_iso_5450_energy_per_event;
+    TH1D * number_jet_seed;
+    TH1D * number_jet_median;
     TH2D * median_rho_nvtx;
+    TH2D * median_rho_seed;
 
 
     std::map<TString, TH1F*> pusHists1d_;
