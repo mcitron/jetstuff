@@ -1,8 +1,8 @@
 void makeNewRate()
 {
-  TFile * f = TFile::Open("neutrino_skim_run2.root");
+  TFile * f = TFile::Open("neutrino_skim_run.root");
   TFile * f_out = new TFile("neutrino_rate.root","recreate");
-  TTree * tree = (TTree *) f->Get("demo/L1Tree;1"); 
+  TTree * tree = (TTree *) f->Get("demo/L1Tree;3"); 
   int mNPV;
   f_out->cd();
   std::vector<float> * donutpt; 
@@ -10,7 +10,7 @@ void makeNewRate()
   std::vector<float> * globalpt; 
   std::vector<float> * nopuspt; 
   std::vector<float> * nopusseedpt; 
-  int jetnum = 3;
+  int jetnum = 4;
   tree->SetBranchAddress("jetPt_5400_calib_global",&globalpt);
   tree->SetBranchAddress("jetPt_5450_calib_donut",&donutseedpt);
   tree->SetBranchAddress("jetPt_5400_calib_donut",&donutpt);
@@ -25,7 +25,7 @@ void makeNewRate()
 
 
     int nevent = tree->GetEntries();
-    for (int k =30; k <300; k++)
+    for (int k =30; k <500; k++)
     {
       if (k%10 == 0) std::cout << k << std::endl;
       double counterdo = 0;

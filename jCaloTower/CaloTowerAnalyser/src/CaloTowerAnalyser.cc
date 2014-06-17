@@ -458,8 +458,14 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   std::vector<jJet> L1_4300_pu_jJet;
 
   //make a container for the L1 jets
-  std::vector<jJet> L1_5400_jJet = getL1Jets(myarray, 5, 4, 0, 0);
-  std::vector<jJet> L1_5450_jJet = getL1Jets(myarray, 5, 4, 5, 0);
+  std::vector<jJet> L1_5400_jJet = getL1JetsMask(myarray, mask_circle_9by9(), mask_donut_11by11(), 0, 0);
+  std::vector<jJet> L1_5450_jJet = getL1JetsMask(myarray, mask_circle_9by9(), mask_donut_11by11(), 5, 0);
+
+  std::vector<jJet> L1_5450_jJet_old = getL1Jets(myarray, 5, 4, 5, 0);
+  std::vector<jJet> L1_5400_jJet_old = getL1Jets(myarray, 5, 4, 0, 0);
+  std::cout << L1_5450_jJet.size() <<" "<<L1_5450_jJet_old.size() << std::endl;
+  std::cout << L1_5400_jJet.size() <<" "<<L1_5400_jJet_old.size() << std::endl;
+
   std::vector<jJet> L1_5420_jJet = getL1Jets(myarray, 5, 4, 2, 0);
   std::vector<jJet> L1_5430_jJet = getL1Jets(myarray, 5, 4, 3, 0);
   std::vector<jJet> L1_5440_jJet = getL1Jets(myarray, 5, 4, 4, 0);
@@ -477,7 +483,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   //std::vector<jJet> L1_4300donut_jJet;
   std::vector<jJet> L1_4300global_jJet;
 
-  makePusHists(myarray, L1_4300_jJet, L1_5450_jJet);
+  //makePusHists(myarray, L1_4300_jJet, L1_5450_jJet);
 
   double median_jet_5400 = getMedian(L1_5400_jJet);
   int median_seed = getMedianSeed(L1_5400_jJet);
@@ -489,7 +495,6 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   std::map <TString,std::vector<jJet> > jJetMap;
   std::map <TString,std::vector<fastjet::PseudoJet> > ak4Map;
   std::map <TString,const reco::GenJetCollection * > genMap;
-
   for(unsigned int i=0; i<L1_5400_jJet.size(); i++) {
     double newenergydonut5400=L1_5400_jJet[i].eatDonut();
     double newenergyglobal5400=L1_5400_jJet[i].eatGlobe(median_jet_5400);
@@ -610,7 +615,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       this->compareJetCollections(L1_5420_jJet, ak4genjetsp_jJet,"5420_nopus_gen",false);
       this->compareJetCollections(L1_5430_jJet, ak4genjetsp_jJet,"5430_nopus_gen",false);
       this->compareJetCollections(L1_5440_jJet, ak4genjetsp_jJet,"5440_nopus_gen",false);
-      */
+   */
   //this->compareJetCollections(L1_5400donut_jJet, top_jJet,"5400_donut_top",false);
   //this->compareJetCollections(L1_5400_jJet, top_jJet,"5400_nopus_top",false);
   //this->compareJetCollections(L1_5400global_jJet, top_jJet,"5400_global_top",false);
@@ -659,7 +664,7 @@ CaloTowerAnalyser::endJob()
    CaloTowerAnalyser::beginRun(edm::Run const&, edm::EventSetup const&)
    {
    }
-   */
+ */
 
 // ------------ method called when ending the processing of a run  ------------
 /*
@@ -667,7 +672,7 @@ CaloTowerAnalyser::endJob()
    CaloTowerAnalyser::endRun(edm::Run const&, edm::EventSetup const&)
    {
    }
-   */
+ */
 
 // ------------ method called when starting to processes a luminosity block  ------------
 /*
@@ -675,7 +680,7 @@ CaloTowerAnalyser::endJob()
    CaloTowerAnalyser::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
    {
    }
-   */
+ */
 
 // ------------ method called when ending the processing of a luminosity block  ------------
 /*
@@ -683,7 +688,7 @@ CaloTowerAnalyser::endJob()
    CaloTowerAnalyser::endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
    {
    }
-   */
+ */
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
 void

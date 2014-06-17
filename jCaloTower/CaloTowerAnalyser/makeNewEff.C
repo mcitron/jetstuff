@@ -1,6 +1,6 @@
 void makeNewEff()
 {
-  TFile * f = new TFile("global_PUS_TEST_tree.root");
+  TFile * f = new TFile("global_PUS_TEST.root");
   TFile * f_out = new TFile("ttbar_rate.root","recreate");
   TTree * tree = (TTree *) f->Get("demo/L1Tree"); 
   int mNPV;
@@ -39,7 +39,7 @@ void makeNewEff()
       double counterdogen = 0;
       double counterglogen = 0;
 
-      for (int i = 0; i < nevent/5;i++)
+      for (int i = 0; i < nevent;i++)
       {
 
 	tree->GetEvent(i);
