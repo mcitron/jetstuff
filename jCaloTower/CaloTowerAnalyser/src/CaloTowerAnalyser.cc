@@ -25,6 +25,7 @@ CaloTowerAnalyser::CaloTowerAnalyser(const edm::ParameterSet& iConfig) {
   tree = fs->make<TTree>("L1Tree","L1Tree");
 
   tree->Branch("mNPV", &mNPV, "mNPV/I");  
+  tree->Branch("medianRho", &medianRho, "medianRho/D");  
 // std::string folderName = "Event_";
   // std::stringstream caseNumber;
   // caseNumber << eventNumber;
@@ -50,11 +51,11 @@ CaloTowerAnalyser::CaloTowerAnalyser(const edm::ParameterSet& iConfig) {
   //genjet_pt_nomunu_far = dir.make<TH1D>("genjet_pt_nomunu_far",";p_{T};",1000, -0.5, 999.5);
   //genjet_pt_nomunu_far_match_L1 = dir.make<TH1D>("genjet_pt_nomunu_far_match_L1",";p_{T};",1000, -0.5, 999.5);
   median_energy_per_event = dir.make<TH1D>("median_energy_per_event",";median energy per event;",100, -0.5, 99.5);
-  median_jet_5400_energy_per_event = dir.make<TH1D>("median_jet_energy_per_event",";median energy per event;",100, -0.5, 0.95);
+  median_jet_5400_energy_per_event = dir.make<TH1D>("median_jet_energy_per_event",";median energy per event;",100, -0.5, 99.5);
   donut_jet_5450_energy_per_event = dir.make<TH1D>("donut_jet_energy_per_jet",";median energy per event;",200, -0.5,199.5);
   donut_jet_iso_5450_energy_per_event = dir.make<TH1D>("donut_jet_energy_per_jet",";median energy per event;",200, -0.5,199.5);
-  median_rho_nvtx = dir.make<TH2D>("median_energy_jet_tower_per_event",";nvtx;median rho",100, -0.5, 99.5,100, -0.5, 0.95);
-  median_rho_seed = dir.make<TH2D>("median_seed_rho",";nvtx;median rho",100, -0.5, 99.5,100, -0.5, 0.95);
+  median_rho_nvtx = dir.make<TH2D>("median_energy_jet_tower_per_event",";nvtx;median rho",100, -0.5, 99.5,100, -0.5, 99.5);
+  median_rho_seed = dir.make<TH2D>("median_seed_rho",";nvtx;median rho",100, -0.5, 99.5,100, -0.5, 99.5);
 
 
   num_tops_per_event = dir.make<TH1D>("Number_of_tops",";Num;",100, -0.5, 99.5);
@@ -148,7 +149,6 @@ CaloTowerAnalyser::CaloTowerAnalyser(const edm::ParameterSet& iConfig) {
   this->setNintBins(nintBins);
 
   //Make the necessary histograms
-  this->bookPusHists("pus_histograms");
 
 
 }
@@ -344,6 +344,8 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   std::vector<fastjet::PseudoJet> ak4ttjets;
 
   std::vector< std::vector<int> > myarray(56, std::vector<int>(72, 0)); //this is just a container for the (E+H) per tower
+  std::vector< std::vector<int> > myarrayECAL(56, std::vector<int>(72, 0)); //this is just a container for the (E+H) per tower
+  std::vector< std::vector<int> > myarrayHCAL(56, std::vector<int>(72, 0)); //this is just a container for the (E+H) per tower
 
   int ntowersinevent=0; //this is a container to calculate the number of non-zero towers in an event (correlation with NPV)
   std::vector<int> energies_per_event; //this is a container to calculate the median tower energy in an event
@@ -358,6 +360,8 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     if((*j).E() + (*j).H() > 0) { ntowersinevent++; } //to look at correlation with NPV
 
     myarray[g.new_iEta((*j).iEta())][g.new_iPhi((*j).iPhi())] = ((*j).E() + (*j).H());
+    myarrayECAL[g.new_iEta((*j).iEta())][g.new_iPhi((*j).iPhi())] = ((*j).E());
+    myarrayHCAL[g.new_iEta((*j).iEta())][g.new_iPhi((*j).iPhi())] = ((*j).H());
     ET += (*j).E()+(*j).H();
     met_x -= cos(g.phi((*j).iPhi())) * ((*j).E() + (*j).H());
     met_y -= sin(g.phi((*j).iPhi())) * ((*j).E() + (*j).H());
@@ -458,13 +462,14 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   std::vector<jJet> L1_4300_pu_jJet;
 
   //make a container for the L1 jets
-  std::vector<jJet> L1_5400_jJet = getL1JetsMask(myarray, mask_circle_9by9(), mask_donut_11by11(), 0, 0);
-  std::vector<jJet> L1_5450_jJet = getL1JetsMask(myarray, mask_circle_9by9(), mask_donut_11by11(), 5, 0);
-
+  std::vector<jJet> L1_5400_jJet = getL1JetsMask(myarray, mask_square_9by9(), mask_donut_11by11(),4, 0, 0);
+  std::vector<jJet> L1_5450_jJet = getL1JetsMask(myarray, mask_square_9by9(), mask_donut_11by11(),4, 5, 0);
+  std::vector<jJet> L1_5450_3_strips_jJet = getL1JetsMask(myarray, mask_square_9by9(), mask_donut_15by15(),12, 5, 0);
+  std::vector<jJet> L1_5450_squares_jJet = getL1JetsMask(myarray, mask_square_9by9(), mask_donut_squares_15by15(),12, 5, 0);
+  std::vector<jJet> L1_5450_2_strips_jJet = getL1JetsMask(myarray, mask_square_9by9(), mask_donut_13by13(),8, 5, 0);
   std::vector<jJet> L1_5450_jJet_old = getL1Jets(myarray, 5, 4, 5, 0);
   std::vector<jJet> L1_5400_jJet_old = getL1Jets(myarray, 5, 4, 0, 0);
-  std::cout << L1_5450_jJet.size() <<" "<<L1_5450_jJet_old.size() << std::endl;
-  std::cout << L1_5400_jJet.size() <<" "<<L1_5400_jJet_old.size() << std::endl;
+
 
   std::vector<jJet> L1_5420_jJet = getL1Jets(myarray, 5, 4, 2, 0);
   std::vector<jJet> L1_5430_jJet = getL1Jets(myarray, 5, 4, 3, 0);
@@ -477,15 +482,15 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   std::vector<jJet> L1_5400donut_jJet;
   std::vector<jJet> L1_5400global_jJet;
   std::vector<jJet> L1_5450donut_jJet;
-  std::vector<jJet> L1_5450donut_iso_jJet;
   std::vector<jJet> L1_5450global_jJet;
 
   //std::vector<jJet> L1_4300donut_jJet;
   std::vector<jJet> L1_4300global_jJet;
 
-  //makePusHists(myarray, L1_4300_jJet, L1_5450_jJet);
 
   double median_jet_5400 = getMedian(L1_5400_jJet);
+  medianRho = median_jet_5400;
+  //std::cout << medianRho << std::endl;
   int median_seed = getMedianSeed(L1_5400_jJet);
   //double median_jet_5450 = getMedian(L1_5450_jJet);
   //double median_jet_4300 = getMedian(L1_4300_jJet);
@@ -512,19 +517,13 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     }
   }
   double donut_energy=0;
-  double donut_energy_iso=0;
   for(unsigned int i=0; i<L1_5450_jJet.size(); i++) {
     double newenergydonut5450=L1_5450_jJet[i].eatDonut();
     double newenergyglobal5450=L1_5450_jJet[i].eatGlobe(median_jet_5400);
     //Fill Real and pu jjet vectors
     donut_energy+=(L1_5450_jJet.at(i).pt()-newenergydonut5450)/L1_5450_jJet.size();
-    if(L1_5450_jJet.at(i).isolatedJet(L1_5450_jJet,81)) donut_energy_iso+=(L1_5450_jJet.at(i).pt()-newenergydonut5450)/L1_5450_jJet.size();
     if(newenergydonut5450 >= 1.) { 
       L1_5450donut_jJet.push_back(jJet(newenergydonut5450, L1_5450_jJet[i].iEta(), L1_5450_jJet[i].iPhi()));
-      if(L1_5450_jJet.at(i).isolatedJet(L1_5450_jJet,81))
-      {
-	L1_5450donut_iso_jJet.push_back(jJet(newenergydonut5450, L1_5450_jJet[i].iEta(), L1_5450_jJet[i].iPhi()));
-      }
     }
     if(newenergyglobal5450 >= 1.) {
       L1_5450global_jJet.push_back(jJet(newenergyglobal5450, L1_5450_jJet[i].iEta(), L1_5450_jJet[i].iPhi())); 
@@ -532,9 +531,13 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     }
   }
   donut_jet_5450_energy_per_event->Fill(donut_energy);
-  donut_jet_iso_5450_energy_per_event->Fill(donut_energy_iso);
 
   for (auto jet = L1_5450_jJet.begin();jet != L1_5450_jJet.end(); jet++) jet->setPt(jet->pt()*0.5);
+  for (auto jet = L1_5450_3_strips_jJet.begin();jet != L1_5450_3_strips_jJet.end(); jet++) jet->setPt(jet->pt()*0.5);
+  for (auto jet = L1_5450_squares_jJet.begin();jet != L1_5450_squares_jJet.end(); jet++) jet->setPt(jet->pt()*0.5);
+  for (auto jet = L1_5450_2_strips_jJet.begin();jet != L1_5450_2_strips_jJet.end(); jet++) jet->setPt(jet->pt()*0.5);
+  for (auto jet = L1_5450_jJet_old.begin();jet != L1_5450_jJet_old.end(); jet++) jet->setPt(jet->pt()*0.5);
+  for (auto jet = L1_5400_jJet_old.begin();jet != L1_5400_jJet_old.end(); jet++) jet->setPt(jet->pt()*0.5);
   for (auto jet = L1_5440_jJet.begin();jet != L1_5440_jJet.end(); jet++) jet->setPt(jet->pt()*0.5);
   for (auto jet = L1_5430_jJet.begin();jet != L1_5430_jJet.end(); jet++) jet->setPt(jet->pt()*0.5);
   for (auto jet = L1_5420_jJet.begin();jet != L1_5420_jJet.end(); jet++) jet->setPt(jet->pt()*0.5);
@@ -563,6 +566,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   std::map <TString,std::vector<jJet> > jJetComp;
 
   jJetComp["5400_nopus"]=L1_5400_jJet;
+  jJetComp["5400_nopus_old"]=L1_5400_jJet_old;
   jJetComp["5400_donut"]=L1_5400donut_jJet;
   jJetComp["5400_global"]=L1_5400global_jJet;
   jJetComp["5400_calib_nopus"]=calibrated_L1_5400_jJet;
@@ -570,6 +574,10 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   jJetComp["5400_calib_global"]=calibrated_L1_5400global_jJet;
 
   jJetComp["5450_nopus"]=L1_5450_jJet;
+  jJetComp["5450_3_strips_nopus"]=L1_5450_3_strips_jJet;
+  jJetComp["5450_squares_nopus"]=L1_5450_squares_jJet;
+  jJetComp["5450_2_strips_nopus"]=L1_5450_2_strips_jJet;
+  jJetComp["5450_nopus_old"]=L1_5450_jJet_old;
   jJetComp["5450_donut"]=L1_5450donut_jJet;
   jJetComp["5450_global"]=L1_5450global_jJet;
   jJetComp["5450_calib_nopus"]=calibrated_L1_5450_jJet;
@@ -596,47 +604,15 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     this->MakeSumTree(gct_jJet_uncalib,"gct_uncalib_gen",true,false);
   }
 
-  /*  this->compareJetCollections(calibrated_L1_5400global_jJet, ak4genjetsp_jJet, "5400_calib_global_gen",false);
-
-      this->compareJetCollections(calibrated_L1_5400donut_jJet, L1_5400donut_jJet,"5400_donut_calib_uncalib",false);
-      this->compareJetCollections(calibrated_L1_5400_jJet, ak4genjetsp_jJet,"5400_nopus_calib_uncalib",false);
-      this->compareJetCollections(calibrated_L1_5400global_jJet, ak4genjetsp_jJet, "5400_global_calib_uncalib",false);
-
-      this->compareJetCollections(L1_5400donut_jJet, ak4genjetsp_jJet,"5400_donut_gen",false);
-      this->compareJetCollections(L1_5400_jJet, ak4genjetsp_jJet,"5400_nopus_gen",false);
-      this->compareJetCollections(L1_5400global_jJet, ak4genjetsp_jJet, "5400_global_gen",false);
-
-      this->compareJetCollections(L1_5450donut_jJet, ak4genjetsp_jJet,"5450_donut_gen",false);
-      this->compareJetCollections(L1_5450_jJet, ak4genjetsp_jJet,"5450_nopus_gen",false);
-      this->compareJetCollections(L1_5450global_jJet, ak4genjetsp_jJet, "5450_global_gen",false);
-
-      this->compareJetCollections(calibrated_L1_5450donut_jJet, ak4genjetsp_jJet,"5450_calib_donut_gen",false);
-      this->compareJetCollections(calibrated_L1_5450_jJet, ak4genjetsp_jJet,"5450_calib_nopus_gen",false);
-      this->compareJetCollections(L1_5420_jJet, ak4genjetsp_jJet,"5420_nopus_gen",false);
-      this->compareJetCollections(L1_5430_jJet, ak4genjetsp_jJet,"5430_nopus_gen",false);
-      this->compareJetCollections(L1_5440_jJet, ak4genjetsp_jJet,"5440_nopus_gen",false);
-   */
-  //this->compareJetCollections(L1_5400donut_jJet, top_jJet,"5400_donut_top",false);
-  //this->compareJetCollections(L1_5400_jJet, top_jJet,"5400_nopus_top",false);
-  //this->compareJetCollections(L1_5400global_jJet, top_jJet,"5400_global_top",false);
-
-  //this->compareJetCollections(top_jJet, L1_5400donut_jJet,"5400_top_donut",false);
-  //this->compareJetCollections(top_jJet, L1_5400_jJet,"5400_top_nopus",false);
-  //this->compareJetCollections(top_jJet, L1_5400global_jJet,"5400_top_global",false);
-
-  //std::cout << mPrintMe << std::endl;
-  jJetMap["L1_5400_Donut"] = L1_5400donut_jJet;
-  ///   jJetMap["L1_5400_Donut_mask"] = L1_5400donut_jJet_mask;
-  jJetMap["L1_4300_Donut"] = L1_4300donut_jJet;
-  //  mPrintMe=true;
+  jJetMap["L1_5400_mask"] = L1_5400_jJet;
+  jJetMap["L1_5400_old"] = L1_5400_jJet_old;
+  //mPrintMe=true;
   if(this->mPrintMe)
   {
     std::cout << "Event Printed" << std::endl;
-    printOneEvent(triggertowers, jJetMap,ak4Map,genMap);
+    //printOneEvent(triggertowers, jJetMap,ak4Map,genMap);
   }
   this->mPrintMe = false;
-  //CALIBRATE!!!
-
 
   tree->Fill();
   mEventNumber++;
@@ -664,7 +640,7 @@ CaloTowerAnalyser::endJob()
    CaloTowerAnalyser::beginRun(edm::Run const&, edm::EventSetup const&)
    {
    }
- */
+   */
 
 // ------------ method called when ending the processing of a run  ------------
 /*
@@ -672,7 +648,7 @@ CaloTowerAnalyser::endJob()
    CaloTowerAnalyser::endRun(edm::Run const&, edm::EventSetup const&)
    {
    }
- */
+   */
 
 // ------------ method called when starting to processes a luminosity block  ------------
 /*
@@ -680,7 +656,7 @@ CaloTowerAnalyser::endJob()
    CaloTowerAnalyser::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
    {
    }
- */
+   */
 
 // ------------ method called when ending the processing of a luminosity block  ------------
 /*
@@ -688,7 +664,7 @@ CaloTowerAnalyser::endJob()
    CaloTowerAnalyser::endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
    {
    }
- */
+   */
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
 void

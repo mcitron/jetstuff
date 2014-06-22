@@ -10,6 +10,7 @@ void plotRateEff()
   PUSregime.push_back("donutseedjetpt");
   PUSregime.push_back("nopusjetpt");
   PUSregime.push_back("nopusseedjetpt");
+  PUSregime.push_back("gctjetpt");
 
   TFile* top = new TFile("ratePlotsEff.root","recreate");
   //TH1D * matchedhist_global_global =  (f->Get("demo/ak4_global_pus/col2_matched_global_alljet_pt"));
@@ -22,8 +23,10 @@ void plotRateEff()
     //for (auto iJet = jetnum.begin(); iJet!=jetnum.end(); iJet++)
     {
       std::cout << *iPUS << std::endl;
-      TH1D * origplot_rate = f_rate->Get((*iPUS+TString("_rate")));
+      //TH1D * origplot_rate;
       TH1D * origplot_eff = f_eff->Get((*iPUS+TString("_eff")));
+      if (*iPUS == "gctjetpt"){*iPUS= "gct";}
+      TH1D * origplot_rate = f_rate->Get((*iPUS+TString("_rate")));
 
       //Plot the rates for different bins against one another
       if(origplot_rate->GetNbinsX() != origplot_eff->GetNbinsX()) std::cout << "Different binning between rate and efficiency\n";

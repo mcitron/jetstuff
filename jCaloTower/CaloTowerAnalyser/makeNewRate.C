@@ -9,23 +9,26 @@ void makeNewRate()
   std::vector<float> * donutseedpt; 
   std::vector<float> * globalpt; 
   std::vector<float> * nopuspt; 
+  std::vector<float> * gct; 
   std::vector<float> * nopusseedpt; 
-  int jetnum = 4;
+  int jetnum = 1;
   tree->SetBranchAddress("jetPt_5400_calib_global",&globalpt);
   tree->SetBranchAddress("jetPt_5450_calib_donut",&donutseedpt);
   tree->SetBranchAddress("jetPt_5400_calib_donut",&donutpt);
   tree->SetBranchAddress("jetPt_5400_calib_nopus",&nopuspt);
   tree->SetBranchAddress("jetPt_5450_calib_nopus",&nopusseedpt);
+  tree->SetBranchAddress("jetPt_gct_calib_gen",&gct);
 
   TH1D * donutjetpt = new TH1D ("donutjetpt_rate",";pt;",1000,-0.5,999.5);
   TH1D * donutseedjetpt = new TH1D ("donutseedjetpt_rate",";pt;",1000,-0.5,999.5);
   TH1D * globaljetpt = new TH1D ("globaljetpt_rate",";pt;",1000,-0.5,999.5);
   TH1D * nopusjetpt = new TH1D ("nopusjetpt_rate",";pt;",1000,-0.5,999.5);
   TH1D * nopusseedjetpt = new TH1D ("nopusseedjetpt_rate",";pt;",1000,-0.5,999.5);
+  TH1D * gctjetpt = new TH1D ("gct_rate",";pt;",1000,-0.5,999.5);
 
 
     int nevent = tree->GetEntries();
-    for (int k =30; k <500; k++)
+    for (int k =0; k <500; k++)
     {
       if (k%10 == 0) std::cout << k << std::endl;
       double counterdo = 0;
@@ -33,6 +36,7 @@ void makeNewRate()
       double counterglo = 0;
       double countergen = 0;
       double counternop = 0;
+      double countergct = 0;
       double counternopseed = 0;
 
       for (int i = 0; i < nevent;i++)
@@ -60,12 +64,17 @@ void makeNewRate()
 	{
 	  counternopseed+=1;
 	} 
+	if(gct->size()>jetnum && gct->at(jetnum)>k)
+	{
+	  countergct+=1;
+	} 
       }
       globaljetpt->SetBinContent(k,counterglo/nevent);//counter/nevent);
       donutjetpt->SetBinContent(k,counterdo/nevent);//counter/nevent);
       donutseedjetpt->SetBinContent(k,counterdoseed/nevent);//counter/nevent);
       nopusjetpt->SetBinContent(k,counternop/nevent);//counter/nevent);
       nopusseedjetpt->SetBinContent(k,counternopseed/nevent);//counter/nevent);
+      gctjetpt->SetBinContent(k,countergct/nevent);//counter/nevent);
     }
     globaljetpt->SetLineColor(4);
     donutjetpt->SetLineColor(2);
@@ -77,5 +86,6 @@ void makeNewRate()
     donutseedjetpt->Write();
     nopusjetpt->Write();
     nopusseedjetpt->Write();
+    gctjetpt->Write();
     f_out->Close();
 }

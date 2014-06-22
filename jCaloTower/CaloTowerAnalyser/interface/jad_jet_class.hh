@@ -16,6 +16,8 @@ public:
   jJet(double pt, int ieta, int iphi);
   jJet(double pt, int ieta, int iphi,int bx);
   jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<std::pair<int,int> > outerstrips, int jetarea);
+  jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringmax,double jetRms,std::vector<int> ringareas, std::vector<std::pair<int,int> > outerstrips, int jetarea);
+  jJet(double pt, int ieta, int iphi, std::vector<int> ringsums,std::vector<int> ringsumsec,std::vector<int> ringsumshc, std::vector<int> ringmax,std::vector<int> ringareas, std::vector<std::pair<int,int> > outerstrips, int jetarea);
   jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<std::pair<int,int> > outerstrips,std::vector<int> towers, int jetarea);
   jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<std::pair<int,int> > outerstrips, std::vector<int> towers, int jetarea,int seedtower);
   int iEta() const;
@@ -25,7 +27,11 @@ public:
   double pt() const;
   void setPt(double pt);
   bool isolatedJet(const std::vector<jJet>& jetCollection, double dR2Max);
+  int minDeltaR2(const std::vector<jJet>& jetCollection) const;
   std::vector<int> ringSums() const;
+  std::vector<int> ringSumsEC() const;
+  std::vector<int> ringSumsHC() const;
+  std::vector<int> ringMax() const;
   std::vector<int> ringAreas() const;
   std::vector<std::pair<int,int> > getOuterStrips() const;
   std::vector<int> getTowers() const;
@@ -34,6 +40,7 @@ public:
   double eatDonut(); //the energy after PUsubtraction
   double eatGlobe(double median); //the energy after global PUsubtraction
   int area() const;
+  double rms() const;
   int getOuterSum() const;
 private:
   double mpt;
@@ -43,6 +50,10 @@ private:
   int mgphi;
   int mbx;
   std::vector<int> mringsums;
+  std::vector<int> mringsumsec;
+  std::vector<int> mringsumshc;
+  std::vector<int> mringmax;
+  double mrms;
   std::vector<int> mringareas;
   std::vector<std::pair<int,int>> mouterstrips;
   std::vector<int> mtowers;

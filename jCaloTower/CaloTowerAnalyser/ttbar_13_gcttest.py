@@ -26,14 +26,17 @@ process.source = cms.Source("PoolSource",
     ),
     skipEvents=cms.untracked.uint32(0)
 )
+import datetime
+now = datetime.datetime.now()
+date = now.strftime("%Y-%m-%d")
 
 process.demo = cms.EDAnalyzer('CaloTowerAnalyser',
 skim_name=cms.string("jadtest"),
-gctinfo=cms.bool(True)
+gctinfo=cms.bool(False)
 )
 
 process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string('global_PUS_TEST2.root'),
+                                   fileName = cms.string('output/ttbar-output-'+date+'.root'),
                                    #fileName = cms.string('histograms-ttbar_13TeV_PU40_50ns_test_v3.root')
                                    )
 

@@ -167,7 +167,7 @@ double ptStep = 5;
 //=======================
 
 
-TString filename = "../output/qcd_output_2014-06-09.root";
+TString filename = "/afs/cern.ch/work/m/mcitron/jadjets/CMSSW_6_2_0/src/jCaloTower/CaloTowerAnalyser/batch/qcd_new_calib_140602/qcd_new_calib_140602.root";
 
 
 // Directory inside ROOT file

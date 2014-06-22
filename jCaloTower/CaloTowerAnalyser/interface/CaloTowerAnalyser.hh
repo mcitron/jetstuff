@@ -91,7 +91,8 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
 
     void getJets(std::vector < fastjet::PseudoJet > &constits,std::vector < fastjet::PseudoJet > &jets);
     std::vector<jJet> getL1Jets(const std::vector< std::vector<int> > & input, int jetsize, int vetowindowsize, int seedthresh1, int seedthresh2); 
-    std::vector<jJet> getL1JetsMask(const std::vector< std::vector<int> > & input, std::vector<std::vector <int> > mask, std::vector<std::vector <int > > donut_mask, int seedthresh1, int seedthresh2);
+    std::vector<jJet> getL1JetsMask(const std::vector< std::vector<int> > & input, std::vector<std::vector <int> > mask, std::vector<std::vector <int > > donut_mask,int nstrips, int seedthresh1, int seedthresh2);
+    std::vector<jJet> getL1JetsMask(const std::vector< std::vector<int> > & input,const std::vector< std::vector<int> > & inputEC,const std::vector< std::vector<int> > & inputHC, std::vector<std::vector <int> > mask, std::vector<std::vector <int > > donut_mask,int nstrips, int seedthresh1, int seedthresh2);
     //void compareJetCollections(const std::vector<jJet> & col1, const std::vector<jJet> & col2, std::string folderName, bool isgct);
     void MakeJetTree(const std::vector<jJet> & col1,const std::vector<jJet> & col2,TString folderName, bool isgct);
     void MakeSumTree(const std::vector<jJet> & col1,TString folderName,bool isgct, bool iscalibgct=false);
@@ -107,8 +108,6 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     void setEtaBins(std::map<TString,int> etaBins);
     void setPtBins(std::map<TString,int> ptBins);
     void setNintBins(std::map<TString,int> nintBins);
-    void bookPusHists(TString folderName);
-    void makePusHists(const std::vector< std::vector<int> >& myarray,const std::vector<jJet>& L1_4300_jJet,const std::vector<jJet>& L1_5450_jJet);
     double getMedian(const std::vector<jJet> & jets);
     int getMedianSeed(const std::vector<jJet> & jets);
     double calculateHT(const std::vector<jJet> & jets,const int & thresh);
@@ -122,14 +121,22 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     double mGctHtUncalib;
     TTree* tree;
     std::map<TString, std::vector<Float_t> *> jetPt_;
+    std::map<TString, std::vector<Float_t> *> jetMinDR_;
     std::map<TString, std::vector<Float_t> *> jetPhi_;
+    std::map<TString, std::vector<Float_t> *> jetDonut_;
+    std::map<TString, std::vector<Float_t> *> jetArea_;
+    std::map<TString, std::vector<Float_t> *> jetRms_;
     std::map<TString, std::vector<Float_t> *> jetEta_;
-    std::map<TString, std::vector<Float_t> *> jetRing_;
     std::map<TString, std::vector<Float_t> *> jetMatchedPt_;
     std::map<TString, std::vector<Float_t> *> sums_;
-
     std::map<TString, std::vector<Int_t> *> genJetMatchAlgo1_;
     std::map<TString, std::vector<Int_t> *> genJetMatchAlgo2_;
+
+    std::map<TString, std::vector<Float_t> *> jetOuterStripsArea_;
+    std::map<TString, std::vector<Float_t> *> jetOuterStripsEnergy_;
+    std::map<TString, std::vector<Float_t> *> jetRingSumsArea_;
+    std::map<TString, std::vector<Float_t> *> jetRingSumsEnergy_;
+    std::map<TString, std::vector<Float_t> *> jetRingSumsHighest_;
     bool mPrintMe=false;
     virtual void beginJob() ;
     virtual void analyze(const edm::Event&, const edm::EventSetup&);
@@ -145,7 +152,8 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     // ----------member data ---------------------------
     int mEventNumber;
     int mNPV;
-    double mET=0;
+    double medianRho=0;
+    double mET=0.;
     std::vector<double> mMET;
     std::vector<pair_info> pairs;
     TH1D * num_tops_per_event;
