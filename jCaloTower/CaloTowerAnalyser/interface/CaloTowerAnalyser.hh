@@ -97,6 +97,7 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     void MakeJetTree(const std::vector<jJet> & col1,const std::vector<jJet> & col2,TString folderName, bool isgct);
     void MakeSumTree(const std::vector<jJet> & col1,TString folderName,bool isgct, bool iscalibgct=false);
     void MakeMatchTree(const std::vector<jJet> & col1,const std::vector<jJet> & col2,TString folderName,bool isgct);
+    void MakeCalibration(const std::vector<jJet> & col1,const std::vector<jJet> & col2, TString folderName);
     void printOneEvent(const edm::Handle<l1slhc::L1CaloTowerCollection> triggertowers, const std::vector<jJet> & L1jets, const std::vector<fastjet::PseudoJet> & ak4ttjets, const reco::GenJetCollection * ak4genjets, std::vector<fastjet::PseudoJet> & ak4genjetsp);
     void printOneEvent(const edm::Handle<l1slhc::L1CaloTowerCollection> triggertowers, const std::map <TString,std::vector<jJet> > & L1jets, const std::map<TString,std::vector<fastjet::PseudoJet>> & ak4jets,std::map<TString,const reco::GenJetCollection *> ak4genjets);
     std::vector<int> closestJetDistance(const std::vector<jJet> & jJets);
@@ -137,6 +138,12 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     std::map<TString, std::vector<Float_t> *> jetRingSumsArea_;
     std::map<TString, std::vector<Float_t> *> jetRingSumsEnergy_;
     std::map<TString, std::vector<Float_t> *> jetRingSumsHighest_;
+
+    std::map<TString,TH2D *> col2_calib_ratio;
+    std::map<TString,TH2D *> col2_calib_corr;
+    std::map<TString,TProfile *> col2_calib_ratio_profile;
+    std::map<TString,TProfile *> col2_calib_corr_profile;
+
     bool mPrintMe=false;
     virtual void beginJob() ;
     virtual void analyze(const edm::Event&, const edm::EventSetup&);
