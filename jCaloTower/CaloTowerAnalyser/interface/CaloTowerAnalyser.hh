@@ -21,7 +21,6 @@ Implementation:
 //
 
 //Switches
-//#define COMPARE_COLLECTIONS
 
 // system include files
 #include <memory>

@@ -1,5 +1,6 @@
 void efficienciesNVTX(){
-TFile * f_ttbar= new TFile("ttbar_output.root");
+//TFile * f_ttbar= new TFile("ttbar_output.root");
+TFile * f_ttbar= new TFile("/afs/cern.ch/work/m/mcitron/public/TTBAR/140622/ttbar_output.root");
 //TFile * f_ttbar= new TFile("ttbar-output-2014-06-22.root");
 TFile * f_out= new TFile("./effTestNVTX.root","recreate");
 TTree * tree_ttbar = f_ttbar->Get("demo/L1Tree;");
@@ -8,14 +9,14 @@ jetnum.push_back("0");
 jetnum.push_back("1");
 jetnum.push_back("2");
 jetnum.push_back("3");
-int cut = 30;
+int cut = 50;
 std::vector<TString> jetType;
 jetType.push_back("5400_calib_nopus");
 jetType.push_back("5450_calib_nopus");
 jetType.push_back("5450_calib_donut");
 jetType.push_back("5400_calib_donut");
 jetType.push_back("5400_calib_global");
-//jetType.push_back("calib_gct");
+jetType.push_back("gct_calib_gen");
 TString bins = "(1000,0,1000)";
 
 TString bins2 = "(10,0,100,1000,0,1000)";
@@ -25,7 +26,7 @@ for (iNum = jetnum.begin();iNum != jetnum.end(); iNum++)
 {
   TDirectory * jnum = f_out->mkdir("jetNumber_"+*iNum);
   jnum->cd();
-  TCut genptcut = "jetPt_ak4_gen["+*iNum+"]>50";
+  TCut genptcut = "jetPt_ak4_gen["+*iNum+"]>25";
   tree_ttbar->Draw("jetPt_ak4_gen["+*iNum+"]>>overall_"+*iNum,genptcut,"");
   TH1D *overall = (TH1D*)gPad->GetPrimitive("overall_"+*iNum);
   double overallNorm = overall->GetEntries();
@@ -49,7 +50,7 @@ for (iNum = jetnum.begin();iNum != jetnum.end(); iNum++)
 	TH1D * cumuplot=makeCumu(dummyplot,overallNorm*factor);
 	cumuplot->SetTitle(buffer);
 	cumuplot->Write();
-	ypoints[i]=cumuplot->GetBinContent(cumuplot->FindBin(100));
+	ypoints[i]=cumuplot->GetBinContent(cumuplot->FindBin(cut));
 	//std::cout << ypoints[i]<< std::endl;
       }
       else
