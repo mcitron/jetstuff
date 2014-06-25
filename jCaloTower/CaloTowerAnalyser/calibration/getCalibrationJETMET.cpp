@@ -167,7 +167,8 @@ double ptStep = 5;
 //=======================
 
 
-TString filename = "/afs/cern.ch/work/m/mcitron/jadjets/CMSSW_6_2_0/src/jCaloTower/CaloTowerAnalyser/batch/qcd_new_calib_140602/qcd_new_calib_140602.root";
+//TString filename = "/afs/cern.ch/work/m/mcitron/public/QCD/140622/qcd_output.root";
+TString filename = "qcd_output_14-06-25.root";
 
 
 // Directory inside ROOT file
@@ -176,10 +177,10 @@ TString ROOTdir  = "";
 // Directory to store plots
 //  TString plotDirectory = "plots/Mk1Release/Presentation/8x8_PreFix/";
 int nEtaBins=8;
-double setPtBin=2;
+double setPtBin=10;
 double setPtMin=0;
 double setPtMax=300;
-TString plotDirectory = "qcd_new_0to300b2_";
+TString plotDirectory = "above30_0to300b10_";
 
 
 
@@ -294,24 +295,31 @@ int getCalibration(){
 
     // ak5PUSRaw vs ak5PUS
 
-    subDirs.push_back( "/5400_donut_gen/" );
-    subDirs.push_back( "/5400_global_gen/" );
-    subDirs.push_back( "/5400_nopus_gen/" );
-    subDirs.push_back( "/5450_donut_gen/" );
- //   subDirs.push_back( "/5450_global_gen/" );
-    subDirs.push_back( "/5450_nopus_gen/" );
+    subDirs.push_back( "/5400_donut/" );
+    subDirs.push_back( "/5400_global/" );
+    subDirs.push_back( "/5400_nopus/" );
+    subDirs.push_back( "/5450_donut/" );
+    subDirs.push_back( "/5450_global/" );
+    subDirs.push_back( "/5450_nopus/" );
+    subDirs.push_back( "/5450_2_strips_nopus/" );
+    subDirs.push_back( "/5450_3_strips_nopus/" );
+    subDirs.push_back( "/5450_squares_nopus/" );
+
     //subDirs.push_back( "/Calibration_LPUS_ak5PUS_AllJets/" );
 
     //	   subDirs.push_back( "/Calibration_UncalibCurr_ak5PUS/" );     
 
 
     std::map <TString, TString> typeLabel;
-    typeLabel[ "/5400_donut_gen/" ] = "5400_donut_4Jets";
-    typeLabel[ "/5400_global_gen/" ] = "5400_global_4Jets";
-    typeLabel[ "/5400_nopus_gen/" ] = "5400_nopus_4Jets";
-    typeLabel[ "/5450_donut_gen/" ] = "5450_donut_4Jets";
-  //  typeLabel[ "/5450_global_gen/" ] = "5450_global_4Jets";
-    typeLabel[ "/5450_nopus_gen/" ] = "5450_nopus_4Jets";
+    typeLabel[ "/5400_donut/" ] = "5400_donut_4Jets";
+    typeLabel[ "/5400_global/" ] = "5400_global_4Jets";
+    typeLabel[ "/5400_nopus/" ] = "5400_nopus_4Jets";
+    typeLabel[ "/5450_donut/" ] = "5450_donut_4Jets";
+    typeLabel[ "/5450_global/" ] = "5450_global_4Jets";
+    typeLabel[ "/5450_nopus/" ] = "5450_nopus_4Jets";
+    typeLabel[ "/5450_2_strips_nopus/" ] = "5450_2_strips_4Jets";
+    typeLabel[ "/5450_3_strips_nopus/" ] = "5450_3_strips_4Jets";
+    typeLabel[ "/5450_squares_nopus/" ] = "5450_squares_4Jets";
     //typeLabel[ "/Calibration_LPUS_ak5PUS_AllJets/" ] = "LPUS_AllJets";
 
 
@@ -768,7 +776,7 @@ int getCalibration(){
 
               fit_gaussian( yProject, nSigma, fitMin, nIter );
 
-              yProject->GetXaxis()->SetRangeUser(0.,210.);
+              yProject->GetXaxis()->SetRangeUser(0.,500.);
 
               TF1* gausPtFit = (TF1*) yProject->GetListOfFunctions()->Last();
 
