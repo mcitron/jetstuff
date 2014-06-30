@@ -136,6 +136,8 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     std::map<TString, std::vector<Float_t> *> jetOuterStripsEnergy_;
     std::map<TString, std::vector<Float_t> *> jetRingSumsArea_;
     std::map<TString, std::vector<Float_t> *> jetRingSumsEnergy_;
+    std::map<TString, std::vector<Float_t> *> jetRingSumsECAL_;
+    std::map<TString, std::vector<Float_t> *> jetRingSumsHCAL_;
     std::map<TString, std::vector<Float_t> *> jetRingSumsHighest_;
 
     std::map<TString,TH2D *> col2_calib_ratio;

@@ -42,6 +42,18 @@ if (col1.size()!=0)
       tree->Branch("jetRingSumsHighest_"+s+"_"+TString(folderName), "std::vector<float>", &jetRingSumsHighest_[folderName+"_jet_"+s]);
       tree->Branch("jetRingSumsArea_"+s+"_"+TString(folderName), "std::vector<float>", &jetRingSumsArea_[folderName+"_jet_"+s]);
     } 
+    for (unsigned int i = 0; i  != col1.at(0).ringSumsEC().size(); i++)
+    {
+      std::string s = std::to_string(i);
+      jetRingSumsECAL_[folderName+"_jet_"+s]= new std::vector<Float_t>();
+      tree->Branch("jetRingSumsECAL_"+s+"_"+TString(folderName), "std::vector<float>", &jetRingSumsECAL_[folderName+"_jet_"+s]);
+    } 
+    for (unsigned int i = 0; i  != col1.at(0).ringSums().size(); i++)
+    {
+      std::string s = std::to_string(i);
+      jetRingSumsHCAL_[folderName+"_jet_"+s]= new std::vector<Float_t>();
+      tree->Branch("jetRingSumsHCAL_"+s+"_"+TString(folderName), "std::vector<float>", &jetRingSumsHCAL_[folderName+"_jet_"+s]);
+    } 
   }
   std::vector<jJet> test = col1;
   pairs = (isgct) ? make_gct_pairs(col2,col1) : make_pairs(col2, col1);
@@ -68,6 +80,16 @@ if (col1.size()!=0)
     jetRingSumsEnergy_[folderName+"_jet_"+s]->clear();
     jetRingSumsHighest_[folderName+"_jet_"+s]->clear();
     jetRingSumsArea_[folderName+"_jet_"+s]->clear();
+  }
+  for (unsigned int i = 0; i  != col1.at(0).ringSumsEC().size(); i++)
+  {
+    std::string s = std::to_string(i);
+    jetRingSumsECAL_[folderName+"_jet_"+s]->clear();
+  }
+  for (unsigned int i = 0; i  != col1.at(0).ringSumsHC().size(); i++)
+  {
+    std::string s = std::to_string(i);
+    jetRingSumsHCAL_[folderName+"_jet_"+s]->clear();
   }
   //  std::vector <Float_t> * jetPhi_[folderName+"_jet"] = new std::vector<Float_t>();
   //  std::vector <Float_t> *  jetEta_[folderName+"_jet"] = new std::vector<Float_t>();
@@ -97,6 +119,16 @@ if (col1.size()!=0)
       jetRingSumsArea_[folderName+"_jet_"+s]->push_back(jet->ringAreas().at(j));
       jetRingSumsEnergy_[folderName+"_jet_"+s]->push_back(jet->ringSums().at(j));
       jetRingSumsHighest_[folderName+"_jet_"+s]->push_back(jet->ringMax().at(j));
+    }
+    for (unsigned int j = 0; j  != col1.at(0).ringSumsEC().size(); j++)
+    {
+      std::string s = std::to_string(j);
+      jetRingSumsECAL_[folderName+"_jet_"+s]->push_back(jet->ringSumsEC().at(j));
+    }
+    for (unsigned int j = 0; j  != col1.at(0).ringSumsHC().size(); j++)
+    {
+      std::string s = std::to_string(j);
+      jetRingSumsHCAL_[folderName+"_jet_"+s]->push_back(jet->ringSumsHC().at(j));
     }
 
     if (col1_matched_index_algo1[i]!=-1)
