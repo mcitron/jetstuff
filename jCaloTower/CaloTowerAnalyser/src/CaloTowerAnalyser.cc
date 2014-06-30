@@ -558,30 +558,30 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   number_jet_seed->Fill(1.-(double)L1_5450_jJet.size()/L1_5400_jJet.size());
   //Calibration
   //std::vector<jJet> calibrated_L1_5400_jJet = calibrateL1Jets(L1_5400_jJet,jetType::l15400nopus20,20,9999);
-  std::vector<jJet> calibrated30_L1_5400_jJet = calibrateL1Jets(L1_5400_jJet,jetType::l15400nopus30,30,9999);
+  std::vector<jJet> calibrated30_L1_5400_jJet = calibrateL1Jets(L1_5400_jJet,jetType::l15400nopus30,15,9999);
   std::vector<jJet> calibrated50_L1_5400_jJet = calibrateL1Jets(L1_5400_jJet,jetType::l15400nopus50,50,9999);
 
-  std::vector<jJet> calibrated30_L1_5400global_jJet = calibrateL1Jets(L1_5400global_jJet,jetType::l15400global30,30,9999);
+  std::vector<jJet> calibrated30_L1_5400global_jJet = calibrateL1Jets(L1_5400global_jJet,jetType::l15400global30,15,9999);
   std::vector<jJet> calibrated50_L1_5400global_jJet = calibrateL1Jets(L1_5400global_jJet,jetType::l15400global50,50,9999);
 
   //std::vector<jJet> calibrated_L1_5400donut_jJet = calibrateL1Jets(L1_5400donut_jJet,jetType::l15400donutGeV,8,9999);
-  std::vector<jJet> calibrated30_L1_5450donut_jJet = calibrateL1Jets(L1_5450donut_jJet,jetType::l15450donut30,30,9999);
+  std::vector<jJet> calibrated30_L1_5450donut_jJet = calibrateL1Jets(L1_5450donut_jJet,jetType::l15450donut30,15,9999);
   std::vector<jJet> calibrated50_L1_5450donut_jJet = calibrateL1Jets(L1_5450donut_jJet,jetType::l15450donut50,50,9999);
 
   //std::vector<jJet> calibrated_L1_5450_jJet = calibrateL1Jets(L1_5450_jJet,jetType::l15450nopus40,40,9999);
-  std::vector<jJet> calibrated30_L1_5450_jJet = calibrateL1Jets(L1_5450_jJet,jetType::l15450nopus30,30,9999);
+  std::vector<jJet> calibrated30_L1_5450_jJet = calibrateL1Jets(L1_5450_jJet,jetType::l15450nopus30,15,9999);
   std::vector<jJet> calibrated50_L1_5450_jJet = calibrateL1Jets(L1_5450_jJet,jetType::l15450nopus50,50,9999);
 
-  std::vector<jJet> calibrated30_L1_5450global_jJet = calibrateL1Jets(L1_5450global_jJet,jetType::l15450global30,30,9999);
+  std::vector<jJet> calibrated30_L1_5450global_jJet = calibrateL1Jets(L1_5450global_jJet,jetType::l15450global30,15,9999);
   std::vector<jJet> calibrated50_L1_5450global_jJet = calibrateL1Jets(L1_5450global_jJet,jetType::l15450global50,50,9999);
 
-  std::vector<jJet> calibrated30_L1_5450_2_strips_jJet = calibrateL1Jets(L1_5450_2_strips_jJet,jetType::l15450twoStrips30,30,9999);
+  std::vector<jJet> calibrated30_L1_5450_2_strips_jJet = calibrateL1Jets(L1_5450_2_strips_jJet,jetType::l15450twoStrips30,15,9999);
   std::vector<jJet> calibrated50_L1_5450_2_strips_jJet = calibrateL1Jets(L1_5450_2_strips_jJet,jetType::l15450twoStrips50,50,9999);
 
-  std::vector<jJet> calibrated30_L1_5450_3_strips_jJet = calibrateL1Jets(L1_5450_3_strips_jJet,jetType::l15450threeStrips30,30,9999);
+  std::vector<jJet> calibrated30_L1_5450_3_strips_jJet = calibrateL1Jets(L1_5450_3_strips_jJet,jetType::l15450threeStrips30,15,9999);
   std::vector<jJet> calibrated50_L1_5450_3_strips_jJet = calibrateL1Jets(L1_5450_3_strips_jJet,jetType::l15450threeStrips50,50,9999);
 
-  std::vector<jJet> calibrated30_L1_5450_squares_jJet = calibrateL1Jets(L1_5450_squares_jJet,jetType::l15450squares30,30,9999);
+  std::vector<jJet> calibrated30_L1_5450_squares_jJet = calibrateL1Jets(L1_5450_squares_jJet,jetType::l15450squares30,15,9999);
   std::vector<jJet> calibrated50_L1_5450_squares_jJet = calibrateL1Jets(L1_5450_squares_jJet,jetType::l15450squares50,50,9999);
 
   //this->mPrintMe = false;

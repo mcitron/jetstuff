@@ -140,6 +140,8 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
 
     std::map<TString,TH2D *> col2_calib_ratio;
     std::map<TString,TH2D *> col2_calib_corr;
+    std::map<TString,TH2D *> col1_calib_ratio;
+    std::map<TString,TProfile *> col1_calib_ratio_profile;
     std::map<TString,TProfile *> col2_calib_ratio_profile;
     std::map<TString,TProfile *> col2_calib_corr_profile;
 

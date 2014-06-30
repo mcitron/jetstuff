@@ -177,10 +177,10 @@ TString ROOTdir  = "";
 // Directory to store plots
 //  TString plotDirectory = "plots/Mk1Release/Presentation/8x8_PreFix/";
 int nEtaBins=8;
-double setPtBin=10;
+double setPtBin=2;
 double setPtMin=0;
 double setPtMax=300;
-TString plotDirectory = "above30_0to300b10_";
+TString plotDirectory = "final_1sigma_0to300b2_";
 
 
 
@@ -470,7 +470,7 @@ int getCalibration(){
       //Rebinning options
       bool doRebin = true;
       int responseRebin=1;
-      int ptRebin=10;
+      int ptRebin=5;
 
       //Option to replace fits with large errors with histograms
       bool replaceBadPoints = false;
@@ -658,9 +658,9 @@ int getCalibration(){
             // Ensure the histogram contains entries
             if ( yProject->GetEntries() != 0){
 
-              const double nSigma = 1.5;
+              const double nSigma = 1.0;
               const double fitMin = -999;
-              const int    nIter  = 5;
+              const int    nIter  = 3;
 
               if(doRebin) yProject->Rebin(responseRebin);
               fit_gaussian( yProject, nSigma, fitMin, nIter );
@@ -767,9 +767,9 @@ int getCalibration(){
             // Ensure the histogram contains entries
             if ( yProject->GetEntries() != 0){
 
-              const double nSigma = 1.5;
+              const double nSigma = 1.0;
               const double fitMin = -999;
-              const int    nIter  = 5;
+              const int    nIter  = 3;
 
               if(doRebin) yProject->Rebin(ptRebin);
 

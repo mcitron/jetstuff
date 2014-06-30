@@ -129,6 +129,7 @@ void CaloTowerAnalyser::MakeCalibration(const std::vector<jJet> & col1,const std
   etaCalibBins["iEta_21_to_28"] = std::make_pair(22,29);
 
   TFileDirectory calibdir=dir.mkdir("calibration");
+  TFileDirectory calibL1dir=dir.mkdir("l1");
   if(!pMade[folderName+"_calibration"])
   {
     for(auto etaBinIt=etaCalibBins.begin(); etaBinIt!=etaCalibBins.end(); etaBinIt++){
@@ -136,8 +137,12 @@ void CaloTowerAnalyser::MakeCalibration(const std::vector<jJet> & col1,const std
       col2_calib_ratio[TString(folderName)+etaBinIt->first]=calibdir.make<TH2D>("col2_calib_ratio_"+etaBinIt->first,";col2 p_{T};col1 p_{T}/col2 p_{T}",1000,-0.5,999.5,200,-10.05,10.95);
       col2_calib_ratio_profile[TString(folderName)+etaBinIt->first]=calibdir.make<TProfile>("col2_calib_ratio_profile_"+etaBinIt->first,";col2 p_{T};col1 p_{T}/col2 p_{T}",1000,-0.5,999.5);
 
+      col1_calib_ratio[TString(folderName)+etaBinIt->first]=calibL1dir.make<TH2D>("col1_calib_ratio_"+etaBinIt->first,";col1 p_{T};col1 p_{T}/col2 p_{T}",1000,-0.5,999.5,200,-10.05,10.95);
+      col1_calib_ratio_profile[TString(folderName)+etaBinIt->first]=calibL1dir.make<TProfile>("col1_calib_ratio_profile_"+etaBinIt->first,";col1 p_{T};col1 p_{T}/col2 p_{T}",1000,-0.5,999.5);
+
       col2_calib_corr[TString(folderName)+etaBinIt->first]=calibdir.make<TH2D>("col2_calib_corr_"+etaBinIt->first,";col2 p_{T};col1 p_{T}",1000,-0.5,999.5,1000,-0.5,999.5);
       col2_calib_corr_profile[TString(folderName)+etaBinIt->first]=calibdir.make<TProfile>("col2_calib_corr_profile_"+etaBinIt->first,";col2 p_{T};col1 p_{T}",1000,-0.5,999.5);
+
     }
     pMade[folderName+"_calibration"] = true;
   }
@@ -157,6 +162,9 @@ void CaloTowerAnalyser::MakeCalibration(const std::vector<jJet> & col1,const std
 	    col2_calib_ratio_profile[TString(folderName)+etaBinIt->first]->Fill(col2[i].pt(),col1[col2_matched_index[i]].pt()/col2[i].pt());
 	    col2_calib_corr[TString(folderName)+etaBinIt->first]->Fill(col2[i].pt(),col1[col2_matched_index[i]].pt());
 	    col2_calib_corr_profile[TString(folderName)+etaBinIt->first]->Fill(col2[i].pt(),col1[col2_matched_index[i]].pt());
+
+	    col1_calib_ratio[TString(folderName)+etaBinIt->first]->Fill(col1[i].pt(),col1[col2_matched_index[i]].pt()/col2[i].pt());
+	    col1_calib_ratio_profile[TString(folderName)+etaBinIt->first]->Fill(col1[i].pt(),col1[col2_matched_index[i]].pt()/col2[i].pt());
 	  }
 	}
       }

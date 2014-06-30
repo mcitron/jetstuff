@@ -5,8 +5,8 @@ import os
 
 num = str(int(os.environ['LSB_JOBINDEX'])-1)
 
-filelist='/afs/cern.ch/work/m/mcitron/jadjets/CMSSW_6_2_0/src/jCaloTower/CaloTowerAnalyser/batch/testout.txt'
-outputdir="/afs/cern.ch/work/m/mcitron/public/QCD/140622/"
+filelist='/afs/cern.ch/work/a/aelwood/trigger/jets/jadjet/CMSSW_6_2_0/src/jCaloTower/CaloTowerAnalyser/batch/testout.txt'
+outputdir="/afs/cern.ch/work/a/aelwood/public/qcd_output_14-06-27"
 
 arg_array=[]
 
