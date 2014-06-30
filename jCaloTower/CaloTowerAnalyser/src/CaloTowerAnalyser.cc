@@ -462,6 +462,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   std::vector<jJet> L1_5450_2_strips_jJet = getL1JetsMask(myarray, mask_square_9by9(), mask_donut_13by13(),8, 5, 0);
   std::vector<jJet> L1_5450_jJet_old = getL1Jets(myarray, 5, 4, 5, 0);
   std::vector<jJet> L1_5400_jJet_old = getL1Jets(myarray, 5, 4, 0, 0);
+  std::vector<jJet> L1_5400_for_Nick = getL1JetsMask(myarray,myarrayECAL,myarrayHCAL, mask_square_9by9(),mask_donut_11by11(),4,0,0);
 
   std::vector<jJet> L1_5400donut_jJet;
   std::vector<jJet> L1_5400global_jJet;
@@ -571,7 +572,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   this->MakeMatchTree(ak4genjetsp_jJet,ak4genjetsp_jJet,"ak4_gen",false);
   std::map <TString,std::vector<jJet> > jJetComp;
 
-  jJetComp["5400_nopus"]=L1_5400_jJet;
+  /*jJetComp["5400_nopus"]=L1_5400_jJet;
   jJetComp["5400_nopus_old"]=L1_5400_jJet_old;
   jJetComp["5400_donut"]=L1_5400donut_jJet;
   jJetComp["5400_global"]=L1_5400global_jJet;
@@ -587,7 +588,8 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   jJetComp["5450_donut"]=L1_5450donut_jJet;
   jJetComp["5450_global"]=L1_5450global_jJet;
   jJetComp["5450_calib_nopus"]=calibrated_L1_5450_jJet;
-  jJetComp["5450_calib_donut"]=calibrated_L1_5450donut_jJet;
+  jJetComp["5450_calib_donut"]=calibrated_L1_5450donut_jJet;*/
+  jJetComp["L1_for_Nick"]=L1_5400_for_Nick;
 
   for (auto jet = jJetComp.begin();jet != jJetComp.end(); jet++)
   {

@@ -21,8 +21,18 @@ process.source = cms.Source("PoolSource",
     #'file:/afs/cern.ch/work/j/jad/public/TriggerTowers_TTbar_13TeV_PU40_25ns_1-10_skimmed_v2.root'
     #'file:/afs/cern.ch/work/j/jad/public/TriggerTowers_TTbar_13TeV_noPU_test2_v3.root'
     #'file:/afs/cern.ch/work/j/jad/public/TriggerTowers_TTbar_13TeV_PU40_50ns_1-10_skimmed_v3.root'    
-      'file:/afs/cern.ch/work/a/aelwood/public/TriggerTowers_TTbar_13TeV_PU40_50ns_1-10_skimmed_v3.root'
+      #'file:/afs/cern.ch/work/a/aelwood/public/TriggerTowers_TTbar_13TeV_PU40_50ns_1-10_skimmed_v3.root'
       #'file:/afs/cern.ch/work/j/jad/public/TriggerTowers_TTbar_13TeV_noPU_skimmed_v2.root'
+'file:/afs/cern.ch/work/m/mcitron/PU140TTBAR/L1SkimRun_10_1_fnV.root',
+'file:/afs/cern.ch/work/m/mcitron/PU140TTBAR/L1SkimRun_11_1_0HL.root',
+'file:/afs/cern.ch/work/m/mcitron/PU140TTBAR/L1SkimRun_12_1_3vs.root',
+'file:/afs/cern.ch/work/m/mcitron/PU140TTBAR/L1SkimRun_1_1_ysm.root',
+'file:/afs/cern.ch/work/m/mcitron/PU140TTBAR/L1SkimRun_2_1_rrq.root',
+'file:/afs/cern.ch/work/m/mcitron/PU140TTBAR/L1SkimRun_3_1_gLD.root',
+'file:/afs/cern.ch/work/m/mcitron/PU140TTBAR/L1SkimRun_4_1_bJw.root',
+'file:/afs/cern.ch/work/m/mcitron/PU140TTBAR/L1SkimRun_6_1_RZp.root',
+'file:/afs/cern.ch/work/m/mcitron/PU140TTBAR/L1SkimRun_8_1_rla.root',
+'file:/afs/cern.ch/work/m/mcitron/PU140TTBAR/L1SkimRun_9_1_h1z.root',
     ),
     skipEvents=cms.untracked.uint32(0)
 )
