@@ -9,7 +9,11 @@ if (col1.size()!=0)
     std::cout << folderName+"_jet" <<std::endl;
     jetPt_[folderName+"_jet"] = new std::vector<Float_t>();
     jetArea_[folderName+"_jet"] = new std::vector<Float_t>();
-    jetRms_[folderName+"_jet"] = new std::vector<Float_t>();
+    jetFirEta_[folderName+"_jet"] = new std::vector<Float_t>();
+    jetCovEtaPhi_[folderName+"_jet"] = new std::vector<Float_t>();
+    jetFirPhi_[folderName+"_jet"] = new std::vector<Float_t>();
+    jetSecEta_[folderName+"_jet"] = new std::vector<Float_t>();
+    jetSecPhi_[folderName+"_jet"] = new std::vector<Float_t>();
     jetPhi_[folderName+"_jet"] = new std::vector<Float_t>();
     jetEta_[folderName+"_jet"] = new std::vector<Float_t>();
     jetDonut_[folderName+"_jet"] = new std::vector<Float_t>();
@@ -17,7 +21,11 @@ if (col1.size()!=0)
     jetMinDR_[folderName+"_jet"] = new std::vector<Float_t>();
     tree->Branch("jetPt_"+TString(folderName), "std::vector<float>", &jetPt_[folderName+"_jet"]);
     tree->Branch("jetArea_"+TString(folderName), "std::vector<float>", &jetArea_[folderName+"_jet"]);
-    tree->Branch("jetRms_"+TString(folderName), "std::vector<float>", &jetRms_[folderName+"_jet"]);
+    tree->Branch("jetFirEta_"+TString(folderName), "std::vector<float>", &jetFirEta_[folderName+"_jet"]);
+    tree->Branch("jetCovEtaPhi_"+TString(folderName), "std::vector<float>", &jetCovEtaPhi_[folderName+"_jet"]);
+    tree->Branch("jetFirPhi_"+TString(folderName), "std::vector<float>", &jetFirPhi_[folderName+"_jet"]);
+    tree->Branch("jetSecEta_"+TString(folderName), "std::vector<float>", &jetSecEta_[folderName+"_jet"]);
+    tree->Branch("jetSecPhi_"+TString(folderName), "std::vector<float>", &jetSecPhi_[folderName+"_jet"]);
     tree->Branch("jetPhi_"+TString(folderName), "std::vector<float>", &jetPhi_[folderName+"_jet"]);
     tree->Branch("jetEta_"+TString(folderName), "std::vector<float>", &jetEta_[folderName+"_jet"]);
     tree->Branch("jetDonut_"+TString(folderName), "std::vector<float>", &jetDonut_[folderName+"_jet"]);
@@ -61,7 +69,11 @@ if (col1.size()!=0)
   //std::cout << col1_matched_index_algo1.at(0) << std::endl;
   jetPt_[folderName+"_jet"]->clear();
   jetArea_[folderName+"_jet"]->clear();
-  jetRms_[folderName+"_jet"]->clear();
+  jetFirEta_[folderName+"_jet"]->clear();
+  jetCovEtaPhi_[folderName+"_jet"]->clear();
+  jetFirPhi_[folderName+"_jet"]->clear();
+  jetSecEta_[folderName+"_jet"]->clear();
+  jetSecPhi_[folderName+"_jet"]->clear();
   jetPhi_[folderName+"_jet"]->clear();
   jetEta_[folderName+"_jet"]->clear();
   jetDonut_[folderName+"_jet"]->clear();
@@ -104,7 +116,11 @@ if (col1.size()!=0)
     } 
     jetDonut_[folderName+"_jet"]->push_back(jet->getOuterSum());
     jetArea_[folderName+"_jet"]->push_back(jet->area());
-    jetRms_[folderName+"_jet"]->push_back(jet->rms());
+    jetFirEta_[folderName+"_jet"]->push_back(jet->firEta());
+    jetFirPhi_[folderName+"_jet"]->push_back(jet->firPhi());
+    jetSecEta_[folderName+"_jet"]->push_back(jet->secEta());
+    jetSecPhi_[folderName+"_jet"]->push_back(jet->secPhi());
+    jetCovEtaPhi_[folderName+"_jet"]->push_back(jet->covEtaPhi());
 
     jetMinDR_[folderName+"_jet"]->push_back(test.at(i).minDeltaR2(col1));
     for (unsigned int j = 0; j  != jet->getOuterStrips().size(); j++)
