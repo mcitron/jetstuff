@@ -5,8 +5,8 @@ import os
 
 num = str(int(os.environ['LSB_JOBINDEX'])-1)
 
-filelist='/afs/cern.ch/work/a/aelwood/trigger/jets/jadjet/CMSSW_6_2_0/src/jCaloTower/CaloTowerAnalyser/batch/testout.txt'
-outputdir="/afs/cern.ch/work/a/aelwood/public/qcd_output_14-06-27"
+filelist='/afs/cern.ch/work/a/aelwood/trigger/jets/jadjet/CMSSW_6_2_0/src/jCaloTower/CaloTowerAnalyser/crab/files.txt'
+outputdir="/afs/cern.ch/work/a/aelwood/public/qcd_output_14-07-02"
 
 arg_array=[]
 
@@ -17,7 +17,7 @@ with open(filelist) as f:
   i+=1
 
 #define file names
-configinput=make_config.make_config_input(arg_array[int(num)][0],arg_array[int(num)][1],arg_array[int(num)][2],arg_array[int(num)][3],"skimrun")
+configinput=make_config.make_config_input(arg_array[int(num)][0],arg_array[int(num)][1],arg_array[int(num)][2],arg_array[int(num)][3],"jadtest")
 if not os.path.exists(outputdir):
     os.makedirs(outputdir)
 print configinput

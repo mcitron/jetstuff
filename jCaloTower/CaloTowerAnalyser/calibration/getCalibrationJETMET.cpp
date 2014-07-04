@@ -180,7 +180,7 @@ int nEtaBins=8;
 double setPtBin=2;
 double setPtMin=0;
 double setPtMax=300;
-TString plotDirectory = "final_1sigma_0to300b2_";
+TString plotDirectory = "mostcommon_0to300b2_";
 
 
 
@@ -467,10 +467,14 @@ int getCalibration(){
       //double ptMax = 120;
       double ptMax = setPtMax;
 
+      //Choose whether to do a fit or take the most common value
+      bool doFit = false;
+      bool doMostCommon = true;
+
       //Rebinning options
-      bool doRebin = true;
+      bool doRebin = false;
       int responseRebin=1;
-      int ptRebin=5;
+      int ptRebin=10;
 
       //Option to replace fits with large errors with histograms
       bool replaceBadPoints = false;
@@ -478,9 +482,9 @@ int getCalibration(){
 
       //The allowed difference between the mean of the fit
       //and the hist mean
-      double allowedFitDifference = 0.2;//0.1;
-      double allowedPtErr = ptBinning*2.0;//*1.5;
-      double allowedReciprocalResponseErr = 0.2;//0.1;
+      double allowedFitDifference = 2.0;//0.1;
+      double allowedPtErr = ptBinning*5.0;//*1.5;
+      double allowedReciprocalResponseErr = 0.5;//0.1;
 
 
       // **************************************************
@@ -663,7 +667,7 @@ int getCalibration(){
               const int    nIter  = 3;
 
               if(doRebin) yProject->Rebin(responseRebin);
-              fit_gaussian( yProject, nSigma, fitMin, nIter );
+              if(doFit) fit_gaussian( yProject, nSigma, fitMin, nIter );
 
 
               yProject->GetXaxis()->SetRangeUser(0.,2.5);
@@ -679,7 +683,7 @@ int getCalibration(){
                 fitStat->Draw();
               }
 
-              if ( gausResFit) {
+              if (doFit && gausResFit) {
                 //		yProject->Fit(gausResFit,"QR");
                 gausResFit->SetLineColor(kRed);
                 gausResFit->SetLineWidth(1);
@@ -689,7 +693,7 @@ int getCalibration(){
               //    canv->SaveAs(plotDirectory + filepath + histName + newSaveName + "FitGaus.pdf");   // write histogram to file
 
 
-              if ( gausResFit) {
+              if ( doFit && gausResFit) {
 
                 // Get gaussian fit mean 
                 response    = gausResFit->GetParameter( 1 );
@@ -698,7 +702,13 @@ int getCalibration(){
 
                 //Fill the chi2
                 responseChi2->Fill((ptLow+ptHigh)/2.0,etaIndex+0.5,gausResFit->GetChisquare()/(yProject->GetNbinsX()-3.0));
-              }	      
+              }else if(doMostCommon){
+                response = yProject->GetBinCenter(yProject->GetMaximumBin());
+                int bin1Fwhm = yProject->FindFirstBinAbove(yProject->GetMaximum()/2.);
+                int bin2Fwhm = yProject->FindLastBinAbove(yProject->GetMaximum()/2.);
+                double fwhm = yProject->GetBinCenter(bin2Fwhm) - yProject->GetBinCenter(bin1Fwhm);
+                responseErr = fwhm/2.4;
+              }
               std::cout << "Final fit: Response = " << response << " +/- " << responseErr << "\n";
 
             }
@@ -774,11 +784,12 @@ int getCalibration(){
               if(doRebin) yProject->Rebin(ptRebin);
 
 
-              fit_gaussian( yProject, nSigma, fitMin, nIter );
+              if(doFit) fit_gaussian( yProject, nSigma, fitMin, nIter );
 
               yProject->GetXaxis()->SetRangeUser(0.,500.);
 
               TF1* gausPtFit = (TF1*) yProject->GetListOfFunctions()->Last();
+
 
 
               //statsbox wizardry
@@ -789,7 +800,7 @@ int getCalibration(){
                 fitStat->SetX1NDC(.57); fitStat->SetX2NDC(.88); fitStat->SetY1NDC(.14); fitStat->SetY2NDC(.53);
                 fitStat->Draw();
               }
-              if ( gausPtFit) { 
+              if ( doFit && gausPtFit) { 
                 //		yProject->Fit(gausPtFit,"QR"); 
                 gausPtFit->SetLineColor(kRed);
                 gausPtFit->SetLineWidth(1);
@@ -799,7 +810,7 @@ int getCalibration(){
               //      canv->SaveAs(plotDirectory + filepath + histName + newSaveName + "FitGaus.pdf");   // write histogram to file
 
 
-              if (gausPtFit){
+              if (doFit && gausPtFit){
                 // Get gaussian fit mean
                 l1Pt    = gausPtFit->GetParameter( 1 );
                 //l1PtErr = gausPtFit->GetParameter( 2 );
@@ -807,6 +818,13 @@ int getCalibration(){
 
                 //Fill the chi2
                 ptChi2->Fill((ptLow+ptHigh)/2.0,etaIndex+0.5,gausPtFit->GetChisquare()/(yProject->GetNbinsX()-3.0));
+              }else if(doMostCommon){
+                l1Pt = yProject->GetBinCenter(yProject->GetMaximumBin());
+
+                int bin1Fwhm2 = yProject->FindFirstBinAbove(yProject->GetMaximum()/2.);
+                int bin2Fwhm2 = yProject->FindLastBinAbove(yProject->GetMaximum()/2.);
+                double fwhm = yProject->GetBinCenter(bin2Fwhm2) - yProject->GetBinCenter(bin1Fwhm2);
+                l1PtErr = fwhm/2.4;
               }
 
               std::cout << "Final fit: L1Pt = " << l1Pt << " +/- " << l1PtErr << "\n";
@@ -844,7 +862,7 @@ int getCalibration(){
 
 
       }
-    
+
 
       //#ifdef DEBUG_OFF  
 
