@@ -450,6 +450,14 @@ int calibrateFile(TString ROOTFile,  double calibFitMin = 0, double calibFitMax 
   }
   directory.Remove(index, directory.Length() );
 
+  TString lutOut = ROOTFile;
+  index = 0;
+  while ( lutOut.Index(".", index) != -1 ){
+    index = lutOut.Index(".", index) + 1;
+  }
+  lutOut.Remove(index, lutOut.Length() );
+  lutOut=lutOut+"lut";
+
   // Open the ROOT file
   //TFile *f = new TFile(ROOTFile, "OPEN");
   TFile *f = new TFile(ROOTFile, "UPDATE");
@@ -496,10 +504,10 @@ int calibrateFile(TString ROOTFile,  double calibFitMin = 0, double calibFitMax 
   std::cout << "Output LUT: \n\n";
   std::cout << outputCMSSW << "\n\n";
 
-
-
-
-
+  ofstream outputLutFile;
+  outputLutFile.open (lutOut.Data());
+  outputLutFile << outputCMSSW << "\n";
+  outputLutFile.close();
 
   return 0;
 }
@@ -512,99 +520,99 @@ int calibrateFile(TString ROOTFile,  double calibFitMin = 0, double calibFitMax 
 // recalibrateFile( "/vols/cms04/mb1512/Batch/2014-02-07_SingleMu_12Dec_11x11/SingleMu_12Dec_11x11.root", "Calibration_CalibPUS_ak5PUS" )
 /*
 
-int recalibrateFile( TString ROOTFile, TString jetCollection = "Calibration_CalibPrePUS_ak5PUS", double transitionPt = 45, bool NVTXCorrection = false ){
+   int recalibrateFile( TString ROOTFile, TString jetCollection = "Calibration_CalibPrePUS_ak5PUS", double transitionPt = 45, bool NVTXCorrection = false ){
 
 
 
 
-  // Find the directory in which the ROOT file resides
-  TString directory = ROOTFile;
-  int index = 0;
-  while ( directory.Index("/", index) != -1 ){
-    index = directory.Index("/", index) + 1;
-  }
-  directory.Remove(index, directory.Length() );
+// Find the directory in which the ROOT file resides
+TString directory = ROOTFile;
+int index = 0;
+while ( directory.Index("/", index) != -1 ){
+index = directory.Index("/", index) + 1;
+}
+directory.Remove(index, directory.Length() );
 
-  // Open the ROOT file
-  TFile *f = new TFile(ROOTFile, "OPEN");
-
-
-
-
-
-  // list of histogram names in ROOT file with their corresponding directory structure 
-  std::vector < std::pair <TString, TString> > fileHistPair;
-  // get list of histograms in file 
-  fileHistPair = getROOTobjects(f, "", "TProfile");
-
-  TString outputLowPt, outputHighPt, outputNVTXResponse;
-
-  // Calibrate each histogram in the ROOTfile
-  for (unsigned int i = 0; i < fileHistPair.size(); i++){
-
-    // Extract the directory and name of the histogram 
-    TString filepathRaw      = fileHistPair[i].first;
-    TString histogramName = fileHistPair[i].second;
-
-    // Skip directories that are non pertinent
-    if ( filepathRaw.Contains("/Calibration/") == 0 ){
-      continue;
-    }
-    if ( filepathRaw.Contains( jetCollection ) == 0 ){
-      continue;
-    }
-    if ( filepathRaw.Contains("/Recalib") == 0 ){
-      continue;
-    }
-    // Get only relavent histograms
-    if ( histogramName.Contains("JetResponse_vs_L1PT") == 0 ){
-      continue;
-    }
-
-    TString etaRange = histogramName;
-    etaRange.ReplaceAll(jetCollection + "_JetResponse_vs_L1PT_","");
-    etaRange.ReplaceAll("_prof","");
-
-    // Run recalibration on the graph
-    recalibrateGraph( f, directory, outputLowPt, outputHighPt, outputNVTXResponse, 0, transitionPt, 200, jetCollection, etaRange, NVTXCorrection );
-
-  }
+// Open the ROOT file
+TFile *f = new TFile(ROOTFile, "OPEN");
 
 
 
 
 
+// list of histogram names in ROOT file with their corresponding directory structure 
+std::vector < std::pair <TString, TString> > fileHistPair;
+// get list of histograms in file 
+fileHistPair = getROOTobjects(f, "", "TProfile");
 
+TString outputLowPt, outputHighPt, outputNVTXResponse;
 
+// Calibrate each histogram in the ROOTfile
+for (unsigned int i = 0; i < fileHistPair.size(); i++){
 
+// Extract the directory and name of the histogram 
+TString filepathRaw      = fileHistPair[i].first;
+TString histogramName = fileHistPair[i].second;
 
-  // Write low-pT LUT  
-  std::ofstream iWriteLowPt (directory + jetCollection + "LowPt.LUT", std::ofstream::out);
-  iWriteLowPt << outputLowPt;
-  iWriteLowPt.close();
+// Skip directories that are non pertinent
+if ( filepathRaw.Contains("/Calibration/") == 0 ){
+continue;
+}
+if ( filepathRaw.Contains( jetCollection ) == 0 ){
+continue;
+}
+if ( filepathRaw.Contains("/Recalib") == 0 ){
+continue;
+}
+// Get only relavent histograms
+if ( histogramName.Contains("JetResponse_vs_L1PT") == 0 ){
+continue;
+}
 
-  // Write high-pT LUT  
-  std::ofstream iWriteHighPt (directory + jetCollection + "HighPt.LUT", std::ofstream::out);
-  iWriteHighPt << outputHighPt;
-  iWriteHighPt.close();
+TString etaRange = histogramName;
+etaRange.ReplaceAll(jetCollection + "_JetResponse_vs_L1PT_","");
+etaRange.ReplaceAll("_prof","");
 
-  // Write offset LUT  
-  std::ofstream iWriteNVTXResponse (directory + jetCollection + "NVTXResponse.LUT", std::ofstream::out);
-  iWriteNVTXResponse << outputNVTXResponse;
-  iWriteNVTXResponse.close();
+// Run recalibration on the graph
+recalibrateGraph( f, directory, outputLowPt, outputHighPt, outputNVTXResponse, 0, transitionPt, 200, jetCollection, etaRange, NVTXCorrection );
 
-
-  std::cout << "\n\n\n\nWritten LUTs:\n\n" 
-    << "\t" << directory + jetCollection + "LowPt.LUT"        << "\n"
-    << "\t" << directory + jetCollection + "HighPt.LUT"       << "\n"
-    << "\t" << directory + jetCollection + "NVTXResponse.LUT" << "\n\n";
+}
 
 
 
 
 
 
-  return 0;
+
+
+
+// Write low-pT LUT  
+std::ofstream iWriteLowPt (directory + jetCollection + "LowPt.LUT", std::ofstream::out);
+iWriteLowPt << outputLowPt;
+iWriteLowPt.close();
+
+// Write high-pT LUT  
+std::ofstream iWriteHighPt (directory + jetCollection + "HighPt.LUT", std::ofstream::out);
+iWriteHighPt << outputHighPt;
+iWriteHighPt.close();
+
+// Write offset LUT  
+std::ofstream iWriteNVTXResponse (directory + jetCollection + "NVTXResponse.LUT", std::ofstream::out);
+iWriteNVTXResponse << outputNVTXResponse;
+iWriteNVTXResponse.close();
+
+
+std::cout << "\n\n\n\nWritten LUTs:\n\n" 
+<< "\t" << directory + jetCollection + "LowPt.LUT"        << "\n"
+<< "\t" << directory + jetCollection + "HighPt.LUT"       << "\n"
+<< "\t" << directory + jetCollection + "NVTXResponse.LUT" << "\n\n";
+
+
+
+
+
+
+return 0;
 }
 
 */

@@ -168,7 +168,7 @@ double ptStep = 5;
 
 
 //TString filename = "/afs/cern.ch/work/m/mcitron/public/QCD/140622/qcd_output.root";
-TString filename = "qcd_output_14-06-25.root";
+TString filename = "/vols/cms02/ace09/public/qcd_output_14-07-02/qcd_output_14-07-02.root";
 
 
 // Directory inside ROOT file
@@ -180,7 +180,7 @@ int nEtaBins=8;
 double setPtBin=2;
 double setPtMin=0;
 double setPtMax=300;
-TString plotDirectory = "mostcommon_0to300b2_";
+TString plotDirectory = "fit_0to300b2_";
 
 
 
@@ -303,7 +303,7 @@ int getCalibration(){
     subDirs.push_back( "/5450_nopus/" );
     subDirs.push_back( "/5450_2_strips_nopus/" );
     subDirs.push_back( "/5450_3_strips_nopus/" );
-    subDirs.push_back( "/5450_squares_nopus/" );
+  //  subDirs.push_back( "/5450_squares_nopus/" );
 
     //subDirs.push_back( "/Calibration_LPUS_ak5PUS_AllJets/" );
 
@@ -319,7 +319,7 @@ int getCalibration(){
     typeLabel[ "/5450_nopus/" ] = "5450_nopus_4Jets";
     typeLabel[ "/5450_2_strips_nopus/" ] = "5450_2_strips_4Jets";
     typeLabel[ "/5450_3_strips_nopus/" ] = "5450_3_strips_4Jets";
-    typeLabel[ "/5450_squares_nopus/" ] = "5450_squares_4Jets";
+  //  typeLabel[ "/5450_squares_nopus/" ] = "5450_squares_4Jets";
     //typeLabel[ "/Calibration_LPUS_ak5PUS_AllJets/" ] = "LPUS_AllJets";
 
 
@@ -468,13 +468,13 @@ int getCalibration(){
       double ptMax = setPtMax;
 
       //Choose whether to do a fit or take the most common value
-      bool doFit = false;
-      bool doMostCommon = true;
+      bool doFit = true;
+      bool doMostCommon = false;
 
       //Rebinning options
-      bool doRebin = false;
+      bool doRebin = true;
       int responseRebin=1;
-      int ptRebin=10;
+      int ptRebin=2;
 
       //Option to replace fits with large errors with histograms
       bool replaceBadPoints = false;
@@ -482,9 +482,9 @@ int getCalibration(){
 
       //The allowed difference between the mean of the fit
       //and the hist mean
-      double allowedFitDifference = 2.0;//0.1;
-      double allowedPtErr = ptBinning*5.0;//*1.5;
-      double allowedReciprocalResponseErr = 0.5;//0.1;
+      double allowedFitDifference = 0.2;//2.0;//0.1;
+      double allowedPtErr = ptBinning*2.0;//*1.5;
+      double allowedReciprocalResponseErr = 0.3;//0.1;
 
 
       // **************************************************
@@ -662,7 +662,7 @@ int getCalibration(){
             // Ensure the histogram contains entries
             if ( yProject->GetEntries() != 0){
 
-              const double nSigma = 1.0;
+              const double nSigma = 1.5;
               const double fitMin = -999;
               const int    nIter  = 3;
 
@@ -704,10 +704,13 @@ int getCalibration(){
                 responseChi2->Fill((ptLow+ptHigh)/2.0,etaIndex+0.5,gausResFit->GetChisquare()/(yProject->GetNbinsX()-3.0));
               }else if(doMostCommon){
                 response = yProject->GetBinCenter(yProject->GetMaximumBin());
-                int bin1Fwhm = yProject->FindFirstBinAbove(yProject->GetMaximum()/2.);
+
+                //For fwhm, go from the centre so as not to be effected by being bound below by 0
+
+                //int bin1Fwhm = yProject->FindFirstBinAbove(yProject->GetMaximum()/2.);
                 int bin2Fwhm = yProject->FindLastBinAbove(yProject->GetMaximum()/2.);
-                double fwhm = yProject->GetBinCenter(bin2Fwhm) - yProject->GetBinCenter(bin1Fwhm);
-                responseErr = fwhm/2.4;
+                double fwhm = yProject->GetBinCenter(bin2Fwhm) - response;
+                responseErr = fwhm/1.2;
               }
               std::cout << "Final fit: Response = " << response << " +/- " << responseErr << "\n";
 
@@ -777,7 +780,7 @@ int getCalibration(){
             // Ensure the histogram contains entries
             if ( yProject->GetEntries() != 0){
 
-              const double nSigma = 1.0;
+              const double nSigma = 1.5;
               const double fitMin = -999;
               const int    nIter  = 3;
 
@@ -821,10 +824,13 @@ int getCalibration(){
               }else if(doMostCommon){
                 l1Pt = yProject->GetBinCenter(yProject->GetMaximumBin());
 
-                int bin1Fwhm2 = yProject->FindFirstBinAbove(yProject->GetMaximum()/2.);
+                //For fwhm, go from the centre so as not to be effected by being bound below by 0
+
+                //int bin1Fwhm = yProject->FindFirstBinAbove(yProject->GetMaximum()/2.);
                 int bin2Fwhm2 = yProject->FindLastBinAbove(yProject->GetMaximum()/2.);
-                double fwhm = yProject->GetBinCenter(bin2Fwhm2) - yProject->GetBinCenter(bin1Fwhm2);
-                l1PtErr = fwhm/2.4;
+
+                double fwhm = yProject->GetBinCenter(bin2Fwhm2) - l1Pt;
+                l1PtErr = fwhm/1.2;
               }
 
               std::cout << "Final fit: L1Pt = " << l1Pt << " +/- " << l1PtErr << "\n";
@@ -969,13 +975,13 @@ int getCalibration(){
         }
 
         outputCMSSW += "\n\t),";
-
+/*
         ofstream calibLUT;
         calibLUT.open( plotDirectory + collName + "LUT.txt" );
         calibLUT << outputCMSSW;
         calibLUT.close();
 
-
+*/
         std::cout << "Made LUT: " + plotDirectory + collName + "LUT.txt" + "\n";
         std::cout << outputCMSSW << "\n\n";
 
@@ -1242,8 +1248,8 @@ std::vector < std::pair <TString, TString> > getROOTobjects(TFile* f, TString ro
     objName      = key->GetName();
 
     //Modified to cut down on number of directories
-    if(objName.Contains("Recalib") || objName.Contains("Delta") || objName.Contains("_Calib")) continue;
-    //std::cout << objName.Data() << std::endl;
+    if(objName.Contains("L1Tree") || objName.Contains("_Calib") || objName.Contains("l1") || objName.Contains("global_histograms") || objName.Contains("calib30") || objName.Contains("calib50")) continue;
+    std::cout << objName.Data() << std::endl;
     //std::cout << objectList.size() << std::endl;
 
     objClassName = obj->ClassName();
