@@ -19,6 +19,7 @@ double calibFit( Double_t *v, Double_t *par ){
 }
 
 enum jetType{
+  l15400donut,
   l15400global,
   l15400nopus,
   l15450donut,
@@ -36,6 +37,7 @@ std::vector<jJet> calibrateL1Jets(const std::vector<jJet>& inJets, const jetType
   for(int i=0; i<48; i++){
 
     if(type==jetType::l15400global) lut.push_back(luts5400GeV::globalLut[i]);
+    else if(type==jetType::l15400donut) lut.push_back(luts5400GeV::donutLut[i]);
     else if(type==jetType::l15400nopus) lut.push_back(luts5400GeV::nopusLut[i]);
     else if(type==jetType::l15450donut) lut.push_back(luts5450GeV::donutLut[i]);
     else if(type==jetType::l15450global) lut.push_back(luts5450GeV::globalLut[i]);
