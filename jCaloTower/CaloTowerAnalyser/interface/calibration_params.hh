@@ -1,8 +1,7 @@
 #ifndef CALIBRATIONPARAMS_HH
 #define CALIBRATIONPARAMS_HH
 
-//#include "jCaloTower/CaloTowerAnalyser/interface/calibrationLuts.hh"
-#include "jCaloTower/CaloTowerAnalyser/interface/calibrationLutsGeV.hh"
+#include "jCaloTower/CaloTowerAnalyser/interface/calibrationLuts.hh"
 
 double calibFit( Double_t *v, Double_t *par ){
 
@@ -20,23 +19,13 @@ double calibFit( Double_t *v, Double_t *par ){
 }
 
 enum jetType{
-  l15400global30,
-  l15400nopus30,
-  l15450donut30,
-  l15450nopus30,
-  l15450global30,
-  l15450twoStrips30,
-  l15450threeStrips30,
-  l15450squares30,
-
-  l15400global50,
-  l15400nopus50,
-  l15450donut50,
-  l15450nopus50,
-  l15450global50,
-  l15450twoStrips50,
-  l15450threeStrips50,
-  l15450squares50,
+  l15400global,
+  l15400nopus,
+  l15450donut,
+  l15450nopus,
+  l15450global,
+  l15450twoStrips,
+  l15450threeStrips,
 };
 
 std::vector<jJet> calibrateL1Jets(const std::vector<jJet>& inJets, const jetType & type, double ptMin, double ptMax){
@@ -46,23 +35,13 @@ std::vector<jJet> calibrateL1Jets(const std::vector<jJet>& inJets, const jetType
   std::vector<jJet> outJets;
   for(int i=0; i<48; i++){
 
-    if(type==jetType::l15400global30) lut.push_back(luts5400GeV::globalLut30[i]);
-    else if(type==jetType::l15400nopus30) lut.push_back(luts5400GeV::nopusLut30[i]);
-    else if(type==jetType::l15450donut30) lut.push_back(luts5450GeV::donutLut30[i]);
-    else if(type==jetType::l15450global30) lut.push_back(luts5450GeV::globalLut30[i]);
-    else if(type==jetType::l15450nopus30) lut.push_back(luts5450GeV::nopusLut30[i]);
-    else if(type==jetType::l15450twoStrips30) lut.push_back(luts5450GeV::twoStripsLut30[i]);
-    else if(type==jetType::l15450threeStrips30) lut.push_back(luts5450GeV::threeStripsLut30[i]);
-    else if(type==jetType::l15450squares30) lut.push_back(luts5450GeV::squaresLut30[i]);
-
-    else if(type==jetType::l15400global50) lut.push_back(luts5400GeV::globalLut50[i]);
-    else if(type==jetType::l15400nopus50) lut.push_back(luts5400GeV::nopusLut50[i]);
-    else if(type==jetType::l15450donut50) lut.push_back(luts5450GeV::donutLut50[i]);
-    else if(type==jetType::l15450global50) lut.push_back(luts5450GeV::globalLut50[i]);
-    else if(type==jetType::l15450nopus50) lut.push_back(luts5450GeV::nopusLut50[i]);
-    else if(type==jetType::l15450twoStrips50) lut.push_back(luts5450GeV::twoStripsLut50[i]);
-    else if(type==jetType::l15450threeStrips50) lut.push_back(luts5450GeV::threeStripsLut50[i]);
-    else if(type==jetType::l15450squares50) lut.push_back(luts5450GeV::squaresLut50[i]);
+    if(type==jetType::l15400global) lut.push_back(luts5400GeV::globalLut[i]);
+    else if(type==jetType::l15400nopus) lut.push_back(luts5400GeV::nopusLut[i]);
+    else if(type==jetType::l15450donut) lut.push_back(luts5450GeV::donutLut[i]);
+    else if(type==jetType::l15450global) lut.push_back(luts5450GeV::globalLut[i]);
+    else if(type==jetType::l15450nopus) lut.push_back(luts5450GeV::nopusLut[i]);
+    else if(type==jetType::l15450twoStrips) lut.push_back(luts5450GeV::twoStripsLut[i]);
+    else if(type==jetType::l15450threeStrips) lut.push_back(luts5450GeV::threeStripsLut[i]);
 
     else std::cout << "Invalid type to get lut" << std::endl;
 
