@@ -43,7 +43,9 @@ process.o1 = cms.OutputModule("PoolOutputModule",
 #     'keep *_L1TestPatternCaloTowerProducer_*_*',
 
 #     'keep *_hcalDigis_*_*',
-     
+#                                            'keep *_PUsubAK5CaloJetProducer_*_*', 
+#                                            'keep *_PUsubAK5PFJetProducer_*_*', 
+     'keep *_*_Rho_*',     
      'keep *_valHcalTriggerPrimitiveDigis_*_*',
      'keep *_ecalDigis_EcalTriggerPrimitives_*',  
      'keep *_L1CaloTowerProducer_*_*',

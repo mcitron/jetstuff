@@ -59,11 +59,11 @@ TH1F * makeCumu(TH1F * input, double overallNorm){
   //output->SetBinContent(0,1.);
   int nXbins = input->GetNbinsX();
   int nYbins = input->GetNbinsY();
-  int dummy = input->GetBinContent(nXbins+1);
-  for (int xbins = 0; xbins <= nXbins; xbins++)
+  int dummy = 0;
+  for (int xbins = 0; xbins <= nXbins+1; xbins++)
   {
-    dummy += input->GetBinContent(nXbins-xbins);
-    output->SetBinContent((nXbins-xbins),ZB_XSECTION*((double)dummy)/overallNorm);
+    dummy += input->GetBinContent(nXbins+1-xbins);
+    output->SetBinContent((nXbins+1-xbins),ZB_XSECTION*((double)dummy)/overallNorm);
   }
 
   return output;

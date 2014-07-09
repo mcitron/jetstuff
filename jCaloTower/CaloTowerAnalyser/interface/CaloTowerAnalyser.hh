@@ -135,6 +135,12 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     std::map<TString, std::vector<Float_t> *> sums_;
     std::map<TString, std::vector<Int_t> *> genJetMatchAlgo1_;
     std::map<TString, std::vector<Int_t> *> genJetMatchAlgo2_;
+    std::map<TString, std::vector<Int_t> *> jetTowerEnergyUp1_;
+    std::map<TString, std::vector<Int_t> *> jetTowerEnergyUp2_;
+    std::map<TString, std::vector<Int_t> *> jetTowerEnergyUp3_;
+    std::map<TString, std::vector<Int_t> *> jetTowerEnergyUp4_;
+    std::map<TString, std::vector<Int_t> *> jetTowerEnergyUp5_;
+    std::map<TString, std::vector<Int_t> *> jetTowerEnergyUp8_;
 
     std::map<TString, std::vector<Float_t> *> jetOuterStripsArea_;
     std::map<TString, std::vector<Float_t> *> jetOuterStripsEnergy_;
@@ -164,7 +170,9 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     // ----------member data ---------------------------
     int mEventNumber;
     int mNPV;
-    double medianRho=0;
+    double medianRho=0.;
+    int numHotTow=0.;
+    int numHotTow12=0.;
     double mET=0.;
     std::vector<double> mMET;
     std::vector<pair_info> pairs;

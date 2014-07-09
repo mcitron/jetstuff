@@ -11,18 +11,19 @@ threshold  = cms.untracked.string('ERROR')
 
 
 
-#process.source = cms.Source("PoolSource",
-# fileNames = cms.untracked.vstring(
+process.source = cms.Source("PoolSource",
+ fileNames = cms.untracked.vstring(
 
     #Neutrino13 PU40 50ns
- #  {0} 
+   '{0}',
  #  ),
 
+   ),
+
    # RAW files
-  # secondaryFileNames = cms.untracked.vstring(
-  # )
-#)
-process.load({0})
+   secondaryFileNames = cms.untracked.vstring(
+   )
+)
 
 
 process.o1 = cms.OutputModule("PoolOutputModule",
@@ -77,7 +78,7 @@ process.maxEvents = cms.untracked.PSet(
     # restrict number of events to 1000
     #input = cms.untracked.int32(10)
     # run over all events
-    input = cms.untracked.int32(10000)
+    input = cms.untracked.int32(-1)
 )
 
 process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')

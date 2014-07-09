@@ -19,6 +19,13 @@ if (col1.size()!=0)
     jetDonut_[folderName+"_jet"] = new std::vector<Float_t>();
     jetMatchedPt_[folderName+"_jet"] = new std::vector<Float_t>();
     jetMinDR_[folderName+"_jet"] = new std::vector<Float_t>();
+    jetTowerEnergyUp1_[folderName+"_jet"] = new std::vector<int>();
+    jetTowerEnergyUp2_[folderName+"_jet"] = new std::vector<int>();
+    jetTowerEnergyUp3_[folderName+"_jet"] = new std::vector<int>();
+    jetTowerEnergyUp4_[folderName+"_jet"] = new std::vector<int>();
+    jetTowerEnergyUp5_[folderName+"_jet"] = new std::vector<int>();
+    jetTowerEnergyUp8_[folderName+"_jet"] = new std::vector<int>();
+
     tree->Branch("jetPt_"+TString(folderName), "std::vector<float>", &jetPt_[folderName+"_jet"]);
     tree->Branch("jetArea_"+TString(folderName), "std::vector<float>", &jetArea_[folderName+"_jet"]);
     tree->Branch("jetFirEta_"+TString(folderName), "std::vector<float>", &jetFirEta_[folderName+"_jet"]);
@@ -31,6 +38,14 @@ if (col1.size()!=0)
     tree->Branch("jetDonut_"+TString(folderName), "std::vector<float>", &jetDonut_[folderName+"_jet"]);
     tree->Branch("jetMatchedPt_"+TString(folderName), "std::vector<float>", &jetMatchedPt_[folderName+"_jet"]);
     tree->Branch("jetMinDR_"+TString(folderName), "std::vector<float>", &jetMinDR_[folderName+"_jet"]);
+
+    tree->Branch("jetTowerEnergyUp1_"+TString(folderName), "std::vector<int>", &jetTowerEnergyUp1_[folderName+"_jet"]);
+    tree->Branch("jetTowerEnergyUp2_"+TString(folderName), "std::vector<int>", &jetTowerEnergyUp2_[folderName+"_jet"]);
+    tree->Branch("jetTowerEnergyUp3_"+TString(folderName), "std::vector<int>", &jetTowerEnergyUp3_[folderName+"_jet"]);
+    tree->Branch("jetTowerEnergyUp4_"+TString(folderName), "std::vector<int>", &jetTowerEnergyUp4_[folderName+"_jet"]);
+    tree->Branch("jetTowerEnergyUp5_"+TString(folderName), "std::vector<int>", &jetTowerEnergyUp5_[folderName+"_jet"]);
+    tree->Branch("jetTowerEnergyUp8_"+TString(folderName), "std::vector<int>", &jetTowerEnergyUp8_[folderName+"_jet"]);
+
     pMade[folderName+"_jet"]=true;
     for (unsigned int i = 0; i  != col1.at(0).getOuterStrips().size(); i++)
     {
@@ -56,7 +71,7 @@ if (col1.size()!=0)
       jetRingSumsECAL_[folderName+"_jet_"+s]= new std::vector<Float_t>();
       tree->Branch("jetRingSumsECAL_"+s+"_"+TString(folderName), "std::vector<float>", &jetRingSumsECAL_[folderName+"_jet_"+s]);
     } 
-    for (unsigned int i = 0; i  != col1.at(0).ringSums().size(); i++)
+    for (unsigned int i = 0; i  != col1.at(0).ringSumsHC().size(); i++)
     {
       std::string s = std::to_string(i);
       jetRingSumsHCAL_[folderName+"_jet_"+s]= new std::vector<Float_t>();
@@ -79,6 +94,13 @@ if (col1.size()!=0)
   jetDonut_[folderName+"_jet"]->clear();
   jetMatchedPt_[folderName+"_jet"]->clear();
   jetMinDR_[folderName+"_jet"]->clear();
+
+  jetTowerEnergyUp1_[folderName+"_jet"]->clear();
+  jetTowerEnergyUp2_[folderName+"_jet"]->clear();
+  jetTowerEnergyUp3_[folderName+"_jet"]->clear();
+  jetTowerEnergyUp4_[folderName+"_jet"]->clear();
+  jetTowerEnergyUp5_[folderName+"_jet"]->clear();
+  jetTowerEnergyUp8_[folderName+"_jet"]->clear();
 
   for (unsigned int i = 0; i  != col1.at(0).getOuterStrips().size(); i++)
   {
@@ -123,6 +145,28 @@ if (col1.size()!=0)
     jetCovEtaPhi_[folderName+"_jet"]->push_back(jet->covEtaPhi());
 
     jetMinDR_[folderName+"_jet"]->push_back(test.at(i).minDeltaR2(col1));
+    std::vector<uint8_t> towers = jet->getTowers();
+    int dummy1=0;
+    int dummy2=0;
+    int dummy3=0;
+    int dummy4=0;
+    int dummy5=0;
+    int dummy8=0;
+    for (unsigned int j = 0; j < towers.size(); j++)
+    {
+      if (towers.at(j) <= 1) dummy1 += towers.at(j);
+      if (towers.at(j) <= 2) dummy2 += towers.at(j);
+      if (towers.at(j) <= 3) dummy3 += towers.at(j);
+      if (towers.at(j) <= 4) dummy4 += towers.at(j);
+      if (towers.at(j) <= 5) dummy5 += towers.at(j);
+      if (towers.at(j) <= 8) dummy8 += towers.at(j);
+    }
+    jetTowerEnergyUp1_[folderName+"_jet"]->push_back(dummy1);
+    jetTowerEnergyUp2_[folderName+"_jet"]->push_back(dummy2);
+    jetTowerEnergyUp3_[folderName+"_jet"]->push_back(dummy3);
+    jetTowerEnergyUp4_[folderName+"_jet"]->push_back(dummy4);
+    jetTowerEnergyUp5_[folderName+"_jet"]->push_back(dummy5);
+    jetTowerEnergyUp8_[folderName+"_jet"]->push_back(dummy8);
     for (unsigned int j = 0; j  != jet->getOuterStrips().size(); j++)
     {
       std::string s = std::to_string(j);

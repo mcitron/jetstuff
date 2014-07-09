@@ -3,18 +3,20 @@
 
 jJet::jJet(double pt, int ieta, int iphi) : mpt(pt), mieta(ieta), miphi(iphi) {}
 jJet::jJet(double pt, int geta, int gphi,int bx) : mpt(pt), mgeta(geta), mgphi(gphi),mbx(bx) {}
-jJet::jJet(double pt, int ieta, int iphi, std::vector<int> ringsums,std::vector<int> ringmax, double jetFirMomEta,double jetFirMomPhi,double jetSecMomEta,double jetSecMomPhi, double covEtaPhi,std::vector<int> ringareas,std::vector<std::pair<int,int> > outerstrips, int jetarea) : mpt(pt), mieta(ieta), miphi(iphi), mringsums(ringsums),mringmax(ringmax),mfireta(jetFirMomEta),mfirphi(jetFirMomPhi),mseceta(jetSecMomEta),msecphi(jetSecMomPhi),mcov(covEtaPhi), mringareas(ringareas), mouterstrips(outerstrips),marea(jetarea) {
-   std::sort(mouterstrips.begin(), mouterstrips.end());
-}
-jJet::jJet(double pt, int ieta, int iphi, std::vector<int> ringsums,std::vector<int> ringsumsec,std::vector<int> ringsumshc,std::vector<int> ringmax, double jetFirMomEta,double jetFirMomPhi,double jetSecMomEta,double jetSecMomPhi,double covEtaPhi, std::vector<int> ringareas, std::vector<std::pair<int,int> > outerstrips, int jetarea) : mpt(pt), mieta(ieta), miphi(iphi), mringsums(ringsums),mringsumsec(ringsumsec),mringsumshc(ringsumshc),mringmax(ringmax),mfireta(jetFirMomEta),mfirphi(jetFirMomPhi),mseceta(jetSecMomEta),msecphi(jetSecMomPhi),mcov(covEtaPhi), mringareas(ringareas), mouterstrips(outerstrips),marea(jetarea) {
-   std::sort(mouterstrips.begin(), mouterstrips.end());
-
-}
-jJet::jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<std::pair<int,int> > outerstrips, std::vector<int> towers, int jetarea) : mpt(pt), mieta(ieta), miphi(iphi), mringsums(ringsums), mringareas(ringareas), mouterstrips(outerstrips),mtowers(towers),marea(jetarea) {
+jJet::jJet(double pt, int ieta, int iphi, std::vector<int> ringsums,std::vector<int> ringmax, double jetFirMomEta,double jetFirMomPhi,double jetSecMomEta,double jetSecMomPhi, double covEtaPhi,std::vector<int> ringareas,std::vector<std::pair<int,int> > outerstrips, std::vector<uint8_t> towers, int jetarea) : mpt(pt), mieta(ieta), miphi(iphi), mringsums(ringsums),mringmax(ringmax),mfireta(jetFirMomEta),mfirphi(jetFirMomPhi),mseceta(jetSecMomEta),msecphi(jetSecMomPhi),mcov(covEtaPhi), mringareas(ringareas), mouterstrips(outerstrips),mtowers(towers),marea(jetarea) {
    std::sort(mouterstrips.begin(), mouterstrips.end());
    std::sort(mtowers.begin(), mtowers.end());
 }
-jJet::jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<std::pair<int,int> > outerstrips, std::vector<int> towers, int jetarea,int seedtower) : mpt(pt), mieta(ieta), miphi(iphi), mringsums(ringsums), mringareas(ringareas), mouterstrips(outerstrips),mtowers(towers),marea(jetarea),mseed(seedtower) {
+jJet::jJet(double pt, int ieta, int iphi, std::vector<int> ringsums,std::vector<int> ringsumsec,std::vector<int> ringsumshc,std::vector<int> ringmax, double jetFirMomEta,double jetFirMomPhi,double jetSecMomEta,double jetSecMomPhi,double covEtaPhi, std::vector<int> ringareas, std::vector<std::pair<int,int> > outerstrips, std::vector<uint8_t> towers, int jetarea) : mpt(pt), mieta(ieta), miphi(iphi), mringsums(ringsums),mringsumsec(ringsumsec),mringsumshc(ringsumshc),mringmax(ringmax),mfireta(jetFirMomEta),mfirphi(jetFirMomPhi),mseceta(jetSecMomEta),msecphi(jetSecMomPhi),mcov(covEtaPhi), mringareas(ringareas), mouterstrips(outerstrips),mtowers(towers),marea(jetarea) {
+   std::sort(mouterstrips.begin(), mouterstrips.end());
+   std::sort(mtowers.begin(), mtowers.end());
+
+}
+jJet::jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<std::pair<int,int> > outerstrips, std::vector<uint8_t> towers, int jetarea) : mpt(pt), mieta(ieta), miphi(iphi), mringsums(ringsums), mringareas(ringareas), mouterstrips(outerstrips),mtowers(towers),marea(jetarea) {
+   std::sort(mouterstrips.begin(), mouterstrips.end());
+   std::sort(mtowers.begin(), mtowers.end());
+}
+jJet::jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<std::pair<int,int> > outerstrips, std::vector<uint8_t> towers, int jetarea,int seedtower) : mpt(pt), mieta(ieta), miphi(iphi), mringsums(ringsums), mringareas(ringareas), mouterstrips(outerstrips),mtowers(towers),marea(jetarea),mseed(seedtower) {
    std::sort(mouterstrips.begin(), mouterstrips.end());
    std::sort(mtowers.begin(), mtowers.end());
 }
@@ -35,7 +37,7 @@ std::vector<int> jJet::ringSumsHC() const { return mringsumshc; }
 std::vector<int> jJet::ringMax() const { return mringmax; }
 std::vector<int> jJet::ringAreas() const { return mringareas; }
 std::vector<std::pair<int,int> > jJet::getOuterStrips() const { return mouterstrips; }
-std::vector<int> jJet::getTowers() const { return mtowers; }
+std::vector<uint8_t> jJet::getTowers() const { return mtowers; }
 
 int jJet::getOuterSum() const 
 { 

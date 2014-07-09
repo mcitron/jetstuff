@@ -1,12 +1,12 @@
 import subprocess
 import make_config
-#import sys
+import sys
 import os
 
 num = str(int(os.environ['LSB_JOBINDEX'])-1)
 
-filelist='/afs/cern.ch/work/m/mcitron/jadjets/CMSSW_6_2_0/src/jCaloTower/CaloTowerAnalyser/batch/testout.txt'
-outputdir="/afs/cern.ch/work/m/mcitron/public/QCD/140622/"
+filelist = sys.argv[1]
+outputdir = sys.argv[2]
 
 arg_array=[]
 

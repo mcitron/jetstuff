@@ -9,8 +9,8 @@ num = str(int(os.environ['LSB_JOBINDEX'])-1)
 # sys.exit(1)
 #outputdir=sys.argv[1]#'file:/afs/cern.ch/work/m/mcitron/public/'    
 #filelist=sys.argv[2]#'/afs/cern.ch/work/m/mcitron/jadjets/CMSSW_6_2_0/src/jCaloTower/CaloTowerAnalyser/batch/testin.txt'
-outputdir='//afs/cern.ch/work/m/mcitron/public/QCDPU1/'    
-filelist='/afs/cern.ch/work/m/mcitron/jadjets/CMSSW_6_2_0/src/jCaloTower/CaloTowerAnalyser/batch/qcd_pu1.txt'
+outputdir='//afs/cern.ch/work/m/mcitron/public/QCDPU140/'    
+filelist='//afs/cern.ch/work/m/mcitron/jadjets/CMSSW_6_2_0/src/jCaloTower/CaloTowerAnalyser/batch/qcd_pu140.txt'
 arg_array=[]
 i=0
 with open(filelist) as f:

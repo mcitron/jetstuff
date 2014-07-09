@@ -25,6 +25,8 @@ CaloTowerAnalyser::CaloTowerAnalyser(const edm::ParameterSet& iConfig) {
   tree = fs->make<TTree>("L1Tree","L1Tree");
 
   tree->Branch("mNPV", &mNPV, "mNPV/I");  
+  tree->Branch("numHotTow", &numHotTow, "numHotTow/I");  
+  tree->Branch("numHotTow12", &numHotTow12, "numHotTow12/I");  
   tree->Branch("medianRho", &medianRho, "medianRho/D");  
 // std::string folderName = "Event_";
   // std::stringstream caseNumber;
@@ -352,6 +354,8 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   double ET=0;
   double met_x=0;
   double met_y=0;
+  numHotTow = 0;
+  numHotTow12 = 0;
   for(l1slhc::L1CaloTowerCollection::const_iterator j=triggertowers->begin(); j!=triggertowers->end(); j++) {
 
     if ( abs((*j).iEta()) > 28 ) { continue; } //i.e. |eta| < 3 only
@@ -365,6 +369,8 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     ET += (*j).E()+(*j).H();
     met_x -= cos(g.phi((*j).iPhi())) * ((*j).E() + (*j).H());
     met_y -= sin(g.phi((*j).iPhi())) * ((*j).E() + (*j).H());
+    if (abs((*j).iEta()) <= 12 && ((*j).E() + (*j).H()) > 0.1) { numHotTow12++; }
+    if (((*j).E() + (*j).H()) > 0.1) { numHotTow++; }
     //so now myarray is on the scale ieta 0-56, iphi 0-71
     //std::cout << "old: (" << (*j).iEta() << ", " << (*j).iPhi() << ", " << (*j).E() + (*j).H() << ")" << std::endl;
     //std::cout << "size = " << triggertowers->size() << std::endl;
@@ -458,6 +464,8 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   std::vector<jJet> L1_5400_jJet = getL1JetsMask(myarray, mask_square_9by9(), mask_donut_11by11(),4, 0, 0);
   std::vector<jJet> L1_5450_jJet = getL1JetsMask(myarray, mask_square_9by9(), mask_donut_11by11(),4, 5, 0);
   std::vector<jJet> L1_5450_3_strips_jJet = getL1JetsMask(myarray, mask_square_9by9(), mask_donut_15by15(),12, 5, 0);
+  std::vector<jJet> L1_5400_3_chunky_jJet = getL1JetsMask(myarray, mask_square_9by9(), mask_chunky_donut_15by15(),4, 0, 0);
+  std::vector<jJet> L1_5450_3_chunkyseed_jJet = getL1JetsMask(myarray, mask_square_9by9(), mask_chunky_donut_15by15(),4, 5, 0);
   std::vector<jJet> L1_5450_squares_jJet = getL1JetsMask(myarray, mask_square_9by9(), mask_donut_squares_15by15(),12, 5, 0);
   std::vector<jJet> L1_5450_2_strips_jJet = getL1JetsMask(myarray, mask_square_9by9(), mask_donut_13by13(),8, 5, 0);
   std::vector<jJet> L1_5450_jJet_old = getL1Jets(myarray, 5, 4, 5, 0);
@@ -531,14 +539,25 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     } 
   } 
   temp.clear();
-  temp = L1_5450_squares_jJet;                          
-  L1_5450_squares_jJet.clear();
+  temp = L1_5400_3_chunky_jJet;                          
+  L1_5400_3_chunky_jJet.clear();
   for(unsigned int i=0; i<temp.size(); i++) {
     double newenergydonut=temp[i].eatDonut();
     if (newenergydonut >= 1.)
     {
-      L1_5450_squares_jJet.push_back(temp[i]);
-      L1_5450_squares_jJet.back().setPt(newenergydonut);
+      L1_5400_3_chunky_jJet.push_back(temp[i]);
+      L1_5400_3_chunky_jJet.back().setPt(newenergydonut);
+    } 
+  } 
+  temp.clear();
+  temp = L1_5450_3_chunkyseed_jJet;                          
+  L1_5450_3_chunkyseed_jJet.clear();
+  for(unsigned int i=0; i<temp.size(); i++) {
+    double newenergydonut=temp[i].eatDonut();
+    if (newenergydonut >= 1.)
+    {
+      L1_5450_3_chunkyseed_jJet.push_back(temp[i]);
+      L1_5450_3_chunkyseed_jJet.back().setPt(newenergydonut);
     } 
   } 
 
@@ -590,8 +609,8 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   this->MakeSumTree(ak4genjetsp_jJet,"ak4_gen",false);
   this->MakeMatchTree(ak4genjetsp_jJet,ak4genjetsp_jJet,"ak4_gen",false);
   std::map <TString,std::vector<jJet> > jJetComp;
-
-  /*jJetComp["5400_nopus"]=L1_5400_jJet;
+/*
+  jJetComp["5400_nopus"]=L1_5400_jJet;
   jJetComp["5400_nopus_old"]=L1_5400_jJet_old;
   jJetComp["5400_donut"]=L1_5400donut_jJet;
   jJetComp["5400_global"]=L1_5400global_jJet;
@@ -609,9 +628,12 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   jJetComp["5450_nopus_old"]=L1_5450_jJet_old;
   jJetComp["5450_donut"]=L1_5450donut_jJet;
   jJetComp["5450_global"]=L1_5450global_jJet;
-  jJetComp["5450_calib_nopus"]=calibrated_L1_5450_jJet;
-  jJetComp["5450_calib_donut"]=calibrated_L1_5450donut_jJet;*/
+  //jJetComp["5450_calib_nopus"]=calibrated_L1_5450_jJet;
+  //jJetComp["5450_calib_donut"]=calibrated_L1_5450donut_jJet;
+  */
   jJetComp["L1_for_Nick"]=L1_5400_for_Nick;
+  //jJetComp["5450_chunky"]=L1_5450_3_chunkyseed_jJet;
+  jJetComp["5400_chunky"]=L1_5400_3_chunky_jJet;
 /*
   jJetComp["5450_calib30_nopus"]=calibrated30_L1_5450_jJet;
   jJetComp["5450_calib50_nopus"]=calibrated50_L1_5450_jJet;
@@ -629,7 +651,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   for (auto jet = jJetComp.begin();jet != jJetComp.end(); jet++)
   {
     this->MakeJetTree(jet->second,ak4genjetsp_jJet,jet->first,false);
-    this->MakeJetTree(ak4genjetsp_jJet,jet->second,TString("gen_")+jet->first,false);
+ //   this->MakeJetTree(ak4genjetsp_jJet,jet->second,TString("gen_")+jet->first,false);
     this->MakeMatchTree(jet->second,ak4genjetsp_jJet,jet->first,false);
     this->MakeSumTree(jet->second,jet->first,false);
     this->MakeCalibration(jet->second,ak4genjetsp_jJet, jet->first);
@@ -638,12 +660,12 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   if(mgct)
   {
     this->MakeJetTree(gct_jJet_calib,ak4genjetsp_jJet, "gct_calib_gen",true);
-    this->MakeJetTree(ak4genjetsp_jJet,gct_jJet_calib,"gen_gct_calib",true);
+//    this->MakeJetTree(ak4genjetsp_jJet,gct_jJet_calib,"gen_gct_calib",true);
     this->MakeMatchTree(gct_jJet_calib,ak4genjetsp_jJet,"gct_calib_gen",true);
     this->MakeSumTree(gct_jJet_calib,"gct_calib_gen",true,true);
 
     this->MakeJetTree(gct_jJet_uncalib,ak4genjetsp_jJet,  "gct_uncalib_gen",true);
-    this->MakeJetTree(ak4genjetsp_jJet,gct_jJet_uncalib,"gen_gct_uncalib",true);
+//    this->MakeJetTree(ak4genjetsp_jJet,gct_jJet_uncalib,"gen_gct_uncalib",true);
     this->MakeMatchTree(gct_jJet_uncalib,ak4genjetsp_jJet,"gct_uncalib_gen",true);
     this->MakeSumTree(gct_jJet_uncalib,"gct_uncalib_gen",true,false);
   }

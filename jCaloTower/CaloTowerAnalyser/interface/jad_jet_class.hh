@@ -16,10 +16,10 @@ public:
   jJet(double pt, int ieta, int iphi);
   jJet(double pt, int ieta, int iphi,int bx);
   jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<std::pair<int,int> > outerstrips, int jetarea);
-  jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringmax,double jetFirMomEta,double jetFirMomPhi,double jetSecMomEta, double jetSecMomPhi,double covEtaPhi, std::vector<int> ringareas, std::vector<std::pair<int,int> > outerstrips, int jetarea);
-  jJet(double pt, int ieta, int iphi, std::vector<int> ringsums,std::vector<int> ringsumsec,std::vector<int> ringsumshc, std::vector<int> ringmax,double jetFirMomEta, double jetFirMomPhi, double jetSecMomEta, double jetSecMomPhi,double covEtaPhi,std::vector<int> ringareas,  std::vector<std::pair<int,int> > outerstrips, int jetarea);
-  jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<std::pair<int,int> > outerstrips,std::vector<int> towers, int jetarea);
-  jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<std::pair<int,int> > outerstrips, std::vector<int> towers, int jetarea,int seedtower);
+  jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringmax,double jetFirMomEta,double jetFirMomPhi,double jetSecMomEta, double jetSecMomPhi,double covEtaPhi, std::vector<int> ringareas, std::vector<std::pair<int,int> > outerstrips, std::vector<uint8_t> towers, int jetarea);
+  jJet(double pt, int ieta, int iphi, std::vector<int> ringsums,std::vector<int> ringsumsec,std::vector<int> ringsumshc, std::vector<int> ringmax,double jetFirMomEta, double jetFirMomPhi, double jetSecMomEta, double jetSecMomPhi,double covEtaPhi,std::vector<int> ringareas,  std::vector<std::pair<int,int> > outerstrips, std::vector<uint8_t> towers, int jetarea);
+  jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<std::pair<int,int> > outerstrips,std::vector<uint8_t> towers, int jetarea);
+  jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<std::pair<int,int> > outerstrips, std::vector<uint8_t> towers, int jetarea,int seedtower);
   int iEta() const;
   int iPhi() const;
   int gEta() const;
@@ -34,7 +34,7 @@ public:
   std::vector<int> ringMax() const;
   std::vector<int> ringAreas() const;
   std::vector<std::pair<int,int> > getOuterStrips() const;
-  std::vector<int> getTowers() const;
+  std::vector<uint8_t> getTowers() const;
   int DeltaR2(const jJet & jet2) const;
   int PUE();
   double eatDonut(); //the energy after PUsubtraction
@@ -64,7 +64,7 @@ private:
   double mcov;
   std::vector<int> mringareas;
   std::vector<std::pair<int,int>> mouterstrips;
-  std::vector<int> mtowers;
+  std::vector<uint8_t> mtowers;
   int marea;
   int mseed;
 };
