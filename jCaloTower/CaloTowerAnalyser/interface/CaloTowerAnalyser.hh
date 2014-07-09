@@ -133,6 +133,7 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     std::map<TString, std::vector<Float_t> *> jetEta_;
     std::map<TString, std::vector<Float_t> *> jetMatchedPt_;
     std::map<TString, std::vector<Float_t> *> sums_;
+    std::vector<Float_t> * Esums_;
     std::map<TString, std::vector<Int_t> *> genJetMatchAlgo1_;
     std::map<TString, std::vector<Int_t> *> genJetMatchAlgo2_;
     std::map<TString, std::vector<Int_t> *> jetTowerEnergyUp1_;
@@ -150,8 +151,6 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     std::map<TString, std::vector<Float_t> *> jetRingSumsHCAL_;
     std::map<TString, std::vector<Float_t> *> jetRingSumsHighest_;
 
-    std::map<TString,TH2D *> col2_calib_ratio;
-    std::map<TString,TH2D *> col2_calib_corr;
     std::map<TString,TProfile *> col2_calib_ratio_profile;
     std::map<TString,TProfile *> col2_calib_corr_profile;
 
@@ -176,20 +175,6 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     double mET=0.;
     std::vector<double> mMET;
     std::vector<pair_info> pairs;
-    TH1D * num_tops_per_event;
-    TH1D * median_energy_per_event;
-
-    TH1D * median_jet_5400_energy_per_event;
-    TH1D * donut_jet_5450_energy_per_event;
-    TH1D * donut_jet_iso_5450_energy_per_event;
-    TH1D * number_jet_seed;
-    TH1D * number_jet_median;
-    TH2D * median_rho_nvtx;
-    TH2D * median_rho_seed;
-
-
-    std::map<TString, TH1F*> pusHists1d_;
-    std::map<TString, TH2F*> pusHists2d_;
     std::map<TString, TProfile*> pusProfile_;
     std::vector<TString> globalPusVars_;
     std::vector<TString> l1Sizes_;
@@ -198,48 +183,6 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     std::map<TString, int> ptBins_;
     std::map<TString, int> nintBins_;
 
-    TH1D * eff_over_x1_top;
-    TH1D * eff_over_x2_top;
-    TH1D * eff_over_x3_top;
-    TH1D * eff_over_x4_top;
-    TH1D * mean_top_pt_hist;
-    TH1D * met_hist;
-    TH1D * et_hist;
-    TH1D * met_x_hist;
-    TH1D * met_y_hist;
-
-
-    TH1D * genjet_pt;
-    TH1D * tower_pt_real; 
-    TH1D * num_tower_pt_real; 
-    TH2D * tower_pt_real_jetpt; 
-    TH2D * num_tower_pt_real_jetpt; 
-    TH1D * tower_pt_pu; 
-    TH1D * num_tower_pt_pu; 
-    TH2D * tower_pt_pu_jetpt; 
-    TH2D * num_tower_pt_pu_jetpt; 
-    TH2D * ntowers_vs_npv;
-
-    TH2D * r4_vs_npv_eta1_pt3050;
-    TH2D * r4_vs_npv_eta2_pt3050;
-    TH2D * r4_vs_npv_eta3_pt3050;
-    TH2D * r4_vs_npv_eta1_pt80100;
-    TH2D * r4_vs_npv_eta2_pt80100;
-    TH2D * r4_vs_npv_eta3_pt80100;
-
-    TH2D * deltaGenL1_pT3050_eta1_v1;
-    TH2D * deltaGenL1_v2;
-    TH2D * deltaGenL1_v3;
-    TH2D * deltaGenL1_pT3050_eta1_v4;
-    TH2D * deltaGenL1_pT3050_eta2_v1;
-    TH2D * deltaGenL1_pT3050_eta2_v4;
-    TH2D * deltaGenL1_pT3050_eta3_v1;
-    TH2D * deltaGenL1_pT3050_eta3_v4;
-    TH2D * deltaGenL1_ntowers;
-    TH2D * deltaGenL1_R1;
-    TH2D * deltaGenL1_R2;
-    TH2D * deltaGenL1_R3;
-    TH2D * deltaGenL1_R4;
 
     std::string mskim;
     bool mgct;

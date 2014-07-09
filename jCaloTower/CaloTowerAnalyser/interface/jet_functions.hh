@@ -177,7 +177,9 @@ std::vector<jJet> CaloTowerAnalyser::getL1JetsMask(const std::vector< std::vecto
 	    }
 	  }
 
+	  if (numtowersaboveme > 0) break;
 	}
+	if (numtowersaboveme > 0) break;
       }
       //now we have a jet candidate centred at i,j, with the ring energies and areas defined
       //now we have the L1 jet candidate:
@@ -187,12 +189,12 @@ std::vector<jJet> CaloTowerAnalyser::getL1JetsMask(const std::vector< std::vecto
 	for(int ring=0; ring < (int)localsums.size(); ring++) { totalenergy += localsums[ring]; }
 	//this is with PUS:
 	if(totalenergy > 0.0) {
-	jetSecMomEta = jetSecMomEta/(totalenergy*totalenergy);
-	jetSecMomPhi = jetSecMomPhi/(totalenergy*totalenergy);
-	jetFirMomEta = jetFirMomEta/(totalenergy);
-	jetFirMomPhi = jetFirMomPhi/(totalenergy);
-	jetCovEtaPhi = jetCovEtaPhi/(totalenergy*totalenergy);
-	//std::cout << jetFirMomPhi << std::endl;
+	  jetSecMomEta = jetSecMomEta/(totalenergy*totalenergy);
+	  jetSecMomPhi = jetSecMomPhi/(totalenergy*totalenergy);
+	  jetFirMomEta = jetFirMomEta/(totalenergy);
+	  jetFirMomPhi = jetFirMomPhi/(totalenergy);
+	  jetCovEtaPhi = jetCovEtaPhi/(totalenergy*totalenergy);
+	  //std::cout << jetFirMomPhi << std::endl;
 	  //TEMP
 	  //areas.at(areas.size()-1)=pusarea;
 
@@ -200,7 +202,7 @@ std::vector<jJet> CaloTowerAnalyser::getL1JetsMask(const std::vector< std::vecto
 	  //L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetTower,jetarea));
 	  L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums,localsumsEC,localsumsHC,localmax,jetFirMomEta,jetFirMomPhi,jetSecMomEta,jetSecMomPhi,jetCovEtaPhi, areas, outerstrips,jetTower,jetarea));
 	  //L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetarea));
-//	  L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetarea, seedtower));
+	  //	  L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetarea, seedtower));
 	}
 
       }
@@ -307,18 +309,18 @@ std::vector<jJet> CaloTowerAnalyser::getL1JetsMask(const std::vector< std::vecto
 	  if(input[k][newl] > seedthresh2) { numtowersabovethresh++; }
 	  if(dl < mask.size() && dk < mask.at(0).size())
 	  {
-	  jetSecMomPhi+=((int)dl-phisize)*((int)dl-phisize)*input[k][newl]*input[k][newl];
-	  jetSecMomEta+=((int)dk-etasize)*((int)dk-etasize)*input[k][newl]*input[k][newl];
-	  jetFirMomPhi+=((int)dl-phisize)*input[k][newl];
-	  jetFirMomEta+=((int)dk-etasize)*input[k][newl];
-	  jetCovEtaPhi+=((int)dk-etasize)*((int)dl-phisize)*input[k][newl]*input[k][newl];
+	    jetSecMomPhi+=((int)dl-phisize)*((int)dl-phisize)*input[k][newl]*input[k][newl];
+	    jetSecMomEta+=((int)dk-etasize)*((int)dk-etasize)*input[k][newl]*input[k][newl];
+	    jetFirMomPhi+=((int)dl-phisize)*input[k][newl];
+	    jetFirMomEta+=((int)dk-etasize)*input[k][newl];
+	    jetCovEtaPhi+=((int)dk-etasize)*((int)dl-phisize)*input[k][newl]*input[k][newl];
 	    if (mask[dl][dk] == 2){if(input[k][newl]>input[i][j]) {numtowersaboveme++;}}
 	    else if (mask[dl][dk] == 1){if(input[k][newl]>=input[i][j]) {numtowersaboveme++;}}
 	    /*
 	       if((k+l) > (i+j) ) { if(input[k][newl] > input[i][j]) { numtowersaboveme++; } }
 	       else if( ((k+l) == (i+j)) && (k-i) > (l-j)) { if(input[k][newl] > input[i][j]) { numtowersaboveme++; } } //this line is to break the degeneracy along the diagonal treating top left different to bottom right
 	       else { if(input[k][newl] >= input[i][j]) { numtowersaboveme++; } }
-	       */
+	     */
 	    for( int m=0; m<nringsveto+1;m++) { //+1 for centre of jet (n steps is n+1 rings!)
 	      if((abs(i-k) == m && abs(j-l) <= m) || (abs(i-k) <= m && abs(j-l) == m)) { 
 		//i.e. we are now in ring m
@@ -330,7 +332,9 @@ std::vector<jJet> CaloTowerAnalyser::getL1JetsMask(const std::vector< std::vecto
 	    }
 	  }
 
+	  if (numtowersaboveme > 0) break;
 	}
+	if (numtowersaboveme > 0) break;
       }
       //now we have a jet candidate centred at i,j, with the ring energies and areas defined
       //now we have the L1 jet candidate:
@@ -351,7 +355,7 @@ std::vector<jJet> CaloTowerAnalyser::getL1JetsMask(const std::vector< std::vecto
 	  //L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetTower,jetarea));
 	  L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums,localmax,jetFirMomEta,jetFirMomPhi,jetSecMomEta,jetSecMomPhi,jetCovEtaPhi, areas, outerstrips,jetTower,jetarea));
 	  //L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetarea));
-//	  L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetarea, seedtower));
+	  //	  L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetarea, seedtower));
 	}
 
       }
@@ -444,7 +448,9 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
 	    }
 	  }
 
+	  if (numtowersaboveme > 0) break;
 	}
+	if (numtowersaboveme > 0) break;
       }
 
       //now we have a jet candidate centred at i,j, with the ring energies and areas defined

@@ -205,58 +205,6 @@ if (col1.size()!=0)
 }
 return;
 }
-void CaloTowerAnalyser::MakeCalibration(const std::vector<jJet> & col1,const std::vector<jJet> & col2, TString folderName)
-{
-  edm::Service<TFileService> fs;
-  TFileDirectory dir = fs->mkdir((folderName).Data());
-
-  std::map<TString,std::pair<int,int>> etaCalibBins;
-  etaCalibBins["iEta_-28_to_-22"] = std::make_pair(-28,-21);
-  etaCalibBins["iEta_-21_to_-15"] = std::make_pair(-21,-14);
-  etaCalibBins["iEta_-14_to_-08"] = std::make_pair(-14,-7);
-  etaCalibBins["iEta_-07_to_-1"] = std::make_pair(-7,0);
-  etaCalibBins["iEta_01_to_07"] = std::make_pair(0,8);
-  etaCalibBins["iEta_08_to_14"] = std::make_pair(8,15);
-  etaCalibBins["iEta_15_to_21"] = std::make_pair(15,22);
-  etaCalibBins["iEta_21_to_28"] = std::make_pair(22,29);
-
-  TFileDirectory calibdir=dir.mkdir("calibration");
-  if(!pMade[folderName+"_calibration"])
-  {
-    for(auto etaBinIt=etaCalibBins.begin(); etaBinIt!=etaCalibBins.end(); etaBinIt++){
-
-      col2_calib_ratio[TString(folderName)+etaBinIt->first]=calibdir.make<TH2D>("col2_calib_ratio_"+etaBinIt->first,";col2 p_{T};col1 p_{T}/col2 p_{T}",1000,-0.5,999.5,200,-10.05,10.95);
-      col2_calib_ratio_profile[TString(folderName)+etaBinIt->first]=calibdir.make<TProfile>("col2_calib_ratio_profile_"+etaBinIt->first,";col2 p_{T};col1 p_{T}/col2 p_{T}",1000,-0.5,999.5);
-
-      col2_calib_corr[TString(folderName)+etaBinIt->first]=calibdir.make<TH2D>("col2_calib_corr_"+etaBinIt->first,";col2 p_{T};col1 p_{T}",1000,-0.5,999.5,1000,-0.5,999.5);
-      col2_calib_corr_profile[TString(folderName)+etaBinIt->first]=calibdir.make<TProfile>("col2_calib_corr_profile_"+etaBinIt->first,";col2 p_{T};col1 p_{T}",1000,-0.5,999.5);
-    }
-    pMade[folderName+"_calibration"] = true;
-  }
-  pairs = make_pairs(col1, col2);
-  std::vector<int> col2_matched_index = analyse_pairs_local(pairs, col2.size(), 33);
-  //std::vector<int> col1_matched_index_local = analyse_pairs_global(pairs, col2.size(), 25);
-
-  for(unsigned int i=0; i<col2_matched_index.size(); i++) {
-    if(col2_matched_index[i] != -1)
-    {
-      if(i < 4)
-      {
-	for(auto etaBinIt=etaCalibBins.begin(); etaBinIt!=etaCalibBins.end(); etaBinIt++){
-	  if (col2[i].iEta() >= etaBinIt->second.first && col2[i].iEta() < etaBinIt->second.second)
-	  { 
-	    col2_calib_ratio[TString(folderName)+etaBinIt->first]->Fill(col2[i].pt(),col1[col2_matched_index[i]].pt()/col2[i].pt());
-	    col2_calib_ratio_profile[TString(folderName)+etaBinIt->first]->Fill(col2[i].pt(),col1[col2_matched_index[i]].pt()/col2[i].pt());
-	    col2_calib_corr[TString(folderName)+etaBinIt->first]->Fill(col2[i].pt(),col1[col2_matched_index[i]].pt());
-	    col2_calib_corr_profile[TString(folderName)+etaBinIt->first]->Fill(col2[i].pt(),col1[col2_matched_index[i]].pt());
-	  }
-	}
-      }
-      else {break;}
-    }
-  }
-
-}
 void CaloTowerAnalyser::MakeMatchTree(const std::vector<jJet> & col1,const std::vector<jJet> & col2, TString folderName,bool isgct) {
 
   if (col1.size()!=0){
