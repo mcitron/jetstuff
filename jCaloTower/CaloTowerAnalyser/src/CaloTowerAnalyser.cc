@@ -612,7 +612,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   jJetComp["5450_calib_nopus"]=calibrated_L1_5450_jJet;
   jJetComp["5450_calib_donut"]=calibrated_L1_5450donut_jJet;*/
   jJetComp["L1_for_Nick"]=L1_5400_for_Nick;
-
+/*
   jJetComp["5450_calib30_nopus"]=calibrated30_L1_5450_jJet;
   jJetComp["5450_calib50_nopus"]=calibrated50_L1_5450_jJet;
   jJetComp["5450_calib30_donut"]=calibrated30_L1_5450donut_jJet;
@@ -625,7 +625,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   jJetComp["5450_calib50_3_strips"]=calibrated50_L1_5450_3_strips_jJet;
   jJetComp["5450_calib30_squares"]=calibrated30_L1_5450_squares_jJet;
   jJetComp["5450_calib50_squares"]=calibrated50_L1_5450_squares_jJet;
-
+*/
   for (auto jet = jJetComp.begin();jet != jJetComp.end(); jet++)
   {
     this->MakeJetTree(jet->second,ak4genjetsp_jJet,jet->first,false);

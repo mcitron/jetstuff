@@ -94,6 +94,11 @@ std::vector<jJet> CaloTowerAnalyser::getL1JetsMask(const std::vector< std::vecto
       areas[0]=1;
       int jetarea = 1;
       //int pusarea=0;
+      double jetSecMomEta = 0.; 
+      double jetSecMomPhi = 0.; 
+      double jetFirMomEta = 0.; 
+      double jetFirMomPhi = 0.; 
+      double jetCovEtaPhi = 0.;
       for(int l=(j-phisizedonut); l<=(j+phisizedonut); l++) {
 	for(int k=(i-etasizedonut); k<=(i+etasizedonut); k++) {
 	  if(k < 0 || k > 55) continue; //i.e. out of bounds of eta<3
@@ -148,6 +153,11 @@ std::vector<jJet> CaloTowerAnalyser::getL1JetsMask(const std::vector< std::vecto
 	  {
 	    jetTower.push_back(input[k][newl]);
 	  }
+	  jetSecMomPhi+=((int)dl-phisize)*((int)dl-phisize)*input[k][newl]*input[k][newl];
+	  jetSecMomEta+=((int)dk-etasize)*((int)dk-etasize)*input[k][newl]*input[k][newl];
+	  jetFirMomPhi+=((int)dl-phisize)*input[k][newl];
+	  jetFirMomEta+=((int)dk-etasize)*input[k][newl];
+	  jetCovEtaPhi+=((int)dk-etasize)*((int)dl-phisize)*input[k][newl]*input[k][newl];
 	  if(input[k][newl] > seedthresh2) { numtowersabovethresh++; }
 	  if(dl < mask.size() && dk < mask.at(0).size())
 	  {
@@ -181,12 +191,18 @@ std::vector<jJet> CaloTowerAnalyser::getL1JetsMask(const std::vector< std::vecto
 	for(int ring=0; ring < (int)localsums.size(); ring++) { totalenergy += localsums[ring]; }
 	//this is with PUS:
 	if(totalenergy > 0.0) {
+	jetSecMomEta = jetSecMomEta/(totalenergy*totalenergy);
+	jetSecMomPhi = jetSecMomPhi/(totalenergy*totalenergy);
+	jetFirMomEta = jetFirMomEta/(totalenergy);
+	jetFirMomPhi = jetFirMomPhi/(totalenergy);
+	jetCovEtaPhi = jetCovEtaPhi/(totalenergy*totalenergy);
+	//std::cout << jetFirMomPhi << std::endl;
 	  //TEMP
 	  //areas.at(areas.size()-1)=pusarea;
 
 	  //TEMP
 	  //L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetTower,jetarea));
-	  L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums,localsumsEC,localsumsHC,localmax, areas, outerstrips,jetarea));
+	  L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums,localsumsEC,localsumsHC,localmax,jetFirMomEta,jetFirMomPhi,jetSecMomEta,jetSecMomPhi,jetCovEtaPhi, areas, outerstrips,jetarea));
 	  //L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetarea));
 //	  L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetarea, seedtower));
 	}
@@ -272,7 +288,11 @@ std::vector<jJet> CaloTowerAnalyser::getL1JetsMask(const std::vector< std::vecto
       }
       //std::cout << outerstrips[0].first <<" "<< outerstrips[0].second << std::endl;
       //std::cout << std::endl;
-      double jetRms = 0; 
+      double jetSecMomEta = 0.; 
+      double jetSecMomPhi = 0.; 
+      double jetFirMomEta = 0.; 
+      double jetFirMomPhi = 0.; 
+      double jetCovEtaPhi = 0.;
       for(int l=(j-phisize); l<=(j+phisize); l++) {
 	for(int k=(i-etasize); k<=(i+etasize); k++) {
 	  unsigned int dk = k-i+etasize;
@@ -294,7 +314,11 @@ std::vector<jJet> CaloTowerAnalyser::getL1JetsMask(const std::vector< std::vecto
 	  if(input[k][newl] > seedthresh2) { numtowersabovethresh++; }
 	  if(dl < mask.size() && dk < mask.at(0).size())
 	  {
-	    jetRms+=(dl*dl+dk*dk)*input[k][newl]*input[k][newl];
+	  jetSecMomPhi+=((int)dl-phisize)*((int)dl-phisize)*input[k][newl]*input[k][newl];
+	  jetSecMomEta+=((int)dk-etasize)*((int)dk-etasize)*input[k][newl]*input[k][newl];
+	  jetFirMomPhi+=((int)dl-phisize)*input[k][newl];
+	  jetFirMomEta+=((int)dk-etasize)*input[k][newl];
+	  jetCovEtaPhi+=((int)dk-etasize)*((int)dl-phisize)*input[k][newl]*input[k][newl];
 	    if (mask[dl][dk] == 2){if(input[k][newl]>input[i][j]) {numtowersaboveme++;}}
 	    else if (mask[dl][dk] == 1){if(input[k][newl]>=input[i][j]) {numtowersaboveme++;}}
 	    /*
@@ -321,7 +345,10 @@ std::vector<jJet> CaloTowerAnalyser::getL1JetsMask(const std::vector< std::vecto
 	double totalenergy=0.0;
 	//std::cout << "iEta: " << g.old_iEta(i) << ", iPhi: " << g.old_iPhi(j) << ", r0: " << localsums[0] <<  ", r1: " << localsums[1] << ", r2: " << localsums[2] << ", r3: " << localsums[3] << ", r4: " << localsums[4] << std::endl;
 	for(int ring=0; ring < (int)localsums.size(); ring++) { totalenergy += localsums[ring]; }
-	jetRms = jetRms/(totalenergy*totalenergy);
+	jetSecMomEta = jetSecMomEta/(totalenergy*totalenergy);
+	jetSecMomPhi = jetSecMomPhi/(totalenergy*totalenergy);
+	jetFirMomEta = jetFirMomEta/(totalenergy);
+	jetFirMomPhi = jetFirMomPhi/(totalenergy);
 	//this is with PUS:
 	if(totalenergy > 0.0) {
 	  //TEMP
@@ -329,7 +356,7 @@ std::vector<jJet> CaloTowerAnalyser::getL1JetsMask(const std::vector< std::vecto
 
 	  //TEMP
 	  //L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetTower,jetarea));
-	  L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums,localmax,jetRms, areas, outerstrips,jetarea));
+	  L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums,localmax,jetFirMomEta,jetFirMomPhi,jetSecMomEta,jetSecMomPhi,jetCovEtaPhi, areas, outerstrips,jetarea));
 	  //L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetarea));
 //	  L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums, areas, outerstrips,jetarea, seedtower));
 	}
@@ -368,7 +395,11 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
       std::vector<int> areas(jetsize+1,0); //to hold the ring areas (i.e. when we get up against the boundaries)
       std::vector<std::pair<int,int>> outerstrips(4,std::make_pair(0,0)); //to hold the energies in the 4 surrounding outer strips (excluding corners)
       int jetarea = 1;
-      double jetRms = 0; 
+      double jetSecMomEta = 0; 
+      double jetSecMomPhi = 0; 
+      double jetFirMomEta = 0; 
+      double jetFirMomPhi = 0; 
+      double jetCovEtaPhi= 0.;
       //int pusarea = 0;
       for(int k=(i-jetsize); k<=(i+jetsize); k++) {
 	for(int l=(j-jetsize); l<=(j+jetsize); l++) {
@@ -386,7 +417,11 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
 	  {
 	    jetTower.push_back(input[k][newl]);
 	  }
-	  jetRms+=(dl*dl+dk*dk)*input[k][newl]*input[k][newl];
+	  jetSecMomPhi+=((int)dl-jetsize)*((int)dl-jetsize)*input[k][newl]*input[k][newl];
+	  jetSecMomEta+=((int)dk-jetsize)*((int)dk-jetsize)*input[k][newl]*input[k][newl];
+	  jetFirMomPhi+=((int)dl-jetsize)*input[k][newl];
+	  jetFirMomEta+=((int)dk-jetsize)*input[k][newl];
+	  jetCovEtaPhi+=((int)dk-jetsize)*((int)dl-jetsize)*input[k][newl]*input[k][newl];
 	  if(input[k][newl] > seedthresh2) { numtowersabovethresh++; }
 
 	  //to decide which ring to assign energy to
@@ -432,7 +467,11 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
 	    double totalenergy=0.0;
 	    //std::cout << "iEta: " << g.old_iEta(i) << ", iPhi: " << g.old_iPhi(j) << ", r0: " << localsums[0] <<  ", r1: " << localsums[1] << ", r2: " << localsums[2] << ", r3: " << localsums[3] << ", r4: " << localsums[4] << std::endl;
 	    for(int ring=0; ring < (int)localsums.size(); ring++) { totalenergy += localsums[ring]; }
-	    jetRms = jetRms/(totalenergy*totalenergy);
+	    jetSecMomEta = jetSecMomEta/(totalenergy*totalenergy);
+	    jetSecMomPhi = jetSecMomPhi/(totalenergy*totalenergy);
+	    jetFirMomEta = jetFirMomEta/(totalenergy);
+	    jetFirMomPhi = jetFirMomPhi/(totalenergy);
+	    jetCovEtaPhi = jetCovEtaPhi/(totalenergy*totalenergy);
 	    //this is with PUS:
 	    //for(int ring=0; ring < (int)localsums.size()-1; ring++) { totalenergy += localsums[ring]; }
 	    //std::sort(outerstrips.begin(),outerstrips.end());
@@ -440,7 +479,7 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
 
 	    //this means we have a viable candidate
 	    if(totalenergy > 0.0) {
-	      L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums,localmax,jetRms, areas, outerstrips,jetarea));
+	      L1_jJets.push_back(jJet(totalenergy, g.old_iEta(i), g.old_iPhi(j), localsums,localmax,jetFirMomEta,jetFirMomPhi,jetSecMomEta,jetSecMomPhi,jetCovEtaPhi, areas, outerstrips,jetarea));
 	      //jJet(double pt, int ieta, int iphi, std::vector<int> ringsums, std::vector<int> ringareas, std::vector<std::pair<int,int> > outerstrips, int jetarea);
 	      //std::cout << areas << std::endl;
 	    }
