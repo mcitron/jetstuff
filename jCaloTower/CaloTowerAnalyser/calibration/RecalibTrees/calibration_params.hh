@@ -79,14 +79,14 @@ std::vector<float> calibrateL1Jets(const std::vector<float>& inJetPt, const std:
         p[3]=lut[9];
         p[4]=lut[10];
         p[5]=lut[11];
-      }else if(inJetEta[i]>=g.eta(-14) && inJetEta[i]<g.eta(7)){
+      }else if(inJetEta[i]>=g.eta(-14) && inJetEta[i]<g.eta(-7)){
         p[0]=lut[12];
         p[1]=lut[13];
         p[2]=lut[14];
         p[3]=lut[15];
         p[4]=lut[16];
         p[5]=lut[17];
-      }else if(inJetEta[i]>=g.eta(7) && inJetEta[i]<g.eta(0)){
+      }else if(inJetEta[i]>=g.eta(-7) && inJetEta[i]<g.eta(0)){
         p[0]=lut[18];
         p[1]=lut[19];
         p[2]=lut[20];
