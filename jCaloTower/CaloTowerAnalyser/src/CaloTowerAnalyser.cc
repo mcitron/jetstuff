@@ -378,6 +378,9 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   jJetComp["L1_for_Nick"]=L1_5400_for_Nick;
   jJetComp["5400_chunky"]=L1_5400_3_chunky_jJet;
 
+  double median_jet_5400 = getMedian(L1_5400_for_Nick);
+  medianRho = median_jet_5400;
+  //std::cout << medianRho << std::endl
   for (auto jet = jJetComp.begin();jet != jJetComp.end(); jet++)
   {
     this->MakeJetTree(jet->second,ak4genjetsp_jJet,jet->first,false);

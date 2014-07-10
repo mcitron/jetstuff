@@ -35,7 +35,7 @@ for (iNum = jetnum.begin();iNum != jetnum.end(); iNum++)
   for (iType = jetType.begin();iType != jetType.end(); iType++)
   {
 
-    TCut matchedcut = "jetMatchedPt_"+*iType+"["+*iNum+"]!=-1";
+    //TCut matchedcut = "jetMatchedPt_"+*iType+"["+*iNum+"]!=-1";
 
 
     tree_ttbar->Draw("jetPt_"+*iType+"["+*iNum+"]>>"+*iType+"_"+*iNum+bins);
