@@ -45,7 +45,7 @@ process.o1 = cms.OutputModule("PoolOutputModule",
 #     'keep *_hcalDigis_*_*',
 #                                            'keep *_PUsubAK5CaloJetProducer_*_*', 
 #                                            'keep *_PUsubAK5PFJetProducer_*_*', 
-     'keep *_*_Rho_*',     
+  #   'keep *_*_Rho_*',     
      'keep *_valHcalTriggerPrimitiveDigis_*_*',
      'keep *_ecalDigis_EcalTriggerPrimitives_*',  
      'keep *_L1CaloTowerProducer_*_*',
@@ -63,8 +63,8 @@ process.o1 = cms.OutputModule("PoolOutputModule",
 #     'keep *_L1TowerJetPUSubtractedProducer_*_*',
 #     'keep *_L1CalibFilterTowerJetProducer_*_*',
     
-#     #kt6 jets for rho
-#     'keep *_kt6CaloJets_*_RECO',
+     #kt6 jets for rho
+   #  'keep *_kt6CaloJetsCentral_*_RECO',
     
 #     'keep *_ak5CaloJets_*_RECO',
 #     'drop *_ak5CaloJets_rho_RECO',

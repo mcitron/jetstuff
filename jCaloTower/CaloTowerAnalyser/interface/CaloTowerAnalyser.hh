@@ -132,8 +132,16 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     std::map<TString, std::vector<Float_t> *> jetCovEtaPhi_;
     std::map<TString, std::vector<Float_t> *> jetEta_;
     std::map<TString, std::vector<Float_t> *> jetMatchedPt_;
-    std::map<TString, std::vector<Float_t> *> sums_;
-    std::vector<Float_t> * Esums_;
+    std::map<TString, double> sumsHT_;
+    std::map<TString, double> sumsMHT_;
+    std::map<TString, double> sumsMHTx_;
+    std::map<TString, double> sumsMHTy_;
+
+    double sumsET_;
+    double sumsMET_;
+    double sumsMETx_;
+    double sumsMETy_;
+
     std::map<TString, std::vector<Int_t> *> genJetMatchAlgo1_;
     std::map<TString, std::vector<Int_t> *> genJetMatchAlgo2_;
     std::map<TString, std::vector<Int_t> *> jetTowerEnergyUp1_;

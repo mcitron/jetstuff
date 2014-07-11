@@ -243,12 +243,16 @@ void CaloTowerAnalyser::MakeSumTree(const std::vector<jJet> & col1,TString folde
     if(!pMade[folderName+"_sum"])
     {
       std::cout << folderName+"_sum" <<std::endl;
-      sums_[folderName+"_sum"] = new std::vector<Float_t>();
-      tree->Branch("sums_"+TString(folderName+"_sum"), "std::vector<float>", &sums_[folderName+"_sum"]);
+      sumsHT_[folderName+"_sum"] = 0.0; 
+      sumsMHT_[folderName+"_sum"] = 0.0; 
+      sumsMHTx_[folderName+"_sum"] = 0.0; 
+      sumsMHTy_[folderName+"_sum"] = 0.0; 
+      tree->Branch("sumsHT_"+TString(folderName+"_sum"), &sumsHT_[folderName+"_sum"],"sumsHT/D");
+      tree->Branch("sumsMHT_"+TString(folderName+"_sum"), &sumsMHT_[folderName+"_sum"],"sumsMHT/D");
+      tree->Branch("sumsMHTx_"+TString(folderName+"_sum"), &sumsMHTx_[folderName+"_sum"],"sumsMHTx/D");
+      tree->Branch("sumsMHTy_"+TString(folderName+"_sum"), &sumsMHTy_[folderName+"_sum"],"sumsMHTy/D");
       pMade[folderName+"_sum"]=true;
     }
-
-    sums_[folderName+"_sum"]->clear();
 
     //  std::vector <Float_t> * jetPhi_[folderName+"_sum"] = new std::vector<Float_t>();
     //  std::vector <Float_t> *  jetEta_[folderName+"_sum"] = new std::vector<Float_t>();
@@ -277,10 +281,10 @@ void CaloTowerAnalyser::MakeSumTree(const std::vector<jJet> & col1,TString folde
       MHTcol1_x=0;
       MHTcol1_y=0;
     }
-    sums_[folderName+"_sum"]->push_back(HTcol1);
-    sums_[folderName+"_sum"]->push_back(MHTcol1);
-    sums_[folderName+"_sum"]->push_back(MHTcol1_x);
-    sums_[folderName+"_sum"]->push_back(MHTcol1_y);
+    sumsHT_[folderName+"_sum"]=HTcol1;
+    sumsMHT_[folderName+"_sum"]=(MHTcol1);
+    sumsMHTx_[folderName+"_sum"]=(MHTcol1_x);
+    sumsMHTy_[folderName+"_sum"]=(MHTcol1_y);
   }
   return;
 }

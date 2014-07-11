@@ -28,6 +28,10 @@ CaloTowerAnalyser::CaloTowerAnalyser(const edm::ParameterSet& iConfig) {
   tree->Branch("numHotTow", &numHotTow, "numHotTow/I");  
   tree->Branch("numHotTow12", &numHotTow12, "numHotTow12/I");  
   tree->Branch("medianRho", &medianRho, "medianRho/D");  
+  tree->Branch("sumsET_", &sumsET_, "ET/D");  
+  tree->Branch("sumsMETx_,", &sumsMETx_, "METx/D");  
+  tree->Branch("sumsMETy_", &sumsMETy_, "METy/D");  
+  tree->Branch("sumsMET_", &sumsMET_, "MET/D");  
   //tree->Branch("Esums_", "std::vector<float>", &Esums_);
 // std::string folderName = "Event_";
   // std::stringstream caseNumber;
@@ -51,50 +55,9 @@ CaloTowerAnalyser::CaloTowerAnalyser(const edm::ParameterSet& iConfig) {
   globalVars.push_back("nint");
   this->setGlobalPusVars(globalVars);
 
-  std::vector<TString> l1Vars;
-  l1Vars.push_back("strip1");
-  l1Vars.push_back("strip2");
-  l1Vars.push_back("strip3");
-  l1Vars.push_back("strip4");
-  l1Vars.push_back("strip5");
-  l1Vars.push_back("strip6");
-  l1Vars.push_back("strip7");
-  l1Vars.push_back("strip8");
-  /* l1Vars.push_back("middle6");
-     l1Vars.push_back("middle4");*/
-  l1Vars.push_back("out1_middle2");
-  l1Vars.push_back("out2_middle2");
-  this->setL1PusVars(l1Vars);
-
-  std::map<TString,int> etaBins;
-  etaBins["eta_bin1"] = -14;
-  etaBins["eta_bin2"] = 0;
-  etaBins["eta_bin3"] = 14;
-  etaBins["eta_bin4"] = 28;
-  this->setEtaBins(etaBins);
-
-  std::map<TString,int> ptBins;
-  ptBins["pt_0to20"] = 20; 
-  ptBins["pt_20to40"] = 40; 
-  ptBins["pt_40to60"] = 60; 
-  ptBins["pt_60to80"] = 80; 
-  ptBins["pt_80to100"] = 100; 
-  ptBins["pt_100to120"] = 120; 
-  ptBins["pt_120to140"] = 140; 
-  ptBins["pt_140to160"] = 160; 
-  ptBins["pt_160to180"] = 180; 
-  ptBins["pt_180to200"] = 200; 
-  this->setPtBins(ptBins);
-
-  std::map<TString, int> nintBins;
-  nintBins["nint_30to35"] = 35;
-  nintBins["nint_35to40"] = 40;
-  nintBins["nint_40to45"] = 45;
-  nintBins["nint_45to50"] = 50;
-  this->setNintBins(nintBins);
 
   //Make the necessary histograms
-
+etaTT = fs->mk
 
 }
 
@@ -319,17 +282,10 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     pseudoak4ttjets.push_back(curPseudoJet);
   }
 
-  mET=ET;
-  mMET.clear();
-  mMET.push_back(met_x);
-  mMET.push_back(met_y);
-  mMET.push_back(sqrt(met_x*met_x+met_y*met_y));
-  /*Esums_->clear();
-  Esums_->push_back(ET);
-  Esums_->push_back(sqrt(met_x*met_x+met_y*met_y));
-  Esums_->push_back(met_x);
-  Esums_->push_back(met_y);*/
-
+  sumsET_=ET;
+  sumsMETx_=met_x;
+  sumsMETy_=met_y;
+  sumsMET_=sqrt(met_x*met_x+met_y*met_y);
   //now make the genjetsp collection (clustered based on eta<3 deposits and no muons and neutrinos)
   this->getJets(pseudoak4genjetsp, ak4genjetsp);
   //now make the ak4tt collection
@@ -425,7 +381,7 @@ CaloTowerAnalyser::endJob()
    CaloTowerAnalyser::beginRun(edm::Run const&, edm::EventSetup const&)
    {
    }
-   */
+ */
 
 // ------------ method called when ending the processing of a run  ------------
 /*
@@ -433,7 +389,7 @@ CaloTowerAnalyser::endJob()
    CaloTowerAnalyser::endRun(edm::Run const&, edm::EventSetup const&)
    {
    }
-   */
+ */
 
 // ------------ method called when starting to processes a luminosity block  ------------
 /*
@@ -441,7 +397,7 @@ CaloTowerAnalyser::endJob()
    CaloTowerAnalyser::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
    {
    }
-   */
+ */
 
 // ------------ method called when ending the processing of a luminosity block  ------------
 /*
@@ -449,7 +405,7 @@ CaloTowerAnalyser::endJob()
    CaloTowerAnalyser::endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
    {
    }
-   */
+ */
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
 void

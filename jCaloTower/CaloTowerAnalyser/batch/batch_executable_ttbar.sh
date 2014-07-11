@@ -1,5 +1,6 @@
 cd /afs/cern.ch/work/m/mcitron/jadjets/CMSSW_6_2_0/src/jCaloTower/CaloTowerAnalyser/batch/
 eval `scramv1 runtime -sh` 
-#python run_calib.py
-python python/run_ttbar_neutrino.py 70000 10 '/afs/cern.ch/work/m/mcitron/public/TTBAR/140622' '/afs/cern.ch/work/a/aelwood/public/TriggerTowers_TTbar_13TeV_PU40_50ns_1-10_skimmed_v3.root' 'jadtest'
-#USAGE run_config.py <tot num> <split> <outputdir> <input>
+#filelist='/afs/cern.ch/work/m/mcitron/jadjets/CMSSW_6_2_0/src/jCaloTower/CaloTowerAnalyser/qcd_PU140.txt'
+filelist='/afs/cern.ch/work/m/mcitron/jadjets/CMSSW_6_2_0/src/jCaloTower/CaloTowerAnalyser/skimfiles/140708_ttbar_PU40.txt'
+outputdir="/afs/cern.ch/work/m/mcitron/public/TTBAR/140710/"
+python python/run_qcd.py $filelist $outputdir

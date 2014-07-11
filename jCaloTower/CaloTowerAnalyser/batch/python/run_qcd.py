@@ -17,7 +17,7 @@ with open(filelist) as f:
   i+=1
 
 #define file names
-configinput=make_config.make_config_input(arg_array[int(num)][0],arg_array[int(num)][1],arg_array[int(num)][2],arg_array[int(num)][3],"skimrun")
+configinput=make_config.make_config_input(arg_array[int(num)][0],arg_array[int(num)][1],arg_array[int(num)][2],arg_array[int(num)][3],"jadtest")
 if not os.path.exists(outputdir):
     os.makedirs(outputdir)
 print configinput
