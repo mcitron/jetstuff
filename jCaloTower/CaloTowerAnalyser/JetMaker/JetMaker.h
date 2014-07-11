@@ -23,6 +23,8 @@ class JetMaker {
     TTree          *fChain;   //!pointer to the analyzed TTree or TChain
     Int_t           fCurrent; //!current Tree number in a TChain
 
+    bool doNGun; //Turn off gen for the neutrino gun
+
     //Add output tree
     TFile* outFile;
     TTree* jetTree;
@@ -409,7 +411,7 @@ class JetMaker {
     TBranch        *b_sumsMHTx_gct_uncalib_gen_sum;   //!
     TBranch        *b_sumsMHTy_gct_uncalib_gen_sum;   //!
 
-    JetMaker(TTree *tree=0);
+    JetMaker(TTree *tree=0, bool genIncluded=true);
     virtual ~JetMaker();
     //virtual Int_t    Cut(Long64_t entry);
     virtual Int_t    GetEntry(Long64_t entry);
@@ -423,8 +425,9 @@ class JetMaker {
 #endif
 
 #ifdef JetMaker_cxx
-JetMaker::JetMaker(TTree *tree) : fChain(0) 
+JetMaker::JetMaker(TTree *tree, bool genIncluded) : fChain(0) 
 {
+  doNGun = !genIncluded;
   // if parameter tree is not specified (or zero), connect the file
   // used to generate this class and read the Tree.
   if (tree == 0) {
@@ -690,30 +693,32 @@ void JetMaker::Init(TTree *tree)
   fChain->SetBranchAddress("sumsMETx_,", &sumsMETx__, &b_METx);
   fChain->SetBranchAddress("sumsMETy_", &sumsMETy_, &b_METy);
   fChain->SetBranchAddress("sumsMET_", &sumsMET_, &b_MET);
-  fChain->SetBranchAddress("jetPt_ak4_gen", &jetPt_ak4_gen, &b_jetPt_ak4_gen);
-  fChain->SetBranchAddress("jetArea_ak4_gen", &jetArea_ak4_gen, &b_jetArea_ak4_gen);
-  fChain->SetBranchAddress("jetFirEta_ak4_gen", &jetFirEta_ak4_gen, &b_jetFirEta_ak4_gen);
-  fChain->SetBranchAddress("jetCovEtaPhi_ak4_gen", &jetCovEtaPhi_ak4_gen, &b_jetCovEtaPhi_ak4_gen);
-  fChain->SetBranchAddress("jetFirPhi_ak4_gen", &jetFirPhi_ak4_gen, &b_jetFirPhi_ak4_gen);
-  fChain->SetBranchAddress("jetSecEta_ak4_gen", &jetSecEta_ak4_gen, &b_jetSecEta_ak4_gen);
-  fChain->SetBranchAddress("jetSecPhi_ak4_gen", &jetSecPhi_ak4_gen, &b_jetSecPhi_ak4_gen);
-  fChain->SetBranchAddress("jetPhi_ak4_gen", &jetPhi_ak4_gen, &b_jetPhi_ak4_gen);
-  fChain->SetBranchAddress("jetEta_ak4_gen", &jetEta_ak4_gen, &b_jetEta_ak4_gen);
-  fChain->SetBranchAddress("jetDonut_ak4_gen", &jetDonut_ak4_gen, &b_jetDonut_ak4_gen);
-  fChain->SetBranchAddress("jetMatchedPt_ak4_gen", &jetMatchedPt_ak4_gen, &b_jetMatchedPt_ak4_gen);
-  fChain->SetBranchAddress("jetMinDR_ak4_gen", &jetMinDR_ak4_gen, &b_jetMinDR_ak4_gen);
-  fChain->SetBranchAddress("jetTowerEnergyUp1_ak4_gen", &jetTowerEnergyUp1_ak4_gen, &b_jetTowerEnergyUp1_ak4_gen);
-  fChain->SetBranchAddress("jetTowerEnergyUp2_ak4_gen", &jetTowerEnergyUp2_ak4_gen, &b_jetTowerEnergyUp2_ak4_gen);
-  fChain->SetBranchAddress("jetTowerEnergyUp3_ak4_gen", &jetTowerEnergyUp3_ak4_gen, &b_jetTowerEnergyUp3_ak4_gen);
-  fChain->SetBranchAddress("jetTowerEnergyUp4_ak4_gen", &jetTowerEnergyUp4_ak4_gen, &b_jetTowerEnergyUp4_ak4_gen);
-  fChain->SetBranchAddress("jetTowerEnergyUp5_ak4_gen", &jetTowerEnergyUp5_ak4_gen, &b_jetTowerEnergyUp5_ak4_gen);
-  fChain->SetBranchAddress("jetTowerEnergyUp8_ak4_gen", &jetTowerEnergyUp8_ak4_gen, &b_jetTowerEnergyUp8_ak4_gen);
-  fChain->SetBranchAddress("sumsHT_ak4_gen_sum", &sumsHT_ak4_gen_sum, &b_sumsHT_ak4_gen_sum);
-  fChain->SetBranchAddress("sumsMHT_ak4_gen_sum", &sumsMHT_ak4_gen_sum, &b_sumsMHT_ak4_gen_sum);
-  fChain->SetBranchAddress("sumsMHTx_ak4_gen_sum", &sumsMHTx_ak4_gen_sum, &b_sumsMHTx_ak4_gen_sum);
-  fChain->SetBranchAddress("sumsMHTy_ak4_gen_sum", &sumsMHTy_ak4_gen_sum, &b_sumsMHTy_ak4_gen_sum);
-  fChain->SetBranchAddress("genJetMatchAlgo1_ak4_gen", &genJetMatchAlgo1_ak4_gen, &b_genJetMatchAlgo1_ak4_gen);
-  fChain->SetBranchAddress("genJetMatchAlgo2_ak4_gen", &genJetMatchAlgo2_ak4_gen, &b_genJetMatchAlgo2_ak4_gen);
+  if(!doNGun){
+    fChain->SetBranchAddress("jetPt_ak4_gen", &jetPt_ak4_gen, &b_jetPt_ak4_gen);
+    fChain->SetBranchAddress("jetArea_ak4_gen", &jetArea_ak4_gen, &b_jetArea_ak4_gen);
+    fChain->SetBranchAddress("jetFirEta_ak4_gen", &jetFirEta_ak4_gen, &b_jetFirEta_ak4_gen);
+    fChain->SetBranchAddress("jetCovEtaPhi_ak4_gen", &jetCovEtaPhi_ak4_gen, &b_jetCovEtaPhi_ak4_gen);
+    fChain->SetBranchAddress("jetFirPhi_ak4_gen", &jetFirPhi_ak4_gen, &b_jetFirPhi_ak4_gen);
+    fChain->SetBranchAddress("jetSecEta_ak4_gen", &jetSecEta_ak4_gen, &b_jetSecEta_ak4_gen);
+    fChain->SetBranchAddress("jetSecPhi_ak4_gen", &jetSecPhi_ak4_gen, &b_jetSecPhi_ak4_gen);
+    fChain->SetBranchAddress("jetPhi_ak4_gen", &jetPhi_ak4_gen, &b_jetPhi_ak4_gen);
+    fChain->SetBranchAddress("jetEta_ak4_gen", &jetEta_ak4_gen, &b_jetEta_ak4_gen);
+    fChain->SetBranchAddress("jetDonut_ak4_gen", &jetDonut_ak4_gen, &b_jetDonut_ak4_gen);
+    fChain->SetBranchAddress("jetMatchedPt_ak4_gen", &jetMatchedPt_ak4_gen, &b_jetMatchedPt_ak4_gen);
+    fChain->SetBranchAddress("jetMinDR_ak4_gen", &jetMinDR_ak4_gen, &b_jetMinDR_ak4_gen);
+    fChain->SetBranchAddress("jetTowerEnergyUp1_ak4_gen", &jetTowerEnergyUp1_ak4_gen, &b_jetTowerEnergyUp1_ak4_gen);
+    fChain->SetBranchAddress("jetTowerEnergyUp2_ak4_gen", &jetTowerEnergyUp2_ak4_gen, &b_jetTowerEnergyUp2_ak4_gen);
+    fChain->SetBranchAddress("jetTowerEnergyUp3_ak4_gen", &jetTowerEnergyUp3_ak4_gen, &b_jetTowerEnergyUp3_ak4_gen);
+    fChain->SetBranchAddress("jetTowerEnergyUp4_ak4_gen", &jetTowerEnergyUp4_ak4_gen, &b_jetTowerEnergyUp4_ak4_gen);
+    fChain->SetBranchAddress("jetTowerEnergyUp5_ak4_gen", &jetTowerEnergyUp5_ak4_gen, &b_jetTowerEnergyUp5_ak4_gen);
+    fChain->SetBranchAddress("jetTowerEnergyUp8_ak4_gen", &jetTowerEnergyUp8_ak4_gen, &b_jetTowerEnergyUp8_ak4_gen);
+    fChain->SetBranchAddress("sumsHT_ak4_gen_sum", &sumsHT_ak4_gen_sum, &b_sumsHT_ak4_gen_sum);
+    fChain->SetBranchAddress("sumsMHT_ak4_gen_sum", &sumsMHT_ak4_gen_sum, &b_sumsMHT_ak4_gen_sum);
+    fChain->SetBranchAddress("sumsMHTx_ak4_gen_sum", &sumsMHTx_ak4_gen_sum, &b_sumsMHTx_ak4_gen_sum);
+    fChain->SetBranchAddress("sumsMHTy_ak4_gen_sum", &sumsMHTy_ak4_gen_sum, &b_sumsMHTy_ak4_gen_sum);
+    fChain->SetBranchAddress("genJetMatchAlgo1_ak4_gen", &genJetMatchAlgo1_ak4_gen, &b_genJetMatchAlgo1_ak4_gen);
+    fChain->SetBranchAddress("genJetMatchAlgo2_ak4_gen", &genJetMatchAlgo2_ak4_gen, &b_genJetMatchAlgo2_ak4_gen);
+  }
   fChain->SetBranchAddress("jetPt_5400_chunky", &jetPt_5400_chunky, &b_jetPt_5400_chunky);
   fChain->SetBranchAddress("jetArea_5400_chunky", &jetArea_5400_chunky, &b_jetArea_5400_chunky);
   fChain->SetBranchAddress("jetFirEta_5400_chunky", &jetFirEta_5400_chunky, &b_jetFirEta_5400_chunky);
@@ -888,10 +893,10 @@ void JetMaker::Show(Long64_t entry)
   fChain->Show(entry);
 }
 /*Int_t JetMaker::Cut(Long64_t entry)
-{
-  // This function may be called from Loop.
-  // returns  1 if entry is accepted.
-  // returns -1 otherwise.
-  return 1;
+  {
+// This function may be called from Loop.
+// returns  1 if entry is accepted.
+// returns -1 otherwise.
+return 1;
 }*/
 #endif // #ifdef JetMaker_cxx
