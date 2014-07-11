@@ -33,7 +33,7 @@ void makeJetPlots()
   std::vector<TString> jetTypes;
   jetTypes.push_back("s0_nopus");
   jetTypes.push_back("s0_donut");
- /* jetTypes.push_back("s0_global");
+  jetTypes.push_back("s0_global");
   jetTypes.push_back("s0_chunky");
   jetTypes.push_back("s0_tsup1");
   jetTypes.push_back("s0_tsup2");
@@ -45,7 +45,7 @@ void makeJetPlots()
   jetTypes.push_back("s5_tsup1");
   jetTypes.push_back("s5_tsup2");
   jetTypes.push_back("s5_tsup3");
-*/
+
   std::vector<TString> jetnum;
   jetnum.push_back("0");
   jetnum.push_back("3");
@@ -71,15 +71,19 @@ void makeJetPlots()
     for(std::vector<TString>::const_iterator iNum=jetnum.begin();
         iNum!=jetnum.end(); iNum++){
 
-      /*
+      
       TH1F* eff = makeEfficiency(treeTtbar, effDir, *iType, *iNum);
       TH1F* rate = makeRate(treeNeut, rateDir, *iType, *iNum);
+
       makeSums(treeTtbar, sumsDir, *iType, "ttbar");
       makeSums(treeNeut, sumsDir, *iType, "ngun");
+
       makeRateEff(rateEffDir, rate, eff, *iNum);
-      */
+
       makeTurnon(treeTtbar, turnonDir, *iType, *iNum, genPtCuts);
 
+      makeEfficienciesNvtx(treeTtbar, effDir, *iType, *iNum);
+      makeRatesNvtx(treeNeut, rateDir, *iType, *iNum);
     }
 
     std::cout << "Done " << iType->Data() << std::endl;
@@ -88,7 +92,124 @@ void makeJetPlots()
 
 }
 
-void makeTurnon(TTree *tree, TDirectory* dir, TString jetType, TString jetNum,
+void makeRatesNvtx(TTree* tree, TDirectory* dir, TString jetType, TString jetNum){
+
+  dir->cd();
+  int cut = 100;
+  TString bins2 = "(10,0,100,1000,0,1000)";
+  TString bins = "(10,0,100)";
+  double xpoints[50];
+  double ypoints[50];
+  double ypointserror[50];
+
+  tree->Draw("jetPt_s0_nopus[0]:mNPV>>overall"+bins2,"","colz");
+  TH2F *overall = (TH2F*)gDirectory->Get("overall");
+
+  tree->Draw("jetPt_"+jetType+"["+jetNum+"]:mNPV>>"+jetType+"_"+jetNum+bins2,"","colz");
+  TH2F *fullL1NVTX = (TH2F*)gPad->GetPrimitive(jetType+"_"+jetNum);
+
+  int i=0;
+
+  for(int nvtx=1; nvtx < fullL1NVTX->GetNbinsX(); nvtx+=1){
+    char buffer[100];
+    sprintf(buffer,"Nvtx%dto%d",nvtx,nvtx+1);
+    TH1D * dummyplot = fullL1NVTX->ProjectionY("temp"+jetType+jetNum,nvtx,nvtx+1);
+    TH1D * dummyoverall = overall->ProjectionY("overall"+jetType+jetNum,nvtx,nvtx+1);
+    int overallNorm=dummyoverall->GetEntries();
+    //std::cout << dummyplot->GetEntries() <<" "<<dummyoverall->GetEntries() << std::endl;
+    if(dummyplot->GetEntries() != 0){
+      TH1D * cumuplot=makeEffNvtxCumu(dummyplot,overallNorm);
+      cumuplot->SetTitle(buffer);
+      //cumuplot->Write();
+      ypoints[i]=cumuplot->GetBinContent(cumuplot->FindBin(cut));
+      ypointserror[i]=cumuplot->GetBinError(cumuplot->FindBin(cut));
+      //std::cout << ypoints[i]<< std::endl;
+    }
+    else
+    {
+      ypoints[i]=0.;
+      ypointserror[i]=0.;
+    }
+    xpoints[i]=fullL1NVTX->GetXaxis()->GetBinCenter(nvtx);
+    i++;
+  }
+
+  TGraphErrors *rate_nvtx_bin_graph = new TGraphErrors(fullL1NVTX->GetNbinsX()-1,
+      &xpoints[0],&ypoints[0],0,&ypointserror[0]);
+  //TGraph *rate_nvtx_bin_graph = new TGraph(dummyplot->GetNbinsX(),&xpoints[0],&ypoints[0]);
+
+  rate_nvtx_bin_graph->SetTitle("ptCut"+jetType+jetNum);
+  rate_nvtx_bin_graph->GetXaxis()->SetTitle("nvtx");
+  rate_nvtx_bin_graph->GetYaxis()->SetTitle("Rate");
+  rate_nvtx_bin_graph->SetName("nvtx_ptCut"+jetType+jetNum);
+  rate_nvtx_bin_graph->SetMarkerStyle(5);
+  //  rate_nvtx_bin_graph->SetLineStyle(0);
+  rate_nvtx_bin_graph->GetYaxis()->SetRangeUser(0,1);
+  rate_nvtx_bin_graph->Write();
+
+}
+
+void makeEfficienciesNvtx(TTree* tree, TDirectory* dir, TString jetType, TString jetNum){
+
+  dir->cd();
+  TString bins2 = "(10,0,100,1000,0,1000)";
+  int cut = 50;
+  double xpoints[50];
+  double ypoints[50];
+  double ypointserror[50];
+
+  TCut genptcut = "jetPt_ak4_gen["+jetNum+"]>25";
+  tree->Draw("jetPt_ak4_gen["+jetNum+"]:mNPV>>overall_"+jetNum+bins2,genptcut,"colz");
+  TH2D *overall = (TH2D*)gDirectory->Get("overall_"+jetNum);
+
+  TCut matchedcut = "jetMatchedPt_"+jetType+"["+jetNum+"]!=-1";
+
+  tree->Draw("jetPt_"+jetType+"["+jetNum+"]:mNPV>>"+jetType+"_"+jetNum+bins2,
+      genptcut&&matchedcut,"colz");
+  TH2F *fullL1NVTX = (TH2F*)gDirectory->Get(jetType+"_"+jetNum);
+
+  int i =0;
+
+  for(int nvtx=1; nvtx < fullL1NVTX->GetNbinsX(); nvtx+=1){
+    char buffer[100];
+    sprintf(buffer,"Nvtx%dto%d",nvtx,nvtx+1);
+    TH1D * dummyplot = fullL1NVTX->ProjectionY("temp"+jetType+jetNum,nvtx,nvtx+1);
+    TH1D * dummyoverall = overall->ProjectionY("overalltemp"+jetType+jetNum,nvtx,nvtx+1);
+    double overallNorm = dummyoverall->GetEntries();
+    //std::cout << dummyplot->GetEntries() << "  " << dummyoverall->GetEntries() << std::endl;
+    //dummyplot->Write();
+    if(dummyplot->GetEntries() != 0){
+      TH1D * cumuplot=makeEffNvtxCumu(dummyplot,overallNorm);
+      cumuplot->SetTitle(buffer);
+      //cumuplot->Write();
+      ypoints[i]=cumuplot->GetBinContent(cumuplot->FindBin(cut));
+      ypointserror[i]=cumuplot->GetBinError(cumuplot->FindBin(cut));
+      //std::cout << ypointserror[i]<< std::endl;
+    }
+    else
+    {
+      ypoints[i]=0.;
+    }
+    xpoints[i]=fullL1NVTX->GetXaxis()->GetBinCenter(nvtx);
+    i++;
+  }
+
+  TGraphErrors *rate_nvtx_bin_graph = new TGraphErrors(fullL1NVTX->GetNbinsX()-1,&xpoints[0],&ypoints[0],0,&ypointserror[0]);
+  //TGraph *rate_nvtx_bin_graph = new TGraph(dummyplot->GetNbinsX(),&xpoints[0],&ypoints[0]);
+
+  rate_nvtx_bin_graph->SetTitle("ptCut"+jetType+jetNum);
+  rate_nvtx_bin_graph->GetXaxis()->SetTitle("nvtx");
+  rate_nvtx_bin_graph->GetYaxis()->SetTitle("Rate");
+  rate_nvtx_bin_graph->SetName("nvtx_ptCut"+jetType+jetNum);
+  rate_nvtx_bin_graph->SetMarkerStyle(5);
+  //  rate_nvtx_bin_graph->SetLineStyle(0);
+  rate_nvtx_bin_graph->GetYaxis()->SetRangeUser(0,1);
+  rate_nvtx_bin_graph->Write();
+
+
+}
+
+void makeTurnon(TTree* tree, TDirectory* dir, TString jetType, TString jetNum,
     const std::vector<TString>& genptcut){
 
   dir->cd();
@@ -238,4 +359,23 @@ TGraphAsymmErrors * effDiv(TH1F * matchedhist, TH1F * allhist)
 
   matchCurve->Divide(matchedhist,allhist);
   return matchCurve;
+}
+
+TH1D * makeEffNvtxCumu(TH1D * input, double overallNorm){
+
+  TH1D * output = new TH1D(*input);
+  //output=input;
+  int norm = input->GetEntries();
+  //output->SetBinContent(0,1.);
+  int nXbins = input->GetNbinsX();
+  int nYbins = input->GetNbinsY();
+  int dummy = input->GetBinContent(nXbins+1);
+  for (int xbins = 0; xbins <= nXbins; xbins++)
+  {
+    dummy += input->GetBinContent(nXbins-xbins);
+    output->SetBinContent((nXbins-xbins),((double)dummy)/overallNorm);
+    output->SetBinError((nXbins-xbins),(sqrt((double)dummy))/overallNorm);
+  }
+
+  return output;
 }
