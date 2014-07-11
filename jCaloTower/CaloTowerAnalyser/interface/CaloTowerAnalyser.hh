@@ -120,6 +120,7 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     double mGctHtCalib;
     double mGctHtUncalib;
     TTree* tree;
+    TTree* masterTree;
     std::map<TString, std::vector<Float_t> *> jetPt_;
     std::map<TString, std::vector<Float_t> *> jetMinDR_;
     std::map<TString, std::vector<Float_t> *> jetPhi_;
@@ -136,12 +137,12 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     std::map<TString, double> sumsMHT_;
     std::map<TString, double> sumsMHTx_;
     std::map<TString, double> sumsMHTy_;
-
+    bool mMaster;
     double sumsET_;
     double sumsMET_;
     double sumsMETx_;
     double sumsMETy_;
-
+    uint8_t jetTower[100][81];
     std::map<TString, std::vector<Int_t> *> genJetMatchAlgo1_;
     std::map<TString, std::vector<Int_t> *> genJetMatchAlgo2_;
     std::map<TString, std::vector<Int_t> *> jetTowerEnergyUp1_;
@@ -166,7 +167,7 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     virtual void beginJob() ;
     virtual void analyze(const edm::Event&, const edm::EventSetup&);
     virtual void endJob() ;
-
+    TH1D * towerPtWeightEta;
     //void Make2DMap(const edm::Handle<l1slhc::L1CaloTowerCollection> triggertowers, const edm::Handle<CaloTowerCollection> calotowers, const int eventNumber);
 
     //virtual void beginRun(edm::Run const&, edm::EventSetup const&);
