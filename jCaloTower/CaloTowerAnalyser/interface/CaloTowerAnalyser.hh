@@ -120,7 +120,7 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     double mGctHtCalib;
     double mGctHtUncalib;
     TTree* tree;
-    TTree* masterTree;
+    //TTree* masterTree;
     std::map<TString, std::vector<Float_t> *> jetPt_;
     std::map<TString, std::vector<Float_t> *> jetMinDR_;
     std::map<TString, std::vector<Float_t> *> jetPhi_;

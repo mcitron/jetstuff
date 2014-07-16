@@ -22,10 +22,10 @@ CaloTowerAnalyser::CaloTowerAnalyser(const edm::ParameterSet& iConfig) {
   mskim=iConfig.getParameter<std::string>("skim_name");
   mgct=iConfig.getParameter<bool>("gctinfo");
 
-  mMaster=iConfig.getParameter<bool>("makeTree");
+  //mMaster=iConfig.getParameter<bool>("makeTree");
 
   tree = fs->make<TTree>("L1Tree","L1Tree");
-  masterTree = fs->make<TTree>("L1MasterTree","L1MasterTree");
+  //masterTree = fs->make<TTree>("L1MasterTree","L1MasterTree");
 
   tree->Branch("mNPV", &mNPV, "mNPV/I");  
   tree->Branch("numHotTow", &numHotTow, "numHotTow/I");  
@@ -40,7 +40,7 @@ CaloTowerAnalyser::CaloTowerAnalyser(const edm::ParameterSet& iConfig) {
   // std::stringstream caseNumber;
   // caseNumber << eventNumber;
   // folderName.append(caseNumber.str());
-  masterTree->Branch("jetTower",jetTower,"jetTower[100][81]/b");
+  //masterTree->Branch("jetTower",jetTower,"jetTower[100][81]/b");
   TriggerTowerGeometry g; //to run the constructor -- could also make this static
 
 
@@ -332,10 +332,14 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   this->MakeSumTree(ak4genjetsp_jJet,"ak4_gen",false);
   this->MakeMatchTree(ak4genjetsp_jJet,ak4genjetsp_jJet,"ak4_gen",false);
 
+  this->MakeJetTree(top_jJet,top_jJet,"top_gen",false);
+  this->MakeSumTree(top_jJet,"top_gen",false);
+
   std::map <TString,std::vector<jJet> > jJetComp;
   jJetComp["L1_for_Nick"]=L1_5400_for_Nick;
   jJetComp["5400_chunky"]=L1_5400_3_chunky_jJet;
-  int nn = 0;
+/*  int nn = 0;
+
   for (auto iJet = L1_5400_for_Nick.begin(); iJet !=  L1_5400_for_Nick.end(); iJet++)
   { 
     if (nn >= 100) break;
@@ -345,7 +349,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       jetTower[nn][mm] = tempTower.at(mm); 
     } 
     nn++;
-  }
+  }*/
   double median_jet_5400 = getMedian(L1_5400_for_Nick);
   medianRho = median_jet_5400;
   //std::cout << medianRho << std::endl
