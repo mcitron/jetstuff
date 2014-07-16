@@ -10,7 +10,7 @@ void make2DPlot(TTree *, TDirectory *,TString, TString,TString,TString);
 
 void makePlots()
 {
-  TFile * fout = new TFile("test.root","recreate");
+  TFile * fout = new TFile("plots.root","recreate");
 
   TFile * finNeutrino = new TFile("/afs/cern.ch/work/m/mcitron/public/NEUTRINO/140710/neutrino_output.root");
   TTree * treeNeut = (TTree *)finNeutrino->Get("demo/L1Tree");

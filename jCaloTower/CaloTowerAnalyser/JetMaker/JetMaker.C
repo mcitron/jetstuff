@@ -54,13 +54,14 @@ void JetMaker::Loop()
     //Apply the types of PUS
 
     //For Gen
-    for(unsigned i=0; i<jetPt_ak4_gen->size(); i++){
-      TLorentzVector jet;
-      jet.SetPtEtaPhiM(jetPt_ak4_gen->at(i),jetEta_ak4_gen->at(i),
-          jetPhi_ak4_gen->at(i),0.);
-      genJetObjects.push_back(jet);
+    if(!doNGun){
+      for(unsigned i=0; i<jetPt_ak4_gen->size(); i++){
+        TLorentzVector jet;
+        jet.SetPtEtaPhiM(jetPt_ak4_gen->at(i),jetEta_ak4_gen->at(i),
+            jetPhi_ak4_gen->at(i),0.);
+        genJetObjects.push_back(jet);
+      }
     }
-
     //For L1
 
     //Define the jetObjects
@@ -180,13 +181,15 @@ void JetMaker::Loop()
 
       //Match the jets to gen
 
-      //Make all possible pairs of jets
-      std::vector<pair_info> pairs = make_pairs(genJetObjects, jetObjects[*it]);
+      std::vector<int> l1_matched_index_algo1;
+      if(!doNGun){
+        //Make all possible pairs of jets
+        std::vector<pair_info> pairs = make_pairs(genJetObjects, jetObjects[*it]);
 
-      //Find the index of the gen jet that is matched to L1
-      std::vector<int> l1_matched_index_algo1 
-        = analyse_pairs_local(pairs, jetObjects[*it].size(),0.49);
-
+        //Find the index of the gen jet that is matched to L1
+        l1_matched_index_algo1 
+          = analyse_pairs_local(pairs, jetObjects[*it].size(),0.49);
+      }
 
       //Fill the tree variables
       int j=0;
@@ -198,14 +201,16 @@ void JetMaker::Loop()
         jetEta[*it]->push_back(iJet->Eta());
         jetPhi[*it]->push_back(iJet->Phi());
 
-        //Fill for the matched
-        if (l1_matched_index_algo1[j]!=-1)
-        {
-          jetMatchedPt[*it]->push_back(genJetObjects.at(l1_matched_index_algo1.at(j)).Pt());
-        }
-        else
-        {
-          jetMatchedPt[*it]->push_back(-1);
+        if(!doNGun){
+          //Fill for the matched
+          if (l1_matched_index_algo1[j]!=-1)
+          {
+            jetMatchedPt[*it]->push_back(genJetObjects.at(l1_matched_index_algo1.at(j)).Pt());
+          }
+          else
+          {
+            jetMatchedPt[*it]->push_back(-1);
+          }
         }
 
         j++;
