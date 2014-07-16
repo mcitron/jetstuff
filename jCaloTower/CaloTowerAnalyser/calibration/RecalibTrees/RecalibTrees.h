@@ -11,6 +11,7 @@
 #include <TROOT.h>
 #include <TChain.h>
 #include <TFile.h>
+#include <TLorentzVector.h>
 
 // Header file for the classes stored in the TTree if any.
 #include <vector>
@@ -28,60 +29,30 @@ class RecalibTrees {
     TFile* outFile;
     TTree* friendTree;
 
-    //Add variablews for the friend tree
-    vector<float> *jetPt_5400_calib_donut;
-    vector<float> *jetPt_5400_calib_global;
-    vector<float> *jetPt_5400_calib_nopus;
-    vector<float> *jetPt_5450_calib_donut;
-    vector<float> *jetPt_5450_calib_global;
-    vector<float> *jetPt_5450_calib_nopus;
-    //vector<float> *jetPt_5450_calib_2_strips;
-    //vector<float> *jetPt_5450_calib_3_strips;
+    bool doNGun;
+    
+    std::vector<TString> jetTypes;
+    std::map<TString, std::vector<float>* > jetPts;
+    std::map<TString, std::vector<float>* > jetCalibPts;
+    std::map<TString, std::vector<float>* > jetCalibMatchedPts;
+    std::map<TString, std::vector<float>* > jetCalibPhis;
+    std::map<TString, std::vector<float>* > jetCalibEtas;
+    std::map<TString, std::vector<float>* > jetEtas;
+    std::map<TString, std::vector<float>* > jetPhis;
+    std::map<TString, double > htCalib;
+    std::map<TString, double > mhtXCalib;
+    std::map<TString, double > mhtYCalib;
+    std::map<TString, TBranch* > jetPtBranches;
+    std::map<TString, TBranch* > jetEtaBranches;
+    std::map<TString, TBranch* > jetPhiBranches;
 
-    //Add new branches
-    TBranch *b_jetPt_5400_calib_donut;
-    TBranch *b_jetPt_5400_calib_global;
-    TBranch *b_jetPt_5400_calib_nopus;
-    TBranch *b_jetPt_5450_calib_donut;
-    TBranch *b_jetPt_5450_calib_global;
-    TBranch *b_jetPt_5450_calib_nopus;
-
-
-    // Declaration of leaf types
-    vector<float> *jetPt_5400_donut;
-    vector<float> *jetPt_5400_global;
-    vector<float> *jetPt_5400_nopus;
-    vector<float> *jetPt_5450_donut;
-    vector<float> *jetPt_5450_global;
-    vector<float> *jetPt_5450_nopus;
-    vector<float> *jetEta_5400_donut;
-    vector<float> *jetEta_5400_global;
-    vector<float> *jetEta_5400_nopus;
-    vector<float> *jetEta_5450_donut;
-    vector<float> *jetEta_5450_global;
-    vector<float> *jetEta_5450_nopus;
-
-    // List of branches
-    TBranch *b_jetPt_5400_donut;
-    TBranch *b_jetPt_5400_global;
-    TBranch *b_jetPt_5400_nopus;
-    TBranch *b_jetPt_5450_donut;
-    TBranch *b_jetPt_5450_global;
-    TBranch *b_jetPt_5450_nopus;
-    TBranch *b_jetEta_5400_donut;
-    TBranch *b_jetEta_5400_global;
-    TBranch *b_jetEta_5400_nopus;
-    TBranch *b_jetEta_5450_donut;
-    TBranch *b_jetEta_5450_global;
-    TBranch *b_jetEta_5450_nopus;
-
-    RecalibTrees(TTree *tree=0, int=0);
+    RecalibTrees(bool doingNGun=false);
     virtual ~RecalibTrees();
     virtual Int_t    Cut(Long64_t entry);
     virtual Int_t    GetEntry(Long64_t entry);
     virtual Long64_t LoadTree(Long64_t entry);
     virtual void     Init(TTree *tree);
-    virtual void     Loop(int,int);
+    virtual void     Loop();
     virtual Bool_t   Notify();
     virtual void     Show(Long64_t entry = -1);
 };
@@ -89,57 +60,75 @@ class RecalibTrees {
 #endif
 
 #ifdef RecalibTrees_cxx
-RecalibTrees::RecalibTrees(TTree *tree, int fileNumber) : fChain(0) 
+RecalibTrees::RecalibTrees(bool doingNGun) //: fChain(0) 
 {
-  // if parameter tree is not specified (or zero), connect the file
-  // used to generate this class and read the Tree.
-  if (tree == 0) {
-    TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/home/adam/ttbar_output.root");
-    if (!f || !f->IsOpen()) {
-      f = new TFile("/home/adam/ttbar_output.root");
-    }
-    TDirectory * dir = (TDirectory*)f->Get("/home/adam/ttbar_output.root:/demo");
-    dir->GetObject("L1Tree",tree);
+  doNGun=doingNGun;
+  
+  TString s1,s2;
+  //TTree* tree;
+  //TTree* fullTree;
 
+  if(doNGun){
+    s1="ngun_jetTree.root";
+    s2="root://eoscms.cern.ch//eos/cms/store/user/mcitron/140706_neutrino_PU40/neutrino_output.root";
+  }else{
+    s1="ttbar_jetTree.root";
+    s2="/home/adam/ttbar_14-07-10.root";
   }
+
+
+  TFile *f1 = (TFile*)gROOT->GetListOfFiles()->FindObject(s1);
+
+  if (!f1 || !f1->IsOpen()) {
+    f1 = new TFile(s1);
+  }
+
+  TTree * tree = (TTree *)f1->Get("jetTree");
+  tree->AddFriend("demo/L1Tree",s2);
+
+  //Define the jet types
+  jetTypes.push_back("s0_nopus");
+  jetTypes.push_back("s0_donut");
+  jetTypes.push_back("s0_global");
+  // jetTypes.push_back("s0_chunky");
+  // jetTypes.push_back("s0_tsup1");
+  // jetTypes.push_back("s0_tsup2");
+  // jetTypes.push_back("s0_tsup3");
+  jetTypes.push_back("s5_nopus");
+  jetTypes.push_back("s5_donut");
+  jetTypes.push_back("s5_global");
+  //  jetTypes.push_back("s5_chunky");
+  //  jetTypes.push_back("s5_tsup1");
+  //  jetTypes.push_back("s5_tsup2");
+  //  jetTypes.push_back("s5_tsup3");
+
+
   Init(tree);
 
+  outFile = new TFile("calibJets.root","RECREATE");
+
+  friendTree = new TTree("jetTree","jetTree");
+
   //Initialise memory for the friend tree
-  jetPt_5400_calib_donut = new std::vector<float>();
-  jetPt_5400_calib_global = new std::vector<float>();
-  jetPt_5400_calib_nopus  = new std::vector<float>();
-  jetPt_5450_calib_donut  = new std::vector<float>();
-  jetPt_5450_calib_global = new std::vector<float>();
-  jetPt_5450_calib_nopus  = new std::vector<float>();
-  //jetPt_5450_calib_2_strips = new std::vector<float>();
-  //jetPt_5450_calib_3_strips = new std::vector<float>();
+  for(std::vector<TString>::const_iterator iType=jetTypes.begin();
+      iType!=jetTypes.end(); iType++){
 
+    jetCalibPts[*iType] = new std::vector<float>();
+    jetCalibPhis[*iType] = new std::vector<float>();
+    jetCalibEtas[*iType] = new std::vector<float>();
+    jetCalibMatchedPts[*iType] = new std::vector<float>();
+    htCalib[*iType] = 0;
+    mhtXCalib[*iType] = 0;
+    mhtYCalib[*iType] = 0;
+    friendTree->Branch("jetPt_calib_"+*iType, "std::vector<float>", &jetCalibPts[*iType] );
+    friendTree->Branch("jetEta_calib_"+*iType, "std::vector<float>", &jetCalibEtas[*iType] );
+    friendTree->Branch("jetPhi_calib_"+*iType, "std::vector<float>", &jetCalibPhis[*iType] );
+    friendTree->Branch("jetMatchedPt_calib_"+*iType, "std::vector<float>", &jetCalibMatchedPts[*iType] );
+    friendTree->Branch("ht_calib_"+*iType, &htCalib[*iType], "ht_calib_"+*iType+"/D");
+    friendTree->Branch("mhtX_calib_"+*iType, &mhtXCalib[*iType], "mhtX_calib_"+*iType+"/D");
+    friendTree->Branch("mhtY_calib_"+*iType, &mhtYCalib[*iType], "mhtY_calib_"+*iType+"/D");
 
-  //Set the branch addresses
-  char fileName[16];
-  sprintf(fileName,"friendTree%d.root",fileNumber);
-
-  outFile = new TFile(fileName,"RECREATE");
-
-  friendTree = new TTree("friendTree","friendTree");
-
-  friendTree->Branch("jetPt_5400_calib_donut", "std::vector<float>", &jetPt_5400_calib_donut );
-  friendTree->Branch("jetPt_5400_calib_nopus", "std::vector<float>", &jetPt_5400_calib_nopus );
-  friendTree->Branch("jetPt_5400_calib_global", "std::vector<float>", &jetPt_5400_calib_global );
-  friendTree->Branch("jetPt_5450_calib_donut", "std::vector<float>", &jetPt_5450_calib_donut );
-  friendTree->Branch("jetPt_5450_calib_nopus", "std::vector<float>", &jetPt_5450_calib_nopus );
-  friendTree->Branch("jetPt_5450_calib_global", "std::vector<float>", &jetPt_5450_calib_global );
-  //friendTree->Branch("jetPt_5450_calib_2_strips", "std::vector<float>", &jetPt_5450_calib_2_strips );
-  //friendTree->Branch("jetPt_5450_calib_3_strips", "std::vector<float>", &jetPt_5450_calib_3_strips );
-
-  //fChain->SetBranchAddress("jetArea_ak4_gen", &jetArea_ak4_gen, &b_jetArea_ak4_gen);
-  //friendTree->SetBranchAddress("jetPt_5400_calib_donut", &jetPt_5400_calib_donut, &b_jetPt_5400_calib_donut);
-  //std::cout << "Got here" << std::endl;
-  //friendTree->SetBranchAddress("jetPt_5400_calib_nopus", &jetPt_5400_calib_nopus, &b_jetPt_5400_calib_nopus);
-  //friendTree->SetBranchAddress("jetPt_5400_calib_global", &jetPt_5400_calib_global, &b_jetPt_5400_calib_global);
-  //friendTree->SetBranchAddress("jetPt_5450_calib_donut", &jetPt_5450_calib_donut, &b_jetPt_5450_calib_donut);
-  //friendTree->SetBranchAddress("jetPt_5450_calib_nopus", &jetPt_5450_calib_nopus, &b_jetPt_5450_calib_nopus);
-  //friendTree->SetBranchAddress("jetPt_5450_calib_global", &jetPt_5450_calib_global, &b_jetPt_5450_calib_global);
+  }
 
 }
 
@@ -149,12 +138,6 @@ RecalibTrees::~RecalibTrees()
   if (!fChain) return;
   delete fChain->GetCurrentFile();
   //  delete friendTree;
-  delete jetPt_5400_calib_donut;
-  delete jetPt_5400_calib_global;
-  delete jetPt_5400_calib_nopus;
-  delete jetPt_5450_calib_donut;
-  delete jetPt_5450_calib_global;
-  delete jetPt_5450_calib_nopus;
 
 }
 
@@ -188,18 +171,15 @@ void RecalibTrees::Init(TTree *tree)
   // (once per file to be processed).
 
   // Set object pointer
-  jetPt_5400_donut=0;
-  jetPt_5400_global=0;
-  jetPt_5400_nopus=0;
-  jetPt_5450_donut=0;
-  jetPt_5450_global=0;
-  jetPt_5450_nopus=0;
-  jetEta_5400_donut=0;
-  jetEta_5400_global=0;
-  jetEta_5400_nopus=0;
-  jetEta_5450_donut=0;
-  jetEta_5450_global=0;
-  jetEta_5450_nopus=0;
+
+  for(std::vector<TString>::const_iterator iType=jetTypes.begin();
+      iType!=jetTypes.end(); iType++){
+
+    jetPts[*iType]=0;
+    jetEtas[*iType]=0;
+    jetPhis[*iType]=0;
+
+  }
 
   // Set branch addresses and branch pointers
   if (!tree) return;
@@ -207,18 +187,20 @@ void RecalibTrees::Init(TTree *tree)
   fCurrent = -1;
   fChain->SetMakeClass(1);
 
-  fChain->SetBranchAddress("jetPt_5400_donut", &jetPt_5400_donut, &b_jetPt_5400_donut);
-  fChain->SetBranchAddress("jetPt_5400_global", &jetPt_5400_global, &b_jetPt_5400_global);
-  fChain->SetBranchAddress("jetPt_5400_nopus", &jetPt_5400_nopus, &b_jetPt_5400_nopus);
-  fChain->SetBranchAddress("jetPt_5450_donut", &jetPt_5450_donut, &b_jetPt_5450_donut);
-  fChain->SetBranchAddress("jetPt_5450_global", &jetPt_5450_global, &b_jetPt_5450_global);
-  fChain->SetBranchAddress("jetPt_5450_nopus", &jetPt_5450_nopus, &b_jetPt_5450_nopus);
-  fChain->SetBranchAddress("jetEta_5400_donut", &jetEta_5400_donut, &b_jetEta_5400_donut);
-  fChain->SetBranchAddress("jetEta_5400_global", &jetEta_5400_global, &b_jetEta_5400_global);
-  fChain->SetBranchAddress("jetEta_5400_nopus", &jetEta_5400_nopus, &b_jetEta_5400_nopus);
-  fChain->SetBranchAddress("jetEta_5450_donut", &jetEta_5450_donut, &b_jetEta_5450_donut);
-  fChain->SetBranchAddress("jetEta_5450_global", &jetEta_5450_global, &b_jetEta_5450_global);
-  fChain->SetBranchAddress("jetEta_5450_nopus", &jetEta_5450_nopus, &b_jetEta_5450_nopus);
+  //Get the gen information
+  if(!doNGun){
+    fChain->SetBranchAddress("jetPt_ak4_gen",&jetPts["Gen"],&jetPtBranches["Gen"]);
+    fChain->SetBranchAddress("jetEta_ak4_gen",&jetEtas["Gen"],&jetEtaBranches["Gen"]);
+    fChain->SetBranchAddress("jetPhi_ak4_gen",&jetPhis["Gen"],&jetPhiBranches["Gen"]);
+  }
+
+  for(std::vector<TString>::const_iterator iType=jetTypes.begin();
+      iType!=jetTypes.end(); iType++){
+
+    fChain->SetBranchAddress("jetPt_"+*iType, &jetPts[*iType], &jetPtBranches[*iType]);
+    fChain->SetBranchAddress("jetEta_"+*iType, &jetEtas[*iType], &jetEtaBranches[*iType]);
+    fChain->SetBranchAddress("jetPhi_"+*iType, &jetPhis[*iType], &jetPhiBranches[*iType]);
+  }
 
   Notify();
 }
