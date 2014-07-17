@@ -12,10 +12,10 @@ void makePlots()
 {
   TFile * fout = new TFile("plots.root","recreate");
 
-  TFile * finNeutrino = new TFile("/afs/cern.ch/work/m/mcitron/public/NEUTRINO/140710/neutrino_output.root");
+  TFile * finNeutrino = new TFile("/afs/cern.ch/work/m/mcitron/public/NEUTRINO/140716/neutrino_output.root");
   TTree * treeNeut = (TTree *)finNeutrino->Get("demo/L1Tree");
 
-  TFile * finTtbar = new TFile("/afs/cern.ch/work/m/mcitron/public/TTBAR/140710/ttbar_output.root");
+  TFile * finTtbar = new TFile("/home/adam/ttbar_14-07-10.root");
   TTree * treeTtbar = (TTree *)finTtbar->Get("demo/L1Tree");
 
   std::map<TString,TString> drawNint;
@@ -28,7 +28,7 @@ void makePlots()
 
   std::map<TString,TString> drawJetPt;
   drawJetPt["rho"] = "medianRho:jetPt_L1_for_Nick[0]>>rho(500,-0.5,499.5,100,-0.005,0.995)";
-  drawJetPt["seed"] = "jetRingSumsEnergy_0_L1_for_Nick:jetPt_L1_for_Nick[0]>>seed(500,-0.5,499.5,300,-0.5,299.5)";
+  drawJetPt["seed"] = "jetRingSumsEnergy_0_L1_for_Nick:jetPt_L1_for_Nick>>seed(500,-0.5,499.5,300,-0.5,299.5)";
   drawJetPt["bigSeed"] = "(jetRingSumsEnergy_0_L1_for_Nick+jetRingSumsEnergy_1_L1_for_Nick):jetPt_L1_for_Nick>>bigSeed(500,-0.5,499.5,300,-0.5,299.5)";
 
   TDirectory * neutrinoDir = fout->mkdir("Neutrino"); 

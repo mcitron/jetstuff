@@ -41,6 +41,7 @@ class RecalibTrees {
     std::map<TString, std::vector<float>* > jetPhis;
     std::map<TString, double > htCalib;
     std::map<TString, double > mhtXCalib;
+    std::map<TString, double > mhtCalib;
     std::map<TString, double > mhtYCalib;
     std::map<TString, TBranch* > jetPtBranches;
     std::map<TString, TBranch* > jetEtaBranches;
@@ -70,7 +71,7 @@ RecalibTrees::RecalibTrees(bool doingNGun) //: fChain(0)
 
   if(doNGun){
     s1="ngun_jetTree.root";
-    s2="root://eoscms.cern.ch//eos/cms/store/user/mcitron/140706_neutrino_PU40/neutrino_output.root";
+    s2="/afs/cern.ch/work/m/mcitron/public/NEUTRINO/140716/neutrino_output.root";
   }else{
     s1="ttbar_jetTree.root";
     s2="/home/adam/ttbar_14-07-10.root";
@@ -120,12 +121,14 @@ RecalibTrees::RecalibTrees(bool doingNGun) //: fChain(0)
     htCalib[*iType] = 0;
     mhtXCalib[*iType] = 0;
     mhtYCalib[*iType] = 0;
+    mhtCalib[*iType] = 0;
     friendTree->Branch("jetPt_calib_"+*iType, "std::vector<float>", &jetCalibPts[*iType] );
     friendTree->Branch("jetEta_calib_"+*iType, "std::vector<float>", &jetCalibEtas[*iType] );
     friendTree->Branch("jetPhi_calib_"+*iType, "std::vector<float>", &jetCalibPhis[*iType] );
     friendTree->Branch("jetMatchedPt_calib_"+*iType, "std::vector<float>", &jetCalibMatchedPts[*iType] );
     friendTree->Branch("ht_calib_"+*iType, &htCalib[*iType], "ht_calib_"+*iType+"/D");
     friendTree->Branch("mhtX_calib_"+*iType, &mhtXCalib[*iType], "mhtX_calib_"+*iType+"/D");
+    friendTree->Branch("mht_calib_"+*iType, &mhtCalib[*iType], "mht_calib_"+*iType+"/D");
     friendTree->Branch("mhtY_calib_"+*iType, &mhtYCalib[*iType], "mhtY_calib_"+*iType+"/D");
 
   }

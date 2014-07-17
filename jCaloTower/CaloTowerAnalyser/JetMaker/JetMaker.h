@@ -460,6 +460,13 @@ JetMaker::JetMaker(TTree *tree, bool doingNGun) : fChain(0)
   jetTypes.push_back("s5_tsup1");
   jetTypes.push_back("s5_tsup2");
   jetTypes.push_back("s5_tsup3");
+  jetTypes.push_back("c10_nopus");
+  jetTypes.push_back("c10_donut");
+  jetTypes.push_back("c10_global");
+  jetTypes.push_back("c10_chunky");
+  jetTypes.push_back("c10_tsup1");
+  jetTypes.push_back("c10_tsup2");
+  jetTypes.push_back("c10_tsup3");
   
   //Assign the memory for all the different types of jets
   for(std::vector<TString>::const_iterator it=jetTypes.begin(); 

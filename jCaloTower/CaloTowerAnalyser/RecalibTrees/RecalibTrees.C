@@ -13,7 +13,7 @@ namespace{
   bool sortbypt(const TLorentzVector &a, const TLorentzVector &b) { return a.Pt() > b.Pt(); } 
 
   void getESums(const std::vector<TLorentzVector>& jets, 
-      double& ht, double& mhtX, double& mhtY){
+      double& ht, double& mhtX, double& mhtY, double& mht){
 
     ht=0;
     TLorentzVector mht;
@@ -24,6 +24,7 @@ namespace{
     }
     mhtX=-1.0*mht.Px();
     mhtY=-1.0*mht.Py();
+    mht=sqrt(mhtX*mhtX+mhtY*mhtY);
   }
 
 }
@@ -117,7 +118,7 @@ void RecalibTrees::Loop()
           = analyse_pairs_local(pairs, jetObjects[*iType].size(),0.49);
       }
 
-      getESums(calibJetObjects[*iType],htCalib[*iType],mhtXCalib[*iType],mhtYCalib[*iType]);
+      getESums(calibJetObjects[*iType],htCalib[*iType],mhtXCalib[*iType],mhtYCalib[*iType],mhtCalib[*iType]);
 
       //Write to the tree and fill
 
