@@ -33,6 +33,7 @@ void JetMaker::Loop()
 
   Long64_t nentries = fChain->GetEntriesFast();
 
+
   outFile->cd();
 
   for (Long64_t jentry=0; jentry<nentries;jentry++) {
@@ -192,14 +193,16 @@ void JetMaker::Loop()
       }
 
       //Fill the tree variables
-      int j=0;
-      for(std::vector<TLorentzVector>::const_iterator iJet=jetObjects[*it].begin(); 
-          iJet!=jetObjects[*it].end(); iJet++){
+      //int j=0;
+      //for(std::vector<TLorentzVector>::const_iterator iJet=jetObjects[*it].begin(); 
+      //    iJet!=jetObjects[*it].end(); iJet++)
+
+      for(unsigned j=0; j<jetObjects[*it].size(); j++){
 
         //Note the conversion to GeV
-        jetPt[*it]->push_back(0.5*iJet->Pt());
-        jetEta[*it]->push_back(iJet->Eta());
-        jetPhi[*it]->push_back(iJet->Phi());
+        jetPt[*it]->push_back(0.5*jetObjects[*it][j].Pt());
+        jetEta[*it]->push_back(jetObjects[*it][j].Eta());
+        jetPhi[*it]->push_back(jetObjects[*it][j].Phi());
 
         if(!doNGun){
           //Fill for the matched
@@ -209,11 +212,11 @@ void JetMaker::Loop()
           }
           else
           {
-            jetMatchedPt[*it]->push_back(-1);
+            jetMatchedPt[*it]->push_back(-1.);
           }
         }
 
-        j++;
+        //j++;
       }
 
       //Calculate the energy sums

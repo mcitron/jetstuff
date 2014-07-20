@@ -9,25 +9,25 @@
 class pair_info {
 
   public:
-    pair_info(int id1, int id2, int dr2);
+    pair_info(int id1, int id2, double dr2);
     int ID1();
     int ID2();
-    int DR2();
+    double DR2();
     void Print();
 
   private:
     int mId1;
     int mId2;
-    int mDR2;
+    double mDR2;
 };
 
-pair_info::pair_info(int id1, int id2, int dr2) {
+pair_info::pair_info(int id1, int id2, double dr2) {
   mId1 = id1;
   mId2 = id2;
   mDR2 = dr2;
 }
 
-int pair_info::DR2() {
+double pair_info::DR2() {
   return mDR2;
 }
 

@@ -20,31 +20,33 @@ void makeJetPlots()
 {
   TFile * fout = new TFile("jetPlots.root","recreate");
 
-  TFile * finNeutrino = new TFile("ngun_jetTree.root");
-  TTree * treeNeut = (TTree *)finNeutrino->Get("jetTree");
+  TFile * finNeutrino = new TFile("calibJetsNgun.root");
+  TTree * treeNeut = (TTree *)finNeutrino->Get("friendTree");
   treeNeut->AddFriend("demo/L1Tree",
-      "/afs/cern.ch/work/m/mcitron/public/NEUTRINO/140710/neutrino_output.root");
+      "root://eoscms.cern.ch//eos/cms/store/user/mcitron/140706_neutrino_PU40/neutrino_output.root");
+  //treeNeut->AddFriend("calibJetNgun.root");
 
-  TFile * finTtbar = new TFile("ttbar_jetTree.root");
+  TFile * finTtbar = new TFile("ttbar_calibJets.root");
   TTree * treeTtbar = (TTree *)finTtbar->Get("jetTree");
   treeTtbar->AddFriend("demo/L1Tree",
-      "/afs/cern.ch/work/m/mcitron/public/TTBAR/140710/ttbar_output.root");
+      "/home/adam/ttbar_14-07-10.root");
+  //treeTtbar->AddFriend("calibJetsTtbar.root");
 
   std::vector<TString> jetTypes;
-  jetTypes.push_back("s0_nopus");
-  jetTypes.push_back("s0_donut");
-  jetTypes.push_back("s0_global");
-  jetTypes.push_back("s0_chunky");
-  jetTypes.push_back("s0_tsup1");
-  jetTypes.push_back("s0_tsup2");
-  jetTypes.push_back("s0_tsup3");
-  jetTypes.push_back("s5_nopus");
-  jetTypes.push_back("s5_donut");
-  jetTypes.push_back("s5_global");
-  jetTypes.push_back("s5_chunky");
-  jetTypes.push_back("s5_tsup1");
-  jetTypes.push_back("s5_tsup2");
-  jetTypes.push_back("s5_tsup3");
+  jetTypes.push_back("calib_s0_nopus");
+  jetTypes.push_back("calib_s0_donut");
+  jetTypes.push_back("calib_s0_global");
+  //jetTypes.push_back("s0_chunky");
+  //jetTypes.push_back("s0_tsup1");
+  //jetTypes.push_back("s0_tsup2");
+  //jetTypes.push_back("s0_tsup3");
+  jetTypes.push_back("calib_s5_nopus");
+  jetTypes.push_back("calib_s5_donut");
+  jetTypes.push_back("calib_s5_global");
+  //jetTypes.push_back("s5_chunky");
+  //jetTypes.push_back("s5_tsup1");
+  //jetTypes.push_back("s5_tsup2");
+  //jetTypes.push_back("s5_tsup3");
 
   std::vector<TString> jetnum;
   jetnum.push_back("0");
@@ -76,7 +78,7 @@ void makeJetPlots()
       TH1F* rate = makeRate(treeNeut, rateDir, *iType, *iNum);
 
       makeSums(treeTtbar, sumsDir, *iType, "ttbar");
-      makeSums(treeNeut, sumsDir, *iType, "ngun");
+      //makeSums(treeNeut, sumsDir, *iType, "ngun");
 
       makeRateEff(rateEffDir, rate, eff, *iNum);
 
@@ -102,7 +104,7 @@ void makeRatesNvtx(TTree* tree, TDirectory* dir, TString jetType, TString jetNum
   double ypoints[50];
   double ypointserror[50];
 
-  tree->Draw("jetPt_s0_nopus[0]:mNPV>>overall"+bins2,"","colz");
+  tree->Draw("jetPt_calib_s0_nopus[0]:mNPV>>overall"+bins2,"","colz");
   TH2F *overall = (TH2F*)gDirectory->Get("overall");
 
   tree->Draw("jetPt_"+jetType+"["+jetNum+"]:mNPV>>"+jetType+"_"+jetNum+bins2,"","colz");

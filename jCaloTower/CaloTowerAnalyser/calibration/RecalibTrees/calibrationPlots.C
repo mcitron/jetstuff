@@ -9,12 +9,20 @@ calibrationPlots(){
 
   //Jet types
   std::vector<TString> jetType;
-  jetType.push_back("5400_donut");
-  jetType.push_back("5400_nopus");
-  jetType.push_back("5400_global");
-  jetType.push_back("5450_donut");
-  jetType.push_back("5450_nopus");
-  jetType.push_back("5450_global");
+  jetType.push_back("s0_nopus");
+  jetType.push_back("s0_donut");
+  jetType.push_back("s0_global");
+  // jetType.push_back("s0_chunky");
+  // jetType.push_back("s0_tsup1");
+  // jetType.push_back("s0_tsup2");
+  // jetType.push_back("s0_tsup3");
+  jetType.push_back("s5_nopus");
+  jetType.push_back("s5_donut");
+  jetType.push_back("s5_global");
+  //  jetType.push_back("s5_chunky");
+  //  jetType.push_back("s5_tsup1");
+  //  jetType.push_back("s5_tsup2");
+  //  jetType.push_back("s5_tsup3");
 
   //Eta cuts
   //  if(inJetEta[i]>=g.eta(-28) && inJetEta[i]<g.eta(-21));
