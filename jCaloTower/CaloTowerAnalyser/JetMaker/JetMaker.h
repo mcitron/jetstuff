@@ -411,7 +411,7 @@ class JetMaker {
     TBranch        *b_sumsMHTx_gct_uncalib_gen_sum;   //!
     TBranch        *b_sumsMHTy_gct_uncalib_gen_sum;   //!
 
-    JetMaker(TTree *tree=0, bool genIncluded=true);
+    JetMaker(TTree *tree=0, bool doingNgun=false);
     virtual ~JetMaker();
     //virtual Int_t    Cut(Long64_t entry);
     virtual Int_t    GetEntry(Long64_t entry);
@@ -425,9 +425,9 @@ class JetMaker {
 #endif
 
 #ifdef JetMaker_cxx
-JetMaker::JetMaker(TTree *tree, bool genIncluded) : fChain(0) 
+JetMaker::JetMaker(TTree *tree, bool doingNGun) : fChain(0) 
 {
-  doNGun = !genIncluded;
+  doNGun = doingNGun;
   // if parameter tree is not specified (or zero), connect the file
   // used to generate this class and read the Tree.
   if (tree == 0) {
