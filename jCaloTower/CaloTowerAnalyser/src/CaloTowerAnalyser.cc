@@ -61,6 +61,14 @@ CaloTowerAnalyser::CaloTowerAnalyser(const edm::ParameterSet& iConfig) {
 
   //Make the necessary histograms
   towerPtWeightEta= fs->make<TH1D>("towerEtaPtWeighted", ";eta;", 100, -3, 3);
+  towerPts = fs->make<TH1D>("towerPt", ";pT;", 1000, -0.5, 999.5);
+  maxTowerPts = fs->make<TH1D>("maxTowerPt", ";pT;", 1000, -0.5, 999.5);
+  towerPtsNint = fs->make<TH2D>("towerPtNint", ";Nint;towerPt", 1000, -0.5, 999.5,100,-0.5,99.5);
+  towerPtJetPtmNPV15to25 = fs->make<TH2D>("towerPtJetPt15to25",";TowerpT;jetPt", 1000, -0.5, 999.5,1000,-0.5,999.5);
+  towerPtJetPtmNPV25to35 = fs->make<TH2D>("towerPtJetPt25to35",";TowerpT;jetPt", 1000, -0.5, 999.5,1000,-0.5,999.5);
+  towerPtJetPtmNPV35to45 = fs->make<TH2D>("towerPtJetPt35to45",";TowerpT;jetPt", 1000, -0.5, 999.5,1000,-0.5,999.5);
+  towerPtJetPtmNPV45to55 = fs->make<TH2D>("towerPtJetPt45to55",";TowerpT;jetPt", 1000, -0.5, 999.5,1000,-0.5,999.5);
+  towerPtJetPtmNPV55to65 = fs->make<TH2D>("towerPtJetPt55to65",";TowerpT;jetPt", 1000, -0.5, 999.5,1000,-0.5,999.5);
 }
 
 
@@ -259,6 +267,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   double met_y=0.;
   numHotTow = 0;
   numHotTow12 = 0;
+  double tow =0.;
   for(l1slhc::L1CaloTowerCollection::const_iterator j=triggertowers->begin(); j!=triggertowers->end(); j++) {
 
     if ( abs((*j).iEta()) > 28 ) { continue; } //i.e. |eta| < 3 only
@@ -278,11 +287,15 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     //std::cout << "old: (" << (*j).iEta() << ", " << (*j).iPhi() << ", " << (*j).E() + (*j).H() << ")" << std::endl;
     //std::cout << "size = " << triggertowers->size() << std::endl;
     towerPtWeightEta->Fill(g.eta((*j).iEta()), ((*j).E() + (*j).H()));
+    towerPts->Fill(((*j).E() + (*j).H()));
+    towerPtsNint->Fill(((*j).E() + (*j).H()),mNPV);
+    if (tow < ((*j).E() + (*j).H()) ) tow = ((*j).E() + (*j).H());
     //make ak4TT:
     fastjet::PseudoJet curPseudoJet;
     curPseudoJet.reset_PtYPhiM( ((*j).E() + (*j).H()) , g.eta((*j).iEta()), g.phi((*j).iPhi()), 0.0); //last argument is mass
     pseudoak4ttjets.push_back(curPseudoJet);
   }
+    maxTowerPts->Fill(tow);
 
   sumsET_=ET;
   sumsMETx_=met_x;
@@ -332,24 +345,43 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   this->MakeSumTree(ak4genjetsp_jJet,"ak4_gen",false);
   this->MakeMatchTree(ak4genjetsp_jJet,ak4genjetsp_jJet,"ak4_gen",false);
 
+  this->MakeJetTree(ak4tt_jJet,ak4tt_jJet,"ak4tt_gen",false);
+  this->MakeSumTree(ak4tt_jJet,"ak4tt_gen",false);
+  this->MakeMatchTree(ak4tt_jJet,ak4genjetsp_jJet,"ak4tt_gen",false);
+
   this->MakeJetTree(top_jJet,top_jJet,"top_gen",false);
   this->MakeSumTree(top_jJet,"top_gen",false);
 
   std::map <TString,std::vector<jJet> > jJetComp;
   jJetComp["L1_for_Nick"]=L1_5400_for_Nick;
   jJetComp["5400_chunky"]=L1_5400_3_chunky_jJet;
-/*  int nn = 0;
 
   for (auto iJet = L1_5400_for_Nick.begin(); iJet !=  L1_5400_for_Nick.end(); iJet++)
-  { 
-    if (nn >= 100) break;
+  {
+
     std::vector<uint8_t> tempTower = iJet->getTowers();
     for (unsigned int mm = 0; mm < tempTower.size(); mm++)
     {
+      if (mNPV <= 25 && mNPV > 15) towerPtJetPtmNPV15to25->Fill(tempTower.at(mm),iJet->pt());
+      if (mNPV <= 35 && mNPV > 25) towerPtJetPtmNPV25to35->Fill(tempTower.at(mm),iJet->pt());
+      if (mNPV <= 45 && mNPV > 35) towerPtJetPtmNPV35to45->Fill(tempTower.at(mm),iJet->pt());
+      if (mNPV <= 55 && mNPV > 45) towerPtJetPtmNPV45to55->Fill(tempTower.at(mm),iJet->pt());
+      if (mNPV <= 65 && mNPV > 55) towerPtJetPtmNPV55to65->Fill(tempTower.at(mm),iJet->pt());
+    }
+  }
+
+  /*  int nn = 0;
+
+      for (auto iJet = L1_5400_for_Nick.begin(); iJet !=  L1_5400_for_Nick.end(); iJet++)
+      { 
+      if (nn >= 100) break;
+      std::vector<uint8_t> tempTower = iJet->getTowers();
+      for (unsigned int mm = 0; mm < tempTower.size(); mm++)
+      {
       jetTower[nn][mm] = tempTower.at(mm); 
-    } 
-    nn++;
-  }*/
+      } 
+      nn++;
+      }*/
   double median_jet_5400 = getMedian(L1_5400_for_Nick);
   medianRho = median_jet_5400;
   //std::cout << medianRho << std::endl
@@ -397,7 +429,7 @@ CaloTowerAnalyser::endJob()
    CaloTowerAnalyser::beginRun(edm::Run const&, edm::EventSetup const&)
    {
    }
- */
+   */
 
 // ------------ method called when ending the processing of a run  ------------
 /*
@@ -405,7 +437,7 @@ CaloTowerAnalyser::endJob()
    CaloTowerAnalyser::endRun(edm::Run const&, edm::EventSetup const&)
    {
    }
- */
+   */
 
 // ------------ method called when starting to processes a luminosity block  ------------
 /*
@@ -413,7 +445,7 @@ CaloTowerAnalyser::endJob()
    CaloTowerAnalyser::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
    {
    }
- */
+   */
 
 // ------------ method called when ending the processing of a luminosity block  ------------
 /*
@@ -421,7 +453,7 @@ CaloTowerAnalyser::endJob()
    CaloTowerAnalyser::endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
    {
    }
- */
+   */
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
 void

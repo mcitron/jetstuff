@@ -168,6 +168,18 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     virtual void analyze(const edm::Event&, const edm::EventSetup&);
     virtual void endJob() ;
     TH1D * towerPtWeightEta;
+    TH1D * maxTowerPts;
+    TH1D * towerPts;
+    TH2D * towerPtsNint;
+
+    TH2D * towerPtJetPtmNPV15to25;
+    TH2D * towerPtJetPtmNPV25to35;
+    TH2D * towerPtJetPtmNPV35to45;
+    TH2D * towerPtJetPtmNPV45to55;
+    TH2D * towerPtJetPtmNPV55to65;
+
+
+
     //void Make2DMap(const edm::Handle<l1slhc::L1CaloTowerCollection> triggertowers, const edm::Handle<CaloTowerCollection> calotowers, const int eventNumber);
 
     //virtual void beginRun(edm::Run const&, edm::EventSetup const&);
