@@ -98,10 +98,12 @@ RecalibTrees::RecalibTrees(bool doingNGun) //: fChain(0)
   jetTypes.push_back("s5_nopus");
   jetTypes.push_back("s5_donut");
   jetTypes.push_back("s5_global");
-  //  jetTypes.push_back("s5_chunky");
-  //  jetTypes.push_back("s5_tsup1");
-  //  jetTypes.push_back("s5_tsup2");
+  jetTypes.push_back("s5_chunky");
+  jetTypes.push_back("s5_tsup1");
+  jetTypes.push_back("s5_tsup2");
   //  jetTypes.push_back("s5_tsup3");
+  jetTypes.push_back("c10_nopus");
+  jetTypes.push_back("c10_donut");
 
 
   Init(tree);

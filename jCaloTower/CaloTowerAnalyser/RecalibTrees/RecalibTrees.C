@@ -16,15 +16,15 @@ namespace{
       double& ht, double& mhtX, double& mhtY, double& mht){
 
     ht=0;
-    TLorentzVector mht;
+    TLorentzVector mhtVec;
 
     for(unsigned i=0; i<jets.size(); i++){
       ht+=jets[i].Pt();
-      mht+=jets[i];
+      mhtVec+=jets[i];
     }
-    mhtX=-1.0*mht.Px();
-    mhtY=-1.0*mht.Py();
-    mht=sqrt(mhtX*mhtX+mhtY*mhtY);
+    mhtX=-1.0*mhtVec.Px();
+    mhtY=-1.0*mhtVec.Py();
+    mht=sqrt(mhtVec.Px()*mhtVec.Px()+mhtVec.Py()*mhtVec.Py());
   }
 
 }

@@ -168,7 +168,7 @@ double ptStep = 5;
 
 
 //TString filename = "/afs/cern.ch/work/m/mcitron/public/QCD/140622/qcd_output.root";
-TString filename = "qcd_output_14-06-25.root";
+TString filename = "qcd_jetTree.root";
 
 
 // Directory inside ROOT file
@@ -177,10 +177,11 @@ TString ROOTdir  = "";
 // Directory to store plots
 //  TString plotDirectory = "plots/Mk1Release/Presentation/8x8_PreFix/";
 int nEtaBins=8;
-double setPtBin=10;
+bool doChi2=false;
+double setPtBin=2;
 double setPtMin=0;
-double setPtMax=300;
-TString plotDirectory = "above30_0to300b10_";
+double setPtMax=600;
+TString plotDirectory = "qcd_0to600b2_";
 
 
 
@@ -295,35 +296,54 @@ int getCalibration(){
 
     // ak5PUSRaw vs ak5PUS
 
-    subDirs.push_back( "/5400_donut/" );
-    subDirs.push_back( "/5400_global/" );
-    subDirs.push_back( "/5400_nopus/" );
-    subDirs.push_back( "/5450_donut/" );
-    subDirs.push_back( "/5450_global/" );
-    subDirs.push_back( "/5450_nopus/" );
-    subDirs.push_back( "/5450_2_strips_nopus/" );
-    subDirs.push_back( "/5450_3_strips_nopus/" );
-    subDirs.push_back( "/5450_squares_nopus/" );
-
-    //subDirs.push_back( "/Calibration_LPUS_ak5PUS_AllJets/" );
-
-    //	   subDirs.push_back( "/Calibration_UncalibCurr_ak5PUS/" );     
+    //subDirs.push_back( "s0_donut" );
+    //subDirs.push_back( "s0_global" );
+    //subDirs.push_back( "s0_nopus" );
+    //subDirs.push_back( "s0_chunky" );
+    //subDirs.push_back( "s0_tsup1" );
+    //subDirs.push_back( "s0_tsup2" );
+    //subDirs.push_back( "s0_tsup3" );
+    //subDirs.push_back( "s5_donut" );
+    //subDirs.push_back( "s5_global" );
+    //subDirs.push_back( "s5_nopus" );
+    //subDirs.push_back( "s5_chunky" );
+    subDirs.push_back( "s5_tsup1" );
+    //subDirs.push_back( "s5_tsup2" );
+    //subDirs.push_back( "s5_tsup3" );
+    //subDirs.push_back( "c10_donut" );
+    //subDirs.push_back( "c10_global" );
+    //subDirs.push_back( "c10_nopus" );
+    //subDirs.push_back( "c10_chunky" );
+    //subDirs.push_back( "c10_tsup1" );
+    //subDirs.push_back( "c10_tsup2" );
+    //subDirs.push_back( "c10_tsup3" );
 
 
     std::map <TString, TString> typeLabel;
-    typeLabel[ "/5400_donut/" ] = "5400_donut_4Jets";
-    typeLabel[ "/5400_global/" ] = "5400_global_4Jets";
-    typeLabel[ "/5400_nopus/" ] = "5400_nopus_4Jets";
-    typeLabel[ "/5450_donut/" ] = "5450_donut_4Jets";
-    typeLabel[ "/5450_global/" ] = "5450_global_4Jets";
-    typeLabel[ "/5450_nopus/" ] = "5450_nopus_4Jets";
-    typeLabel[ "/5450_2_strips_nopus/" ] = "5450_2_strips_4Jets";
-    typeLabel[ "/5450_3_strips_nopus/" ] = "5450_3_strips_4Jets";
-    typeLabel[ "/5450_squares_nopus/" ] = "5450_squares_4Jets";
-    //typeLabel[ "/Calibration_LPUS_ak5PUS_AllJets/" ] = "LPUS_AllJets";
+    //typeLabel[ "s0_donut" ] = "s0_donut_4Jets";
+    //typeLabel[ "s0_global" ] = "s0_global_4Jets";
+    //typeLabel[ "s0_nopus" ] = "s0_nopus_4Jets";
+    //typeLabel[ "s0_chunky" ] = "s0_chunky_4Jets";
+    //typeLabel[ "s0_tsup1" ] = "s0_tsup1_4Jets";
+    //typeLabel[ "s0_tsup2" ] = "s0_tsup2_4Jets";
+    //typeLabel[ "s0_tsup3" ] = "s0_tsup3_4Jets";
+    //typeLabel[ "s5_donut" ] = "s5_donut_4Jets";
+    //typeLabel[ "s5_global" ] = "s5_global_4Jets";
+    //typeLabel[ "s5_nopus" ] = "s5_nopus_4Jets";
+    //typeLabel[ "s5_chunky" ] = "s5_chunky_4Jets";
+    typeLabel[ "s5_tsup1" ] = "s5_tsup1_4Jets";
+    //typeLabel[ "s5_tsup2" ] = "s5_tsup2_4Jets";
+    //typeLabel[ "s5_tsup3" ] = "s5_tsup3_4Jets";
+    //typeLabel[ "c10_donut" ] = "c10_donut_4Jets";
+    //typeLabel[ "c10_global" ] = "c10_global_4Jets";
+    //typeLabel[ "c10_nopus" ] = "c10_nopus_4Jets";
+    //typeLabel[ "c10_chunky" ] = "c10_chunky_4Jets";
+    //typeLabel[ "c10_tsup1" ] = "c10_tsup1_4Jets";
+    //typeLabel[ "c10_tsup2" ] = "c10_tsup2_4Jets";
+    //typeLabel[ "c10_tsup3" ] = "c10_tsup3_4Jets";
 
 
-    // Check labels are defined for each sample analysed
+     //Check labels are defined for each sample analysed
     for (uint iSub = 0; iSub < subDirs.size(); ++iSub ){
 
       // Check a label exists for the current subdir
@@ -345,10 +365,12 @@ int getCalibration(){
 
       // Get the current subdirectory to process
       TString curSubDir = subDirs[iSub];
-
-      TH2D* responseChi2 = new TH2D(typeLabel[subDirs[iSub]]+"responseChi2","Chi2 for the response fits",int((setPtMax-setPtMin)/setPtBin),setPtMin,setPtMax,nEtaBins,0.,nEtaBins);
-      TH2D* ptChi2 = new TH2D(typeLabel[subDirs[iSub]]+"ptChi2","Chi2 for the pt correlation fits",int((setPtMax-setPtMin)/setPtBin),setPtMin,setPtMax,nEtaBins,0.,nEtaBins);
-
+      TH2D* responseChi2;
+      TH2D* ptChi2;
+      if(doChi2){
+        responseChi2 = new TH2D(typeLabel[subDirs[iSub]]+"responseChi2","Chi2 for the response fits",int((setPtMax-setPtMin)/setPtBin),setPtMin,setPtMax,nEtaBins,0.,nEtaBins);
+        ptChi2 = new TH2D(typeLabel[subDirs[iSub]]+"ptChi2","Chi2 for the pt correlation fits",int((setPtMax-setPtMin)/setPtBin),setPtMin,setPtMax,nEtaBins,0.,nEtaBins);
+      }
       for (unsigned int i = 0;i < fileHistPair.size(); i++){
 
         // Extract the directory and name of the histogram
@@ -362,59 +384,63 @@ int getCalibration(){
         filepath         = filepathRaw;
 
         // Find the directory with the calibration plots, currently e.g. : /JetHist/Calibration/Calibration_PrePUS_akPUS/iEtaBinned/iEta_-28to-25
-        if (filepath.Contains("calibration") != 0){
-          // Only load the EtaBinned distributions
-          //if (filepath.Contains("EtaBinned") != 0)
-          //	  if (filepath.Contains("iEtaBinned") != 0)
+        //if (filepath.Contains("calibration") != 0){
+        // Only load the EtaBinned distributions
+        //if (filepath.Contains("EtaBinned") != 0)
+        //	  if (filepath.Contains("iEtaBinned") != 0)
 
-          // Restrict to current subdirectory
-          if ( filepath.Contains( curSubDir ) != 0 ){
-            // TEMPORARY TO SPEED UP DEVELOPMENT RESTRICT TO RELEVENT COLLECTIONS
-            //	if ( (filepath.Contains("_PrePUS_") != 0) || (filepath.Contains("_PUS_") != 0) || (filepath.Contains("_LPUS_") != 0) )
-            // Do not load NVTX binned distributions
-            //if (filepath.Contains("NVTXBinned") == 0)
+        std::cout << filepath.Data() << '\t' << curSubDir.Data() << std::endl;
+        // Restrict to current subdirectory
+        if ( filepath.Contains( curSubDir ) != 0 ){
+          // TEMPORARY TO SPEED UP DEVELOPMENT RESTRICT TO RELEVENT COLLECTIONS
+          //	if ( (filepath.Contains("_PrePUS_") != 0) || (filepath.Contains("_PUS_") != 0) || (filepath.Contains("_LPUS_") != 0) )
+          // Do not load NVTX binned distributions
+          //if (filepath.Contains("NVTXBinned") == 0)
 
+            //std::cout << "Got here 2a\n";
 
-            // Restrict to calibration plots
-            if ( ( histogramName.Contains("ratio_iEta") != 0 ) || ( histogramName.Contains("corr_iEta") != 0 ) ) {
+          // Restrict to calibration plots
+          if ( ( histogramName.Contains("ratio") != 0 ) || ( histogramName.Contains("corr") != 0 ) ) {
 
-              histogramName.ReplaceAll("(","{").ReplaceAll(")","}"); // Replace brackets to allow pdf printing
-              filepath.ReplaceAll("(","{").ReplaceAll(")","}");
+            histogramName.ReplaceAll("(","{").ReplaceAll(")","}"); // Replace brackets to allow pdf printing
+            filepath.ReplaceAll("(","{").ReplaceAll(")","}");
 
-              //	      std::cout << "NEW = " << filepath << "\t" << histogramName << "\n";
+            //	      std::cout << "NEW = " << filepath << "\t" << histogramName << "\n";
 
-              // store histogram and its storage directory
-              histogram2D[ histogramName ]        = (TH2*)f->Get(filepathRaw + "/" + histogramNameRaw)->Clone();
-              histogramDirectory[ histogramName ] = filepath;
+            // store histogram and its storage directory
+            histogram2D[ histogramName ]        = (TH2*)f->Get(filepathRaw + "/" + histogramNameRaw)->Clone();
+            histogramDirectory[ histogramName ] = filepath;
 
-              // Ensure a directory is created to store the histogram
-              makeFullDir( plotDirectory, filepath );
+            // Ensure a directory is created to store the histogram
+            makeFullDir( plotDirectory, filepath );
 
-              // change name to avoid memory conflicts
-              histogram2D[ histogramName ] ->SetName(histogramName);
-
-
-              std::cout << "Got here 2\n";
-
-              // Get Eta label
-              TString EtaStr = histogramName;{
-                while ( EtaStr.Contains("iEta") )
-                  EtaStr = EtaStr.Remove( 0, EtaStr.Index("iEta") + 5);
-              }
-
-              TString etaLowStr  = EtaStr;
-              etaLowStr = etaLowStr.Remove( etaLowStr.Index("_to_") );
-              // 		  TString etaHighStr = EtaStr;
-              // 		  etaHighStr = etaHighStr.Remove( 0, etaHighStr.Index("_to_") + 4);  
-
-              double etaLow  = etaLowStr.Atof();
-              //		  double etaHigh = etaHighStr.Atof();
-              etaBins[ etaLow ] = EtaStr;
+            // change name to avoid memory conflicts
+            histogram2D[ histogramName ] ->SetName(histogramName);
 
 
+            std::cout << "Got here 2\n";
+
+            // Get Eta label
+            TString EtaStr = histogramName;{
+              while ( EtaStr.Contains("Eta") )
+                EtaStr = EtaStr.Remove( 0, EtaStr.Index("Eta") + 4);
             }
+
+            TString etaLowStr  = EtaStr;
+            etaLowStr = etaLowStr.Remove( etaLowStr.Index("_to_") );
+            // 		  TString etaHighStr = EtaStr;
+            // 		  etaHighStr = etaHighStr.Remove( 0, etaHighStr.Index("_to_") + 4);  
+
+            etaLowStr.ReplaceAll("m","-");
+            etaLowStr.ReplaceAll("p","\.");
+            double etaLow  = etaLowStr.Atof();
+            //		  double etaHigh = etaHighStr.Atof();
+            etaBins[ etaLow ] = EtaStr;
+
+
           }
         }
+        //}
       }
 
 
@@ -467,10 +493,14 @@ int getCalibration(){
       //double ptMax = 120;
       double ptMax = setPtMax;
 
+      //Choose whether to do a fit or take the most common value
+      bool doFit = true;
+      bool doMostCommon = false;
+
       //Rebinning options
       bool doRebin = true;
       int responseRebin=1;
-      int ptRebin=10;
+      int ptRebin=2;
 
       //Option to replace fits with large errors with histograms
       bool replaceBadPoints = false;
@@ -478,9 +508,9 @@ int getCalibration(){
 
       //The allowed difference between the mean of the fit
       //and the hist mean
-      double allowedFitDifference = 0.2;//0.1;
+      double allowedFitDifference = 0.2;//2.0;//0.1;
       double allowedPtErr = ptBinning*2.0;//*1.5;
-      double allowedReciprocalResponseErr = 0.2;//0.1;
+      double allowedReciprocalResponseErr = 0.3;//0.1;
 
 
       // **************************************************
@@ -553,12 +583,12 @@ int getCalibration(){
         // Store the name of the collection being calibrated, used to store the calibration data
         TString histBaseName = histName;
 
-        if (histBaseName.Contains("ratio_iEta") != 0){
-          histBaseName = histBaseName.Remove( histBaseName.Index( "_ratio" ) );
+        if (histBaseName.Contains("ratio") != 0){
+          histBaseName = histBaseName.Remove( histBaseName.Index( "ratio" ) );
           //      std::cout << "RES " << histBaseName << "\n";
         }
-        else if(histBaseName.Contains("corr_iEta") != 0 ){
-          histBaseName = histBaseName.Remove( histBaseName.Index( "_corr" ) );
+        else if(histBaseName.Contains("corr") != 0 ){
+          histBaseName = histBaseName.Remove( histBaseName.Index( "corr" ) );
           //      std::cout << "PT " << histBaseName << "\n";
         }
         else{
@@ -620,10 +650,10 @@ int getCalibration(){
           TString newHistName = "#eta #in " + EtaStrLabel + ", " + "p_{T} #in [" + ptLowStr + ", " + ptHighStr + "]";
 
 
-          if ( histName.Contains("ratio_iEta") != 0 ){
+          if ( histName.Contains("ratio") != 0 ){
             newHistName = label + " Response - " + newHistName;
           }
-          else if ( histName.Contains("corr_iEta") != 0 ) {
+          else if ( histName.Contains("corr") != 0 ) {
             newHistName = label + " L1 P_{T} - " + newHistName;
           }
 
@@ -638,7 +668,7 @@ int getCalibration(){
           // ********************************************************************************
 
           bool drawStats = false;
-          if ( histName.Contains("ratio_iEta") != 0 ){
+          if ( histName.Contains("ratio") != 0 ){
 
             //	    yProject->Rebin(5);
             if(!drawStats) yProject->SetStats(0);
@@ -660,10 +690,10 @@ int getCalibration(){
 
               const double nSigma = 1.5;
               const double fitMin = -999;
-              const int    nIter  = 5;
+              const int    nIter  = 3;
 
               if(doRebin) yProject->Rebin(responseRebin);
-              fit_gaussian( yProject, nSigma, fitMin, nIter );
+              if(doFit) fit_gaussian( yProject, nSigma, fitMin, nIter );
 
 
               yProject->GetXaxis()->SetRangeUser(0.,2.5);
@@ -679,7 +709,7 @@ int getCalibration(){
                 fitStat->Draw();
               }
 
-              if ( gausResFit) {
+              if (doFit && gausResFit) {
                 //		yProject->Fit(gausResFit,"QR");
                 gausResFit->SetLineColor(kRed);
                 gausResFit->SetLineWidth(1);
@@ -689,7 +719,7 @@ int getCalibration(){
               //    canv->SaveAs(plotDirectory + filepath + histName + newSaveName + "FitGaus.pdf");   // write histogram to file
 
 
-              if ( gausResFit) {
+              if ( doFit && gausResFit) {
 
                 // Get gaussian fit mean 
                 response    = gausResFit->GetParameter( 1 );
@@ -697,8 +727,17 @@ int getCalibration(){
                 responseErr = gausResFit->GetParError( 1 );
 
                 //Fill the chi2
-                responseChi2->Fill((ptLow+ptHigh)/2.0,etaIndex+0.5,gausResFit->GetChisquare()/(yProject->GetNbinsX()-3.0));
-              }	      
+                if(doChi2) responseChi2->Fill((ptLow+ptHigh)/2.0,etaIndex+0.5,gausResFit->GetChisquare()/(yProject->GetNbinsX()-3.0));
+              }else if(doMostCommon){
+                response = yProject->GetBinCenter(yProject->GetMaximumBin());
+
+                //For fwhm, go from the centre so as not to be effected by being bound below by 0
+
+                //int bin1Fwhm = yProject->FindFirstBinAbove(yProject->GetMaximum()/2.);
+                int bin2Fwhm = yProject->FindLastBinAbove(yProject->GetMaximum()/2.);
+                double fwhm = yProject->GetBinCenter(bin2Fwhm) - response;
+                responseErr = fwhm/1.2;
+              }
               std::cout << "Final fit: Response = " << response << " +/- " << responseErr << "\n";
 
             }
@@ -745,7 +784,7 @@ int getCalibration(){
           // *                              Jet PT calibration                              *
           // ********************************************************************************
 
-          if ( (histName.Contains("corr_iEta") != 0) ){
+          if ( (histName.Contains("corr") != 0) ){
 
             //	    yProject->Rebin(4);
             yProject->Draw();
@@ -769,16 +808,17 @@ int getCalibration(){
 
               const double nSigma = 1.5;
               const double fitMin = -999;
-              const int    nIter  = 5;
+              const int    nIter  = 3;
 
               if(doRebin) yProject->Rebin(ptRebin);
 
 
-              fit_gaussian( yProject, nSigma, fitMin, nIter );
+              if(doFit) fit_gaussian( yProject, nSigma, fitMin, nIter );
 
               yProject->GetXaxis()->SetRangeUser(0.,500.);
 
               TF1* gausPtFit = (TF1*) yProject->GetListOfFunctions()->Last();
+
 
 
               //statsbox wizardry
@@ -789,7 +829,7 @@ int getCalibration(){
                 fitStat->SetX1NDC(.57); fitStat->SetX2NDC(.88); fitStat->SetY1NDC(.14); fitStat->SetY2NDC(.53);
                 fitStat->Draw();
               }
-              if ( gausPtFit) { 
+              if ( doFit && gausPtFit) { 
                 //		yProject->Fit(gausPtFit,"QR"); 
                 gausPtFit->SetLineColor(kRed);
                 gausPtFit->SetLineWidth(1);
@@ -799,14 +839,24 @@ int getCalibration(){
               //      canv->SaveAs(plotDirectory + filepath + histName + newSaveName + "FitGaus.pdf");   // write histogram to file
 
 
-              if (gausPtFit){
+              if (doFit && gausPtFit){
                 // Get gaussian fit mean
                 l1Pt    = gausPtFit->GetParameter( 1 );
                 //l1PtErr = gausPtFit->GetParameter( 2 );
                 l1PtErr = gausPtFit->GetParError( 1 );
 
                 //Fill the chi2
-                ptChi2->Fill((ptLow+ptHigh)/2.0,etaIndex+0.5,gausPtFit->GetChisquare()/(yProject->GetNbinsX()-3.0));
+                if(doChi2) ptChi2->Fill((ptLow+ptHigh)/2.0,etaIndex+0.5,gausPtFit->GetChisquare()/(yProject->GetNbinsX()-3.0));
+              }else if(doMostCommon){
+                l1Pt = yProject->GetBinCenter(yProject->GetMaximumBin());
+
+                //For fwhm, go from the centre so as not to be effected by being bound below by 0
+
+                //int bin1Fwhm = yProject->FindFirstBinAbove(yProject->GetMaximum()/2.);
+                int bin2Fwhm2 = yProject->FindLastBinAbove(yProject->GetMaximum()/2.);
+
+                double fwhm = yProject->GetBinCenter(bin2Fwhm2) - l1Pt;
+                l1PtErr = fwhm/1.2;
               }
 
               std::cout << "Final fit: L1Pt = " << l1Pt << " +/- " << l1PtErr << "\n";
@@ -844,7 +894,7 @@ int getCalibration(){
 
 
       }
-    
+
 
       //#ifdef DEBUG_OFF  
 
@@ -951,13 +1001,13 @@ int getCalibration(){
         }
 
         outputCMSSW += "\n\t),";
+        /*
+           ofstream calibLUT;
+           calibLUT.open( plotDirectory + collName + "LUT.txt" );
+           calibLUT << outputCMSSW;
+           calibLUT.close();
 
-        ofstream calibLUT;
-        calibLUT.open( plotDirectory + collName + "LUT.txt" );
-        calibLUT << outputCMSSW;
-        calibLUT.close();
-
-
+*/
         std::cout << "Made LUT: " + plotDirectory + collName + "LUT.txt" + "\n";
         std::cout << outputCMSSW << "\n\n";
 
@@ -972,11 +1022,12 @@ int getCalibration(){
       // Delete the previous contents of the container
       histogram2D.clear();
 
-      //Save the Chi2 histograms
-      chi2File->cd();
-      responseChi2->Write();
-      ptChi2->Write();
-
+      if(doChi2){
+        //Save the Chi2 histograms
+        chi2File->cd();
+        responseChi2->Write();
+        ptChi2->Write();
+      }
       f->cd();
     }
 
@@ -1224,8 +1275,8 @@ std::vector < std::pair <TString, TString> > getROOTobjects(TFile* f, TString ro
     objName      = key->GetName();
 
     //Modified to cut down on number of directories
-    if(objName.Contains("Recalib") || objName.Contains("Delta") || objName.Contains("_Calib")) continue;
-    //std::cout << objName.Data() << std::endl;
+    if(objName.Contains("L1Tree") || objName.Contains("_Calib") || objName.Contains("l1") || objName.Contains("global_histograms") || objName.Contains("calib30") || objName.Contains("calib50")) continue;
+    std::cout << objName.Data() << std::endl;
     //std::cout << objectList.size() << std::endl;
 
     objClassName = obj->ClassName();

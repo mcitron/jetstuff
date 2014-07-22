@@ -11,6 +11,7 @@
 #include <TROOT.h>
 #include <TChain.h>
 #include <TFile.h>
+#include <TH2D.h>
 
 // Header file for the classes stored in the TTree if any.
 #include <vector>
@@ -28,6 +29,11 @@ class JetMaker {
     //Add output tree
     TFile* outFile;
     TTree* jetTree;
+
+    //Output histograms for calibration
+    std::vector<TString> etaBins;
+    std::map<TString, TH2D* > corrHists;
+    std::map<TString, TH2D* > ratioHists;
 
     //Maps for the output variables
     std::vector<TString> jetTypes;
@@ -442,8 +448,19 @@ JetMaker::JetMaker(TTree *tree, bool doingNGun) : fChain(0)
   Init(tree);
 
   //Initialise the memory for the new tree
-  outFile = new TFile("jetTree.root","RECREATE");
+  outFile = new TFile("jetTreeHists.root","RECREATE");
   jetTree = new TTree("jetTree","jetTree");
+
+  //Add the eta bins for the calibration
+
+  etaBins.push_back("Eta_m3p00_to_m2p25");
+  etaBins.push_back("Eta_m2p25_to_m1p50");
+  etaBins.push_back("Eta_m1p50_to_m0p75");
+  etaBins.push_back("Eta_m0p75_to_0p00");
+  etaBins.push_back("Eta_0p00_to_0p75");
+  etaBins.push_back("Eta_0p75_to_1p50");
+  etaBins.push_back("Eta_1p50_to_2p25");
+  etaBins.push_back("Eta_2p25_to_3p00");
 
   //Declare the types of PUS jets to be made
   jetTypes.push_back("s0_nopus");
@@ -478,6 +495,13 @@ JetMaker::JetMaker(TTree *tree, bool doingNGun) : fChain(0)
     ht[*it] = 0;
     mhtX[*it] = 0;
     mhtY[*it] = 0;
+
+    //Assign memory for the calibration histograms
+    for(std::vector<TString>::const_iterator eBin=etaBins.begin();
+        eBin!=etaBins.end(); eBin++){
+      corrHists[*it+*eBin] = new TH2D("corr_"+*it+"_"+*eBin,";Gen pT; L1 pT",1000,0.,1000.,1000,0.,1000.);
+      ratioHists[*it+*eBin] = new TH2D("ratio_"+*it+"_"+*eBin,";Gen pT; L1 pT",1000,0.,1000.,1000,-10.,10.);
+    }
   }
 
   //Make Branches in the tree

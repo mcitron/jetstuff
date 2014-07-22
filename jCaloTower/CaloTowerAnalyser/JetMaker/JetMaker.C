@@ -2,7 +2,6 @@
 #include "JetMaker.h"
 #include "MatchingAlgo.h"
 
-#include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>
 #include <TLorentzVector.h>
@@ -31,8 +30,9 @@ void JetMaker::Loop()
 {
   if (fChain == 0) return;
 
-  Long64_t nentries = fChain->GetEntriesFast();
+  Long64_t nentries = fChain->GetEntries();
 
+  nentries=3978328;
 
   outFile->cd();
 
@@ -49,7 +49,13 @@ void JetMaker::Loop()
     }
 
     std::map< TString,std::vector<TLorentzVector> > jetObjects;
+    for(std::vector<TString>::const_iterator it=jetTypes.begin();
+        it!=jetTypes.end();it++){
+      jetObjects[*it].reserve(20);
+    }
+
     std::vector<TLorentzVector> genJetObjects;
+    genJetObjects.reserve(20);
 
     //Pull the nopus jets into a TLorentzVector
     //Apply the types of PUS
@@ -66,21 +72,6 @@ void JetMaker::Loop()
     //For L1
 
     //Define the jetObjects
-    /*
-    jetObjects["s0_nopus"] = std::vector<TLorentzVector>(); 
-    jetObjects["s0_donut"] = std::vector<TLorentzVector>(); 
-    jetObjects["s0_global"] = std::vector<TLorentzVector>(); 
-    jetObjects["s0_chunky"] = std::vector<TLorentzVector>(); 
-    jetObjects["s0_tsup1"] = std::vector<TLorentzVector>(); 
-    jetObjects["s0_tsup2"] = std::vector<TLorentzVector>(); 
-    jetObjects["s0_tsup3"] = std::vector<TLorentzVector>(); 
-    jetObjects["s5_nopus"] = std::vector<TLorentzVector>(); 
-    jetObjects["s5_donut"] = std::vector<TLorentzVector>(); 
-    jetObjects["s5_global"] = std::vector<TLorentzVector>(); 
-    jetObjects["s5_chunky"] = std::vector<TLorentzVector>(); 
-    jetObjects["s5_tsup1"] = std::vector<TLorentzVector>(); 
-    jetObjects["s5_tsup2"] = std::vector<TLorentzVector>(); 
-    jetObjects["s5_tsup3"] = std::vector<TLorentzVector>(); */
     for(unsigned i=0; i<jetPt_L1_for_Nick->size(); i++){
       TLorentzVector jet;
       jet.SetPtEtaPhiM(jetPt_L1_for_Nick->at(i),jetEta_L1_for_Nick->at(i),
@@ -177,13 +168,6 @@ void JetMaker::Loop()
       }
     }
 
-/*
-    //Check that all the types of PUS have been done
-    if(jetObjects.size() != jetTypes.size()){
-      std::cout << "ERROR: all jetTypes PUS methods have not been implemented" << std::endl;
-      break;
-    }
-*/
     //Fill the tree variables from the jetObjects
     //Loop over PUS types
 
@@ -212,7 +196,8 @@ void JetMaker::Loop()
       for(unsigned j=0; j<jetObjects[*it].size(); j++){
 
         //Note the conversion to GeV
-        jetPt[*it]->push_back(0.5*jetObjects[*it][j].Pt());
+        double newPt = 0.5*jetObjects[*it][j].Pt();
+        jetPt[*it]->push_back(newPt);
         jetEta[*it]->push_back(jetObjects[*it][j].Eta());
         jetPhi[*it]->push_back(jetObjects[*it][j].Phi());
 
@@ -221,6 +206,20 @@ void JetMaker::Loop()
           if (l1_matched_index_algo1[j]!=-1)
           {
             jetMatchedPt[*it]->push_back(genJetObjects.at(l1_matched_index_algo1.at(j)).Pt());
+
+            //Fill the histograms for the correlation
+            for(unsigned e=0; e<etaBins.size(); e++){
+              double etaLow = e*0.75-3.0;
+              double etaHigh = e*0.75-2.25;
+              if((jetObjects[*it][j].Eta() > etaLow) && (jetObjects[*it][j].Eta() <= etaHigh)){
+
+                corrHists[*it+etaBins[e]]->Fill(genJetObjects.at(l1_matched_index_algo1.at(j)).Pt(),newPt);
+                ratioHists[*it+etaBins[e]]->Fill(genJetObjects.at(l1_matched_index_algo1.at(j)).Pt(),
+                    newPt/genJetObjects.at(l1_matched_index_algo1.at(j)).Pt());
+                break;
+
+              }
+            }
           }
           else
           {
@@ -240,7 +239,23 @@ void JetMaker::Loop()
     if(jentry%10000==0) std::cout << "Done: " << jentry << std::endl;
   }
 
+  //Write the output
+
   jetTree->Write();
+
+  for(std::vector<TString>::const_iterator it=jetTypes.begin(); 
+      it!=jetTypes.end(); it++){
+
+    TDirectory* dir = outFile->mkdir(*it);
+    dir->cd();
+
+    for(std::vector<TString>::const_iterator eBins = etaBins.begin();
+        eBins != etaBins.end(); eBins++){
+
+      corrHists[*it+*eBins]->Write();
+      ratioHists[*it+*eBins]->Write();
+    }
+  }
 
   outFile->Close(); 
 

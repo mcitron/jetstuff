@@ -43,9 +43,11 @@ void makeJetPlots()
   jetTypes.push_back("calib_s5_nopus");
   jetTypes.push_back("calib_s5_donut");
   jetTypes.push_back("calib_s5_global");
-  //jetTypes.push_back("s5_chunky");
-  //jetTypes.push_back("s5_tsup1");
-  //jetTypes.push_back("s5_tsup2");
+  jetTypes.push_back("calib_s5_chunky");
+  jetTypes.push_back("calib_s5_tsup1");
+  jetTypes.push_back("calib_s5_tsup2");
+  jetTypes.push_back("calib_c10_nopus");
+  jetTypes.push_back("calib_c10_donut");
   //jetTypes.push_back("s5_tsup3");
   jetTypes.push_back("gen");
 
@@ -73,26 +75,35 @@ void makeJetPlots()
 
     TDirectory* effDir = jetDir->mkdir("efficiency");
     TDirectory* rateDir = jetDir->mkdir("rate");
+    TDirectory* sumsEffDir = jetDir->mkdir("sumsEfficiency");
+    TDirectory* sumsRateDir = jetDir->mkdir("sumsRate");
     TDirectory* rateEffDir = jetDir->mkdir("rate_eff");
     TDirectory* sumsDir = jetDir->mkdir("sums");
-    TDirectory* turnonDir = jetDir->mkdir("turnons");
+    TDirectory* turnonDir = jetDir->mkdir("jetTurnons");
+    TDirectory* sumsTurnonDir = jetDir->mkdir("sumTurnons");
 
     if(*iType=="gen"){
+
       makeSums(treeTtbar, sumsDir, *iType, "ttbar");
+
     }else{
+
+      makeSums(treeTtbar, sumsDir, *iType, "ttbar");
+      makeSums(treeNeut, sumsDir, *iType, "ngun");
+      makeSumsTurnon(treeTtbar, sumsTurnonDir, *iType, sumPtCuts);
+      TH1F* sumsEff = makeSumsEfficiency(treeTtbar, sumsEffDir, *iType);
+      TH1F* sumsRate = makeSumsRate(treeNeut, sumsRateDir, *iType);
+      makeSumsRateEff(rateEffDir, sumsRate, sumsEff);
+
       for(std::vector<TString>::const_iterator iNum=jetnum.begin();
           iNum!=jetnum.end(); iNum++){
-
 
         TH1F* eff = makeEfficiency(treeTtbar, effDir, *iType, *iNum);
         TH1F* rate = makeRate(treeNeut, rateDir, *iType, *iNum);
 
-        makeSums(treeTtbar, sumsDir, *iType, "ttbar");
-        makeSums(treeNeut, sumsDir, *iType, "ngun");
-
         makeRateEff(rateEffDir, rate, eff, *iNum);
 
-        makeTurnon(treeTtbar, turnonDir, *iType, *iNum, genPtCuts, sumPtCuts);
+        makeTurnon(treeTtbar, turnonDir, *iType, *iNum, genPtCuts);
 
         makeEfficienciesNvtx(treeTtbar, effDir, *iType, *iNum);
         makeRatesNvtx(treeNeut, rateDir, *iType, *iNum);
@@ -222,7 +233,7 @@ void makeEfficienciesNvtx(TTree* tree, TDirectory* dir, TString jetType, TString
 }
 
 void makeTurnon(TTree* tree, TDirectory* dir, TString jetType, TString jetNum,
-    const std::vector<TString>& genptcut, const std::vector<TString>& sumptcut){
+    const std::vector<TString>& genptcut){
 
   //TDirectory* subdir = dir->mkdir("jetTurnons");
   //subdir->cd();
@@ -247,8 +258,11 @@ void makeTurnon(TTree* tree, TDirectory* dir, TString jetType, TString jetNum,
     result->Write((jetNum+"_"+*iPt));
   } 
 
-  //TDirectory* subdir2 = dir->mkdir("sumTurnons");
-  //subdir2->cd();
+
+}
+
+void makeSumsTurnon(TTree* tree, TDirectory* dir, TString jetType,
+    const std::vector<TString>& sumptcut){
 
   tree->Draw("sumsHT_ak4_gen_sum>>denom(400,0.,4000.)");
   TH1F *denom = (TH1F*)gDirectory->Get("denom");
@@ -270,6 +284,26 @@ void makeTurnon(TTree* tree, TDirectory* dir, TString jetType, TString jetNum,
 
   } 
 
+  tree->Draw("sumsMHT_ak4_gen_sum>>denom(400,0.,4000.)");
+  TH1F *denom = (TH1F*)gDirectory->Get("denom");
+  denom->Write();
+  //denom->Rebin(10);
+  denom->Sumw2();
+
+  for (std::vector<TString>::const_iterator iPt = sumptcut.begin(); 
+      iPt!=sumptcut.end(); iPt++){
+
+    tree->Draw("sumsMHT_ak4_gen_sum>>num_"+*iPt+"(400,0.,4000.)",
+        "mht_"+jetType+">"+*iPt);
+    TH1F *num = (TH1F*)gDirectory->Get("num_"+*iPt);
+    num->Write();
+    //num->Rebin(10);
+    num->Sumw2();
+    TGraphAsymmErrors * result=(effDiv(num,denom));
+    result->Write(("mht_"+*iPt));
+
+  } 
+
 
 }
 
@@ -283,6 +317,31 @@ void makeRateEff(TDirectory* dir, TH1F* rate, TH1F* efficiency, TString jetNum){
     TGraph * rate_efficiency =
       new TGraph(rate->GetNbinsX());
     rate_efficiency->SetName("rate_efficiency_jet"+jetNum);
+    rate_efficiency->SetTitle(";Efficiency (ttbar normalised rate);Rate (0 bias normalised rate)");
+
+    for(unsigned bin=0; bin<rate->GetNbinsX(); bin++){
+
+      rate_efficiency->SetPoint(bin, 
+          efficiency->GetBinContent(bin), rate->GetBinContent(bin));
+
+    }
+
+    rate_efficiency->RemovePoint(rate_efficiency->GetN());
+    rate_efficiency->Write();
+  }
+
+}
+
+void makeSumsRateEff(TDirectory* dir, TH1F* rate, TH1F* efficiency){
+
+  dir->cd();
+  if(rate->GetNbinsX() != efficiency->GetNbinsX()) 
+    std::cout << "Different binning between rate and efficiency\n";
+  else{
+
+    TGraph * rate_efficiency =
+      new TGraph(rate->GetNbinsX());
+    rate_efficiency->SetName("rate_efficiency_ht");
     rate_efficiency->SetTitle(";Efficiency (ttbar normalised rate);Rate (0 bias normalised rate)");
 
     for(unsigned bin=0; bin<rate->GetNbinsX(); bin++){
@@ -324,6 +383,9 @@ void makeSums(TTree *tree, TDirectory* dir, TString jetType, TString dataset){
     tree->Draw("mhtY_"+jetType+">>mhtY_"+jetType+dataset+"(400,-2000.,2000.)");
     TH1F* test = (TH1F*) gDirectory->Get("mhtY_"+jetType+dataset);
     test->Write();
+    tree->Draw("mht_"+jetType+">>mht_"+jetType+dataset+"(400,0.,4000.)");
+    TH1F* test = (TH1F*) gDirectory->Get("mht_"+jetType+dataset);
+    test->Write();
   }
 
 }
@@ -331,7 +393,11 @@ void makeSums(TTree *tree, TDirectory* dir, TString jetType, TString dataset){
 TH1F* makeEfficiency(TTree *tree, TDirectory* dir, TString jetType, TString jetNum){
 
   dir->cd();
-  TCut genptcut = "jetPt_ak4_gen["+jetNum+"]>50";
+  if(jetType=="0"){
+    TCut genptcut = "jetPt_ak4_gen["+jetNum+"]>150";
+  }else{
+    TCut genptcut = "jetPt_ak4_gen["+jetNum+"]>50";
+  }
   tree->Draw("jetPt_ak4_gen["+jetNum+"]>>overall_"+jetNum,genptcut,"");
   TH1F *overall = (TH1F*)gDirectory->Get("overall_"+jetNum);
   double overallNorm = overall->GetEntries();
@@ -352,6 +418,27 @@ TH1F* makeEfficiency(TTree *tree, TDirectory* dir, TString jetType, TString jetN
 
 }
 
+TH1F* makeSumsEfficiency(TTree *tree, TDirectory* dir, TString jetType){
+
+  dir->cd();
+  TCut genptcut = "sumsHT_ak4_gen_sum>200";
+  tree->Draw("sumsHT_ak4_gen_sum>>overall",genptcut,"");
+  TH1F *overall = (TH1F*)gDirectory->Get("overall");
+  double overallNorm = overall->GetEntries();
+
+  tree->Draw("ht_"+jetType+">>"+jetType+"(400,0.,4000.)",
+      genptcut,"");
+  TH1F *test = (TH1F*)gDirectory->Get(jetType);
+  test->Write();
+  test->SetName(jetType+"_Efficiency");
+
+  TH1F* cumuplot = makeEfficiencyCumu(test,overallNorm);
+  cumuplot->Write();
+
+  return cumuplot;
+
+}
+
 TH1F* makeRate(TTree *tree, TDirectory* dir, TString jetType, TString jetNum){
 
   dir->cd();
@@ -359,6 +446,20 @@ TH1F* makeRate(TTree *tree, TDirectory* dir, TString jetType, TString jetNum){
   TH1F *test = (TH1F*)gDirectory->Get(jetType+"_"+jetNum);
   test->Write();
   test->SetName(jetType+"_"+jetNum+"_"+"Rate");
+  TH1F* cumuplot = makeRateCumu(test,tree->GetEntries());
+  cumuplot->Write();
+
+  return cumuplot;
+
+}
+
+TH1F* makeSumsRate(TTree *tree, TDirectory* dir, TString jetType){
+
+  dir->cd();
+  tree->Draw("ht_"+jetType+">>ht_"+jetType+"(400,0.,4000.)");
+  TH1F *test = (TH1F*)gDirectory->Get("ht_"+jetType);
+  test->Write();
+  test->SetName("ht_Rate");
   TH1F* cumuplot = makeRateCumu(test,tree->GetEntries());
   cumuplot->Write();
 

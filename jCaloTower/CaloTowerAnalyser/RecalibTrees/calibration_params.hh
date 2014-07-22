@@ -20,12 +20,17 @@ double calibFit( Double_t *v, Double_t *par ){
 }
 
 namespace{
-  TString l15400donut="s0_donut";
-  TString l15400global="s0_global";
-  TString l15400nopus="s0_nopus";
-  TString l15450donut="s5_donut";
-  TString l15450nopus="s5_nopus";
-  TString l15450global="s5_global";
+  TString l1s0donut="s0_donut";
+  TString l1s0global="s0_global";
+  TString l1s0nopus="s0_nopus";
+  TString l1s5donut="s5_donut";
+  TString l1s5nopus="s5_nopus";
+  TString l1s5global="s5_global";
+  TString l1s5chunky="s5_chunky";
+  TString l1s5tsup1="s5_tsup1";
+  TString l1s5tsup2="s5_tsup2";
+  TString l1c10donut="c10_donut";
+  TString l1c10nopus="c10_nopus";
 }
 
 std::vector<TLorentzVector> calibrateL1Jets(const std::vector<TLorentzVector>& inJets, TString type, double ptMin, double ptMax){
@@ -38,14 +43,17 @@ std::vector<TLorentzVector> calibrateL1Jets(const std::vector<TLorentzVector>& i
 
   for(int i=0; i<48; i++){
 
-    if(type==l15400global) lut.push_back(luts5400GeV::globalLut[i]);
-    else if(type==l15400donut) lut.push_back(luts5400GeV::donutLut[i]);
-    else if(type==l15400nopus) lut.push_back(luts5400GeV::nopusLut[i]);
-    else if(type==l15450donut) lut.push_back(luts5450GeV::donutLut[i]);
-    else if(type==l15450global) lut.push_back(luts5450GeV::globalLut[i]);
-    else if(type==l15450nopus) lut.push_back(luts5450GeV::nopusLut[i]);
-//    else if(type==l15450twoStrips) lut.push_back(luts5450GeV::twoStripsLut[i]);
-//    else if(type==l15450threeStrips) lut.push_back(luts5450GeV::threeStripsLut[i]);
+    if(type==l1s0global) lut.push_back(lutss0GeV::globalLut[i]);
+    else if(type==l1s0donut) lut.push_back(lutss0GeV::donutLut[i]);
+    else if(type==l1s0nopus) lut.push_back(lutss0GeV::nopusLut[i]);
+    else if(type==l1s5donut) lut.push_back(lutss5GeV::donutLut[i]);
+    else if(type==l1s5global) lut.push_back(lutss5GeV::globalLut[i]);
+    else if(type==l1s5nopus) lut.push_back(lutss5GeV::nopusLut[i]);
+    else if(type==l1s5chunky) lut.push_back(lutss5GeV::chunkyLut[i]);
+    else if(type==l1s5tsup1) lut.push_back(lutss5GeV::tsup1Lut[i]);
+    else if(type==l1s5tsup2) lut.push_back(lutss5GeV::tsup2Lut[i]);
+    else if(type==l1c10donut) lut.push_back(lutsc10GeV::donutLut[i]);
+    else if(type==l1c10nopus) lut.push_back(lutsc10GeV::nopusLut[i]);
 
     else std::cout << "Invalid type to get lut" << std::endl;
 
