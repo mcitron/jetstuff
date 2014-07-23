@@ -3,7 +3,7 @@ import make_config
 import sys
 import os
 
-num = str(int(os.environ['LSB_JOBINDEX'])-1)
+num = str(int(os.environ['SGE_TASK_ID'])-1)
 
 filelist = sys.argv[1]
 outputdir = sys.argv[2]
