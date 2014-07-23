@@ -30,6 +30,7 @@ class RecalibTrees {
     TTree* friendTree;
 
     bool doNGun;
+    double etaCut;
     
     std::vector<TString> jetTypes;
     std::map<TString, std::vector<float>* > jetPts;
@@ -47,7 +48,7 @@ class RecalibTrees {
     std::map<TString, TBranch* > jetEtaBranches;
     std::map<TString, TBranch* > jetPhiBranches;
 
-    RecalibTrees(bool doingNGun=false);
+    RecalibTrees(bool doingNGun=false, double useEtaCut=3.0);
     virtual ~RecalibTrees();
     virtual Int_t    Cut(Long64_t entry);
     virtual Int_t    GetEntry(Long64_t entry);
@@ -61,9 +62,11 @@ class RecalibTrees {
 #endif
 
 #ifdef RecalibTrees_cxx
-RecalibTrees::RecalibTrees(bool doingNGun) //: fChain(0) 
+RecalibTrees::RecalibTrees(bool doingNGun, double useEtaCut) //: fChain(0) 
 {
   doNGun=doingNGun;
+
+  etaCut = useEtaCut;
   
   TString s1,s2;
   //TTree* tree;

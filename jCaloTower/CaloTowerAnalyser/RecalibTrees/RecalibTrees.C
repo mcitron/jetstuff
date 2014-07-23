@@ -94,12 +94,14 @@ void RecalibTrees::Loop()
 
       //Add the other jets
       for(unsigned i=0; i<jetPts[*iType]->size(); i++){
-        TLorentzVector jet;
-        jet.SetPtEtaPhiM(jetPts[*iType]->at(i),jetEtas[*iType]->at(i),
-            jetPhis[*iType]->at(i),0.);
-      if(jet.Eta()>100 || jet.Eta()<-100) std::cout << "Other\n";
+        if(fabs(jetEtas[*iType]->at(i)) < etaCut){
+          TLorentzVector jet;
+          jet.SetPtEtaPhiM(jetPts[*iType]->at(i),jetEtas[*iType]->at(i),
+              jetPhis[*iType]->at(i),0.);
+          if(jet.Eta()>100 || jet.Eta()<-100) std::cout << "Other\n";
 
-        jetObjects[*iType].push_back(jet);
+          jetObjects[*iType].push_back(jet);
+        }
       }
 
       calibJetObjects[*iType] = calibrateL1Jets(jetObjects[*iType],*iType,10.,9999.);

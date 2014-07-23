@@ -18,15 +18,15 @@ namespace{
 
 void makeJetPlots()
 {
-  TFile * fout = new TFile("jetPlots.root","recreate");
+  TFile * fout = new TFile("jetPlots_Eta2p2.root","recreate");
 
-  TFile * finNeutrino = new TFile("ngun_calibJets.root");
+  TFile * finNeutrino = new TFile("ngun_calibJets_Eta2p2.root");
   TTree * treeNeut = (TTree *)finNeutrino->Get("jetTree");
   treeNeut->AddFriend("demo/L1Tree",
       "/afs/cern.ch/work/m/mcitron/public/NEUTRINO/140716/neutrino_output.root");
   //treeNeut->AddFriend("calibJetNgun.root");
 
-  TFile * finTtbar = new TFile("ttbar_calibJets.root");
+  TFile * finTtbar = new TFile("ttbar_calibJets_Eta2p2.root");
   TTree * treeTtbar = (TTree *)finTtbar->Get("jetTree");
   treeTtbar->AddFriend("demo/L1Tree",
       "/home/adam/ttbar_14-07-10.root");
@@ -91,9 +91,13 @@ void makeJetPlots()
       makeSums(treeTtbar, sumsDir, *iType, "ttbar");
       makeSums(treeNeut, sumsDir, *iType, "ngun");
       makeSumsTurnon(treeTtbar, sumsTurnonDir, *iType, sumPtCuts);
-      TH1F* sumsEff = makeSumsEfficiency(treeTtbar, sumsEffDir, *iType);
-      TH1F* sumsRate = makeSumsRate(treeNeut, sumsRateDir, *iType);
-      makeSumsRateEff(rateEffDir, sumsRate, sumsEff);
+      TH1F* htEff = new TH1F();
+      TH1F* mhtEff = new TH1F();
+      TH1F* htRate = new TH1F();
+      TH1F* mhtRate = new TH1F();
+      makeSumsEfficiency(treeTtbar, sumsEffDir, *iType, htEff, mhtEff);
+      makeSumsRate(treeNeut, sumsRateDir, *iType, htRate, mhtRate);
+      makeSumsRateEff(rateEffDir, htRate, htEff, mhtRate, mhtEff);
 
       for(std::vector<TString>::const_iterator iNum=jetnum.begin();
           iNum!=jetnum.end(); iNum++){
@@ -332,22 +336,42 @@ void makeRateEff(TDirectory* dir, TH1F* rate, TH1F* efficiency, TString jetNum){
 
 }
 
-void makeSumsRateEff(TDirectory* dir, TH1F* rate, TH1F* efficiency){
+void makeSumsRateEff(TDirectory* dir, TH1F* htRate, TH1F* htEff, TH1F* mhtRate, TH1F* mhtEff){
 
   dir->cd();
-  if(rate->GetNbinsX() != efficiency->GetNbinsX()) 
+  if(htRate->GetNbinsX() != htEff->GetNbinsX()) 
     std::cout << "Different binning between rate and efficiency\n";
   else{
 
     TGraph * rate_efficiency =
-      new TGraph(rate->GetNbinsX());
+      new TGraph(htRate->GetNbinsX());
     rate_efficiency->SetName("rate_efficiency_ht");
     rate_efficiency->SetTitle(";Efficiency (ttbar normalised rate);Rate (0 bias normalised rate)");
 
-    for(unsigned bin=0; bin<rate->GetNbinsX(); bin++){
+    for(unsigned bin=0; bin<htRate->GetNbinsX(); bin++){
 
       rate_efficiency->SetPoint(bin, 
-          efficiency->GetBinContent(bin), rate->GetBinContent(bin));
+          htEff->GetBinContent(bin), htRate->GetBinContent(bin));
+
+    }
+
+    rate_efficiency->RemovePoint(rate_efficiency->GetN());
+    rate_efficiency->Write();
+  }
+
+  if(mhtRate->GetNbinsX() != mhtEff->GetNbinsX()) 
+    std::cout << "Different binning between rate and efficiency\n";
+  else{
+
+    TGraph * rate_efficiency =
+      new TGraph(mhtRate->GetNbinsX());
+    rate_efficiency->SetName("rate_efficiency_mht");
+    rate_efficiency->SetTitle(";Efficiency (ttbar normalised rate);Rate (0 bias normalised rate)");
+
+    for(unsigned bin=0; bin<mhtRate->GetNbinsX(); bin++){
+
+      rate_efficiency->SetPoint(bin, 
+          mhtEff->GetBinContent(bin), mhtRate->GetBinContent(bin));
 
     }
 
@@ -418,7 +442,7 @@ TH1F* makeEfficiency(TTree *tree, TDirectory* dir, TString jetType, TString jetN
 
 }
 
-TH1F* makeSumsEfficiency(TTree *tree, TDirectory* dir, TString jetType){
+void makeSumsEfficiency(TTree *tree, TDirectory* dir, TString jetType, TH1F* htEff, TH1F* mhtEff){
 
   dir->cd();
   TCut genptcut = "sumsHT_ak4_gen_sum>200";
@@ -430,12 +454,28 @@ TH1F* makeSumsEfficiency(TTree *tree, TDirectory* dir, TString jetType){
       genptcut,"");
   TH1F *test = (TH1F*)gDirectory->Get(jetType);
   test->Write();
-  test->SetName(jetType+"_Efficiency");
+  test->SetName(jetType+"_ht_Efficiency");
 
   TH1F* cumuplot = makeEfficiencyCumu(test,overallNorm);
   cumuplot->Write();
 
-  return cumuplot;
+  *htEff=*cumuplot;
+
+  TCut genptcut = "sumsMHT_ak4_gen_sum>200";
+  tree->Draw("sumsMHT_ak4_gen_sum>>overall",genptcut,"");
+  TH1F *overall = (TH1F*)gDirectory->Get("overall");
+  double overallNorm = overall->GetEntries();
+
+  tree->Draw("mht_"+jetType+">>"+jetType+"(400,0.,4000.)",
+      genptcut,"");
+  TH1F *test = (TH1F*)gDirectory->Get(jetType);
+  test->Write();
+  test->SetName(jetType+"_mht_Efficiency");
+
+  TH1F* cumuplot = makeEfficiencyCumu(test,overallNorm);
+  cumuplot->Write();
+
+  *mhtEff=*cumuplot;
 
 }
 
@@ -453,7 +493,7 @@ TH1F* makeRate(TTree *tree, TDirectory* dir, TString jetType, TString jetNum){
 
 }
 
-TH1F* makeSumsRate(TTree *tree, TDirectory* dir, TString jetType){
+void makeSumsRate(TTree *tree, TDirectory* dir, TString jetType, TH1F* htRate, TH1F* mhtRate){
 
   dir->cd();
   tree->Draw("ht_"+jetType+">>ht_"+jetType+"(400,0.,4000.)");
@@ -463,8 +503,17 @@ TH1F* makeSumsRate(TTree *tree, TDirectory* dir, TString jetType){
   TH1F* cumuplot = makeRateCumu(test,tree->GetEntries());
   cumuplot->Write();
 
-  return cumuplot;
+  *htRate = *cumuplot;
 
+
+  tree->Draw("mht_"+jetType+">>mht_"+jetType+"(400,0.,4000.)");
+  TH1F *test = (TH1F*)gDirectory->Get("mht_"+jetType);
+  test->Write();
+  test->SetName("mht_Rate");
+  TH1F* cumuplot = makeRateCumu(test,tree->GetEntries());
+  cumuplot->Write();
+
+  *mhtRate = *cumuplot;
 }
 
 TH1F * makeEfficiencyCumu(TH1F * input, double overallNorm){
