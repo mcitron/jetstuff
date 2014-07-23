@@ -345,7 +345,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   this->MakeSumTree(ak4genjetsp_jJet,"ak4_gen",false);
   this->MakeMatchTree(ak4genjetsp_jJet,ak4genjetsp_jJet,"ak4_gen",false);
 
-  this->MakeJetTree(ak4tt_jJet,ak4tt_jJet,"ak4tt_gen",false);
+  this->MakeJetTree(ak4tt_jJet,ak4genjetsp_jJet,"ak4tt_gen",false);
   this->MakeSumTree(ak4tt_jJet,"ak4tt_gen",false);
   this->MakeMatchTree(ak4tt_jJet,ak4genjetsp_jJet,"ak4tt_gen",false);
 

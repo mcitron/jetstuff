@@ -88,11 +88,11 @@ std::vector<jJet> CaloTowerAnalyser::getL1JetsMask(const std::vector< std::vecto
       std::vector<int> localsumsEC(nringsveto+1,0); //to hold the ring sums (+1 for centre)
       std::vector<int> localsumsHC(nringsveto+1,0); //to hold the ring sums (+1 for centre)
       std::vector<int> localmax(nringsveto+1,0); //to hold the ring sums (+1 for centre)
-      std::vector<int> areas(nringsveto+1,0); //to hold the ring areas (i.e. when we get up against the boundaries)
+      std::vector<double> areas(nringsveto+1,0); //to hold the ring areas (i.e. when we get up against the boundaries)
       //std::vector<int> outerstrips(nstripsdonut,0); //to hold the energies in the 4 surrounding outer strips (excluding corners)
-      std::vector<std::pair<int,int>> outerstrips(nstripsdonut,std::make_pair(0,0)); //to hold the energies in the 4 surrounding outer strips (excluding corners)//AND THEIR AREAS!
-      areas[0]=1;
-      int jetarea = 1;
+      std::vector<std::pair<int,double>> outerstrips(nstripsdonut,std::make_pair(0,0.)); //to hold the energies in the 4 surrounding outer strips (excluding corners)//AND THEIR AREAS!
+      areas[0]=g.towerEtaSize(g.old_iEta(i));
+      double jetarea = g.towerEtaSize(g.old_iEta(i));
       //int pusarea=0;
       double jetSecMomEta = 0.; 
       double jetSecMomPhi = 0.; 
@@ -120,8 +120,9 @@ std::vector<jJet> CaloTowerAnalyser::getL1JetsMask(const std::vector< std::vecto
 	  {
 	    if(mask_donut[dl][dk] != 0)
 	    {
+	      double towerArea = g.towerEtaSize(g.old_iEta(k));
 	      outerstrips[mask_donut[dl][dk]-1].first+=input[k][newl];
-	      outerstrips[mask_donut[dl][dk]-1].second++;
+	      outerstrips[mask_donut[dl][dk]-1].second+=towerArea;
 	      //	     std::cout << mask_donut[dl][dk];
 	    }
 	  }
@@ -173,7 +174,8 @@ std::vector<jJet> CaloTowerAnalyser::getL1JetsMask(const std::vector< std::vecto
 		localsums[m] += input[k][newl]; 
 		localsumsEC[m] += inputEC[k][newl]; 
 		localsumsHC[m] += inputHC[k][newl]; 
-		if (mask[dl][dk] != 0) {areas[m] += 1; jetarea++;}
+		double towerArea = g.towerEtaSize(g.old_iEta(k));
+		if (mask[dl][dk] != 0) {areas[m] += towerArea; jetarea+=towerArea;}
 		break; //no point continuining since can only be a member of one ring
 	      }
 	    }
@@ -246,11 +248,11 @@ std::vector<jJet> CaloTowerAnalyser::getL1JetsMask(const std::vector< std::vecto
 
       std::vector<int> localsums(nringsveto+1,0); //to hold the ring sums (+1 for centre)
       std::vector<int> localmax(nringsveto+1,0); //to hold the ring sums (+1 for centre)
-      std::vector<int> areas(nringsveto+1,0); //to hold the ring areas (i.e. when we get up against the boundaries)
+      std::vector<double> areas(nringsveto+1,0.); //to hold the ring areas (i.e. when we get up against the boundaries)
       //std::vector<int> outerstrips(nstripsdonut,0); //to hold the energies in the 4 surrounding outer strips (excluding corners)
-      std::vector<std::pair<int,int>> outerstrips(nstripsdonut,std::make_pair(0,0)); //to hold the energies in the 4 surrounding outer strips (excluding corners)//AND THEIR AREAS!
-      areas[0]=1;
-      int jetarea = 1;
+      std::vector<std::pair<int,double>> outerstrips(nstripsdonut,std::make_pair(0,0.)); //to hold the energies in the 4 surrounding outer strips (excluding corners)//AND THEIR AREAS!
+      areas[0]=g.towerEtaSize(g.old_iEta(i));;
+      double jetarea = g.towerEtaSize(g.old_iEta(i));;
       //int pusarea=0;
       for(int l=(j-phisizedonut); l<=(j+phisizedonut); l++) {
 	for(int k=(i-etasizedonut); k<=(i+etasizedonut); k++) {
@@ -274,8 +276,9 @@ std::vector<jJet> CaloTowerAnalyser::getL1JetsMask(const std::vector< std::vecto
 	  {
 	    if(mask_donut[dl][dk] != 0)
 	    {
+	      double towerArea = g.towerEtaSize(g.old_iEta(k));
 	      outerstrips[mask_donut[dl][dk]-1].first+=input[k][newl];
-	      outerstrips[mask_donut[dl][dk]-1].second++;
+	      outerstrips[mask_donut[dl][dk]-1].second+=towerArea;
 	      //	     std::cout << mask_donut[dl][dk];
 	    }
 	  }
@@ -330,7 +333,8 @@ std::vector<jJet> CaloTowerAnalyser::getL1JetsMask(const std::vector< std::vecto
 		//i.e. we are now in ring m
 		if(input[k][newl]>localmax[m]) localmax[m] = input[k][newl];
 		localsums[m] += input[k][newl]; 
-		if (mask[dl][dk] != 0) {areas[m] += 1; jetarea++;}
+		double towerArea = g.towerEtaSize(g.old_iEta(k));
+		if (mask[dl][dk] != 0) {areas[m] += towerArea; jetarea+=towerArea;}
 		break; //no point continuining since can only be a member of one ring
 	      }
 	    }
@@ -393,9 +397,9 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
       //int seedtower = input[i][j];  
       std::vector<int> localsums(jetsize+1,0); //to hold the ring sums (+1 for centre)
       std::vector<int> localmax(jetsize+1,0); //to hold the ring sums (+1 for centre)
-      std::vector<int> areas(jetsize+1,0); //to hold the ring areas (i.e. when we get up against the boundaries)
-      std::vector<std::pair<int,int>> outerstrips(4,std::make_pair(0,0)); //to hold the energies in the 4 surrounding outer strips (excluding corners)
-      int jetarea = 1;
+      std::vector<double> areas(jetsize+1,0.); //to hold the ring areas (i.e. when we get up against the boundaries)
+      std::vector<std::pair<int,double>> outerstrips(4,std::make_pair(0,0.)); //to hold the energies in the 4 surrounding outer strips (excluding corners)
+      double jetarea = g.towerEtaSize(g.old_iEta(i));
       double jetSecMomEta = 0; 
       double jetSecMomPhi = 0; 
       double jetFirMomEta = 0; 
@@ -435,16 +439,17 @@ std::vector<jJet> CaloTowerAnalyser::getL1Jets(const std::vector< std::vector<in
 		localsums[m] += input[k][newl]; 
 		if (input[k][newl] > localmax[m]) localmax[m] = input[k][newl];
 	      }
-	      areas[m]+=1;
+	      double towerArea = g.towerEtaSize(g.old_iEta(k));
+	      areas[m]+=towerArea;
 	      if(m == jetsize) { //i.e. we are in the outer ring and want to parameterise PU
-		if( (k-i) == m && abs(j-l) <= (m-1) ) { outerstrips[0].first += input[k][newl];outerstrips[0].second+=1;}
-		if( (i-k) == m && abs(j-l) <= (m-1) ) { outerstrips[1].first += input[k][newl];outerstrips[1].second+=1;}
-		if( (l-j) == m && abs(i-k) <= (m-1) ) { outerstrips[2].first += input[k][newl];outerstrips[2].second+=1;}
-		if( (j-l) == m && abs(i-k) <= (m-1) ) { outerstrips[3].first += input[k][newl];outerstrips[3].second+=1;}
+		if( (k-i) == m && abs(j-l) <= (m-1) ) { outerstrips[0].first += input[k][newl];outerstrips[0].second+=towerArea;}
+		if( (i-k) == m && abs(j-l) <= (m-1) ) { outerstrips[1].first += input[k][newl];outerstrips[1].second+=towerArea;}
+		if( (l-j) == m && abs(i-k) <= (m-1) ) { outerstrips[2].first += input[k][newl];outerstrips[2].second+=towerArea;}
+		if( (j-l) == m && abs(i-k) <= (m-1) ) { outerstrips[3].first += input[k][newl];outerstrips[3].second+=towerArea;}
 	      }
 
 	      if(m > 0 && m <= vetowindowsize) { //i.e. don't compare the central tower or towers outside vetowindowsize
-		jetarea++;
+		jetarea+=towerArea;
 		if((k+l) > (i+j) ) { if(input[k][newl] > input[i][j]) { numtowersaboveme++; } }
 		else if( ((k+l) == (i+j)) && (k-i) > (l-j)) { if(input[k][newl] > input[i][j]) { numtowersaboveme++; } } //this line is to break the degeneracy along the diagonal treating top left different to bottom right
 		else { if(input[k][newl] >= input[i][j]) { numtowersaboveme++; } }
