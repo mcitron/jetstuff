@@ -122,7 +122,9 @@ void makeJetPlots()
 void makeRatesNvtx(TTree* tree, TDirectory* dir, TString jetType, TString jetNum){
 
   dir->cd();
-  int cut = 30;
+  int cut;
+  if(jetNum=="0") cut= 100;
+  else if(jetNum=="3") cut= 30;
   TString bins2 = "(10,0,100,1000,0,1000)";
   TString bins = "(10,0,100)";
   double xpoints[50];
@@ -148,8 +150,8 @@ void makeRatesNvtx(TTree* tree, TDirectory* dir, TString jetType, TString jetNum
       TH1D * cumuplot=makeEffNvtxCumu(dummyplot,overallNorm);
       cumuplot->SetTitle(buffer);
       //cumuplot->Write();
-      ypoints[i]=cumuplot->GetBinContent(cumuplot->FindBin(cut));
-      ypointserror[i]=cumuplot->GetBinError(cumuplot->FindBin(cut));
+      ypoints[i]=ZB_XSECTION*cumuplot->GetBinContent(cumuplot->FindBin(cut));
+      ypointserror[i]=ZB_XSECTION*cumuplot->GetBinError(cumuplot->FindBin(cut));
       //std::cout << ypoints[i]<< std::endl;
     }
     else
@@ -168,7 +170,7 @@ void makeRatesNvtx(TTree* tree, TDirectory* dir, TString jetType, TString jetNum
   rate_nvtx_bin_graph->SetTitle("ptCut"+jetType+jetNum);
   rate_nvtx_bin_graph->GetXaxis()->SetTitle("nvtx");
   rate_nvtx_bin_graph->GetYaxis()->SetTitle("Rate");
-  rate_nvtx_bin_graph->SetName("nvtx_ptCut"+jetType+jetNum);
+  rate_nvtx_bin_graph->SetName("nvtx_ptCut_"+jetNum);
   rate_nvtx_bin_graph->SetMarkerStyle(5);
   //  rate_nvtx_bin_graph->SetLineStyle(0);
   rate_nvtx_bin_graph->GetYaxis()->SetRangeUser(0,1);
@@ -180,7 +182,10 @@ void makeEfficienciesNvtx(TTree* tree, TDirectory* dir, TString jetType, TString
 
   dir->cd();
   TString bins2 = "(10,0,100,1000,0,1000)";
-  int cut = 50;
+  int cut;
+  if(jetNum=="0") cut= 150;
+  else if(jetNum=="3") cut= 50;
+  else cut=50;
   double xpoints[50];
   double ypoints[50];
   double ypointserror[50];
@@ -227,7 +232,7 @@ void makeEfficienciesNvtx(TTree* tree, TDirectory* dir, TString jetType, TString
   rate_nvtx_bin_graph->SetTitle("ptCut"+jetType+jetNum);
   rate_nvtx_bin_graph->GetXaxis()->SetTitle("nvtx");
   rate_nvtx_bin_graph->GetYaxis()->SetTitle("Rate");
-  rate_nvtx_bin_graph->SetName("nvtx_ptCut"+jetType+jetNum);
+  rate_nvtx_bin_graph->SetName("nvtx_ptCut_"+jetNum);
   rate_nvtx_bin_graph->SetMarkerStyle(5);
   //  rate_nvtx_bin_graph->SetLineStyle(0);
   rate_nvtx_bin_graph->GetYaxis()->SetRangeUser(0,1);
@@ -259,7 +264,7 @@ void makeTurnon(TTree* tree, TDirectory* dir, TString jetType, TString jetNum,
     num->Rebin(10);
     num->Sumw2();
     TGraphAsymmErrors * result=(effDiv(num,denom));
-    result->Write((jetNum+"_"+*iPt));
+    result->Write(("turnon_"+jetNum+"_"+*iPt));
   } 
 
 
