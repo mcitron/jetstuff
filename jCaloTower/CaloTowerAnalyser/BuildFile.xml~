@@ -5,8 +5,10 @@
 <use name="CommonTools/UtilAlgos"/>
 <use name="PhysicsTools/UtilAlgos"/>
 <use name="SimDataFormats/SLHC"/>
+<use name="fastjet"/>
 <use   name="root"/>
 <use   name="rootrflx"/>
 <use   name="rootcore"/>
 <use   name="rootinteractive"/>
 <flags EDM_PLUGIN="1"/>
+<flags CXXFLAGS="-g"/>

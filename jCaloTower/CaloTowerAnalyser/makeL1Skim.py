@@ -53,7 +53,7 @@ process.o1 = cms.OutputModule("PoolOutputModule",
      'keep PileupSummaryInfos_*_*_*',
      'keep *_genParticles_*_*',
      'keep *_valGctDigis_*_*',
-     'keep *_gctDigis_*_*'
+     'keep *_gctDigis_*_*',
 
 #     'keep *_L1RingSubtractionProducer_*_*',
 #     'keep *_L1TowerJetProducer_*_*',
@@ -72,7 +72,7 @@ process.o1 = cms.OutputModule("PoolOutputModule",
 #     'keep *_ak5PFJets_*_RECO',
 #     'drop *_ak5PFJets_rho_RECO',
 #     'keep *_ak5PFJets_rho_RCTofflineTEST',
-#     'keep *_l1extraParticles_*_*',
+     'keep *_l1extraParticles*_*_*',
 #     'keep *_offlinePrimaryVertices_*_*',
 #     'keep *_ak5JetID_*_*',
 ),
@@ -83,7 +83,7 @@ process.maxEvents = cms.untracked.PSet(
     # restrict number of events to 1000
     #input = cms.untracked.int32(10)
     # run over all events
-    input = cms.untracked.int32(-1)
+    input = cms.untracked.int32(10)
 )
 
 process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
@@ -116,6 +116,9 @@ process.ak4GenJets = process.ak5GenJets.clone(
 
 process.antiktGenJets = cms.Sequence(process.genJetParticles*process.ak4GenJets)
 
+# Load stuff for the UCT emulator comparison
+process.load("L1Trigger.UCT2015.emulationMC_cfi") #for MC
+process.load("L1Trigger.UCT2015.uctl1extraparticles_cfi")
 
 process.load('L1TriggerConfig.GctConfigProducers.L1GctConfig_cff')
 process.L1GctConfigProducers.CalibrationStyle = cms.string('None')
@@ -146,6 +149,8 @@ process.p1 = cms.Path(
     +process.valGctDigis
     +process.SLHCCaloTrigger
     +process.antiktGenJets
+    +process.emulationSequence
+    +process.uct2015L1Extra
 #                       +process.ak5CaloJets
 #                       +process.ak5PFJets
 #                       +process.PUsubAK5CaloJetProducer

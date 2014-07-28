@@ -36,7 +36,7 @@ CaloTowerAnalyser::CaloTowerAnalyser(const edm::ParameterSet& iConfig) {
   tree->Branch("sumsMETy_", &sumsMETy_, "METy/D");  
   tree->Branch("sumsMET_", &sumsMET_, "MET/D");  
   //tree->Branch("Esums_", "std::vector<float>", &Esums_);
-// std::string folderName = "Event_";
+  // std::string folderName = "Event_";
   // std::stringstream caseNumber;
   // caseNumber << eventNumber;
   // folderName.append(caseNumber.str());
@@ -92,17 +92,17 @@ std::vector<double> CaloTowerAnalyser::calculateMHT(const std::vector<jJet> & je
   double mht_x=0.0;
   double mht_y=0.0;
   for(unsigned int i=0; i< jets.size(); i++) {
-      if (jets[i].pt() > thresh)
-      {
-	mht_x -= cos(g.phi(jets[i].iPhi()))*jets[i].pt();
-	mht_y -= sin(g.phi(jets[i].iPhi()))*jets[i].pt();
-      }
+    if (jets[i].pt() > thresh)
+    {
+      mht_x -= cos(g.phi(jets[i].iPhi()))*jets[i].pt();
+      mht_y -= sin(g.phi(jets[i].iPhi()))*jets[i].pt();
     }
-    std::vector<double> results;
-    results.push_back(mht_x);
-    results.push_back(mht_y);
-    results.push_back(sqrt((mht_x*mht_x) + (mht_y*mht_y)));
-    return results;
+  }
+  std::vector<double> results;
+  results.push_back(mht_x);
+  results.push_back(mht_y);
+  results.push_back(sqrt((mht_x*mht_x) + (mht_y*mht_y)));
+  return results;
 }
 //
 // member functions
@@ -116,6 +116,8 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
   std::vector<jJet> gct_jJet_uncalib;
   std::vector<jJet> gct_jJet_calib;
+  std::vector<jJet> uct_jJet_uncalib;
+  std::vector<jJet> uct_jJet_calib;
   if (mgct)
   {
 
@@ -128,8 +130,8 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     for(unsigned int i=0; i<GctUncalibCenJets->size(); i++) {
       if (GctUncalibCenJets->at(i).bx()==0)
       {
-	//std::cout << GctUncalibCenJets->at(i).rank() << ", " << GctUncalibCenJets->at(i).regionId().ieta() << ", " << GctUncalibCenJets->at(i).regionId().iphi() << std::endl;
-	gct_jJet_uncalib.push_back(jJet(GctUncalibCenJets->at(i).rank()*4,GctUncalibCenJets->at(i).regionId().ieta(),GctUncalibCenJets->at(i).regionId().iphi(),GctUncalibCenJets->at(i).bx()));
+        //std::cout << GctUncalibCenJets->at(i).rank() << ", " << GctUncalibCenJets->at(i).regionId().ieta() << ", " << GctUncalibCenJets->at(i).regionId().iphi() << std::endl;
+        gct_jJet_uncalib.push_back(jJet(GctUncalibCenJets->at(i).rank()*4,GctUncalibCenJets->at(i).regionId().ieta(),GctUncalibCenJets->at(i).regionId().iphi(),GctUncalibCenJets->at(i).bx()));
       } 
     }
 
@@ -143,10 +145,23 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       //std::cout << GctCalibCenJets->at(i).rank() << ", " << GctCalibCenJets->at(i).regionId().ieta() << ", " << GctCalibCenJets->at(i).regionId().iphi() << std::endl;
       if (GctUncalibCenJets->at(i).bx()==0)
       {
-	//std::cout << GctUncalibCenJets->at(i).rank() << ", " << GctUncalibCenJets->at(i).regionId().ieta() << ", " << GctUncalibCenJets->at(i).regionId().iphi() << std::endl;
-	gct_jJet_calib.push_back(jJet(GctCalibCenJets->at(i).rank()*4,GctCalibCenJets->at(i).regionId().ieta(),GctCalibCenJets->at(i).regionId().iphi(),GctCalibCenJets->at(i).bx()));
+        //std::cout << GctUncalibCenJets->at(i).rank() << ", " << GctUncalibCenJets->at(i).regionId().ieta() << ", " << GctUncalibCenJets->at(i).regionId().iphi() << std::endl;
+        gct_jJet_calib.push_back(jJet(GctCalibCenJets->at(i).rank()*4,GctCalibCenJets->at(i).regionId().ieta(),GctCalibCenJets->at(i).regionId().iphi(),GctCalibCenJets->at(i).bx()));
       } 
     }
+
+    // Get UCT jets
+    edm::Handle< std::vector<l1extra::L1JetParticle> > UctCalibCenJets;
+    edm::InputTag uctCalibCenJets("l1extraParticlesUCT","Central",mskim);
+    iEvent.getByLabel(uctCalibCenJets, UctCalibCenJets);
+
+    for(unsigned int i=0; i<UctCalibCenJets->size(); i++) {
+      //std::cout << GctCalibCenJets->at(i).rank() << ", " << GctCalibCenJets->at(i).regionId().ieta() << ", " << GctCalibCenJets->at(i).regionId().iphi() << std::endl;
+      //std::cout << GctUncalibCenJets->at(i).rank() << ", " << GctUncalibCenJets->at(i).regionId().ieta() << ", " << GctUncalibCenJets->at(i).regionId().iphi() << std::endl;
+      uct_jJet_calib.push_back(jJet(UctCalibCenJets->at(i).pt(),g.iEta(UctCalibCenJets->at(i).eta()),g.iPhi(UctCalibCenJets->at(i).phi())));
+    }
+
+
     // Get GCT HT jets (calib) collection
     edm::Handle<L1GctEtHadCollection> GctHadTotal;
     edm::InputTag gctHadT("gctDigis","",mskim);
@@ -155,7 +170,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     for(unsigned int i=0; i<GctHadTotal->size(); i++) {
       if (GctHadTotal->at(i).bx()==0)
       {
-	mGctHtCalib=GctHadTotal->at(i).et();
+        mGctHtCalib=GctHadTotal->at(i).et();
       } 
     }
     edm::Handle<L1GctEtHadCollection> GctValHadTotal;
@@ -165,7 +180,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     for(unsigned int i=0; i<GctValHadTotal->size(); i++) {
       if (GctValHadTotal->at(i).bx()==0)
       {
-	mGctHtUncalib=GctValHadTotal->at(i).et();
+        mGctHtUncalib=GctValHadTotal->at(i).et();
       } 
     }
     edm::Handle<L1GctHtMissCollection> GctHtMiss;
@@ -175,7 +190,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     for(unsigned int i=0; i<GctHtMiss->size(); i++) {
       if (GctHtMiss->at(i).bx()==0)
       {
-	mGctHtMissCalib=GctHtMiss->at(i).et();
+        mGctHtMissCalib=GctHtMiss->at(i).et();
       } 
     }
     edm::Handle<L1GctHtMissCollection> GctValHtMiss;
@@ -184,9 +199,16 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     for(unsigned int i=0; i<GctValHtMiss->size(); i++) {
       if (GctValHtMiss->at(i).bx()==0)
       {
-	mGctHtMissUncalib=GctValHtMiss->at(i).et();
+        mGctHtMissUncalib=GctValHtMiss->at(i).et();
       } 
     }
+
+    //Get the UCT sums
+    edm::Handle< std::vector<l1extra::L1EtMissParticle> > uctHtHandle;
+    edm::InputTag uctHtLabel("l1extraParticlesUCT","MHT",mskim);
+    iEvent.getByLabel(uctHtLabel,uctHtHandle);
+    mUctHtMissCalib=uctHtHandle->at(0).pt();
+    mUctHtCalib=uctHtHandle->at(0).etTotal();
 
   }
 
@@ -229,6 +251,17 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   std::vector<fastjet::PseudoJet> ak4genjetsp;
 
   std::vector<jJet> top_jJet;
+
+  //Find just the final electrons and muons in an event
+  std::vector<reco::GenParticle> elecMuVec;
+  for(unsigned int i = 0; i < genphandle->size(); i++) {
+    const reco::GenParticle* p = &((*genphandle)[i]);
+    if ( (p->status() == 1) && p->pt() > 10.0 && abs(p->pdgId()) == 11 && abs(p->pdgId()) == 13) {
+      elecMuVec.push_back(*p);
+    }
+  }
+
+  //Find all the gen particles and check they aren't neutrinos or muons
   for(unsigned int i = 0; i < genphandle->size(); i++) {
     const reco::GenParticle* p = &((*genphandle)[i]);
     if ( (p->status() == 1) && p->pt() > 0.0 && abs(p->pdgId()) != 12 && abs(p->pdgId()) != 13 && abs(p->pdgId()) != 14 && abs(p->pdgId()) != 16 && abs(p->eta()) < 3.0) {
@@ -237,9 +270,22 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       curPseudoJet.reset_PtYPhiM( p->pt(), p->eta(), p->phi(), 0.0); //last argument is mass
       pseudoak4genjetsp.push_back(curPseudoJet);
     }
+
+    //Add just the tops
     if ((p->pdgId() == 6 || p->pdgId() == -6) && p->status()==22)
     {
-      top_jJet.push_back(jJet(p->pt(),g.iEta(p->eta()),g.iPhi(p->phi())));
+      //Make sure the tops aren't close to an electron or muon
+      bool vetoTop=false;
+      for(unsigned j=0; j<elecMuVec.size(); j++){
+        double dR2= (p->eta()-elecMuVec[j].eta())*(p->eta()-elecMuVec[j].eta()) + 
+          (p->phi()-elecMuVec[j].phi())*(p->phi()-elecMuVec[j].phi());
+        if(dR2 < 1.0){
+          vetoTop=true;
+          break;
+        }
+      }
+
+      if(!vetoTop) top_jJet.push_back(jJet(p->pt(),g.iEta(p->eta()),g.iPhi(p->phi())));
     }
   }
   // Handle<l1slhc::L1CaloTowerCollection> offlinetriggertowers;
@@ -295,7 +341,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     curPseudoJet.reset_PtYPhiM( ((*j).E() + (*j).H()) , g.eta((*j).iEta()), g.phi((*j).iPhi()), 0.0); //last argument is mass
     pseudoak4ttjets.push_back(curPseudoJet);
   }
-    maxTowerPts->Fill(tow);
+  maxTowerPts->Fill(tow);
 
   sumsET_=ET;
   sumsMETx_=met_x;
@@ -335,6 +381,7 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     ak4tt_jJet.push_back(jJet(ak4ttjets[i].pt(), g.iEta(ak4ttjets[i].eta()), g.iPhi(ak4ttjets[i].phi())));
   }
 
+  //Add the
 
 
   //make a container for the L1 jets
@@ -397,6 +444,10 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     this->MakeJetTree(gct_jJet_calib,ak4genjetsp_jJet, "gct_calib_gen",true);
     this->MakeMatchTree(gct_jJet_calib,ak4genjetsp_jJet,"gct_calib_gen",true);
     this->MakeSumTree(gct_jJet_calib,"gct_calib_gen",true,true);
+
+    this->MakeJetTree(uct_jJet_calib,ak4genjetsp_jJet, "uct_calib_gen",true);
+    this->MakeMatchTree(uct_jJet_calib,ak4genjetsp_jJet,"uct_calib_gen",true);
+    this->MakeSumTree(uct_jJet_calib,"uct_calib_gen",true,true);
 
     this->MakeJetTree(gct_jJet_uncalib,ak4genjetsp_jJet,  "gct_uncalib_gen",true);
     this->MakeMatchTree(gct_jJet_uncalib,ak4genjetsp_jJet,"gct_uncalib_gen",true);

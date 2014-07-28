@@ -45,6 +45,9 @@ Implementation:
 
 #include "DataFormats/L1GlobalCaloTrigger/interface/L1GctCollections.h"
 
+#include "DataFormats/L1Trigger/interface/L1JetParticle.h"
+#include "DataFormats/L1Trigger/interface/L1EtMissParticle.h"
+
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 
 #include "SimDataFormats/SLHC/interface/L1CaloTower.h"
@@ -119,6 +122,8 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     double mGctHtMissCalib;
     double mGctHtCalib;
     double mGctHtUncalib;
+    double mUctHtMissCalib;
+    double mUctHtCalib;
     TTree* tree;
     //TTree* masterTree;
     std::map<TString, std::vector<Float_t> *> jetPt_;

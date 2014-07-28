@@ -2,6 +2,7 @@
 <use name="FWCore/PluginManager"/>
 <use name="FWCore/ParameterSet"/>
 <use name="DataFormats/CaloTowers"/>
+<use name="DataFormats/L1Trigger"/>
 <use name="CommonTools/UtilAlgos"/>
 <use name="PhysicsTools/UtilAlgos"/>
 <use name="SimDataFormats/SLHC"/>
