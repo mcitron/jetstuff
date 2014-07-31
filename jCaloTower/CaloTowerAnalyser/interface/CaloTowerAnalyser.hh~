@@ -45,6 +45,9 @@ Implementation:
 
 #include "DataFormats/L1GlobalCaloTrigger/interface/L1GctCollections.h"
 
+#include "DataFormats/L1Trigger/interface/L1JetParticle.h"
+#include "DataFormats/L1Trigger/interface/L1EtMissParticle.h"
+
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 
 #include "SimDataFormats/SLHC/interface/L1CaloTower.h"
@@ -93,8 +96,8 @@ class CaloTowerAnalyser : public edm::EDAnalyzer {
     std::vector<jJet> getL1JetsMask(const std::vector< std::vector<int> > & input, std::vector<std::vector <int> > mask, std::vector<std::vector <int > > donut_mask,int nstrips, int seedthresh1, int seedthresh2);
     std::vector<jJet> getL1JetsMask(const std::vector< std::vector<int> > & input,const std::vector< std::vector<int> > & inputEC,const std::vector< std::vector<int> > & inputHC, std::vector<std::vector <int> > mask, std::vector<std::vector <int > > donut_mask,int nstrips, int seedthresh1, int seedthresh2);
     //void compareJetCollections(const std::vector<jJet> & col1, const std::vector<jJet> & col2, std::string folderName, bool isgct);
-    void MakeJetTree(const std::vector<jJet> & col1,const std::vector<jJet> & col2,TString folderName, bool isgct);
-    void MakeSumTree(const std::vector<jJet> & col1,TString folderName,bool isgct, bool iscalibgct=false);
+    void MakeJetTree(const std::vector<jJet> & col1,const std::vector<jJet> & col2,TString folderName, bool isgct, bool isuct=false);
+    void MakeSumTree(const std::vector<jJet> & col1,TString folderName,bool isgct, bool iscalibgct=false, bool isuct=false);
     void MakeMatchTree(const std::vector<jJet> & col1,const std::vector<jJet> & col2,TString folderName,bool isgct);
     void MakeCalibration(const std::vector<jJet> & col1,const std::vector<jJet> & col2, TString folderName);
     void printOneEvent(const edm::Handle<l1slhc::L1CaloTowerCollection> triggertowers, const std::vector<jJet> & L1jets, const std::vector<fastjet::PseudoJet> & ak4ttjets, const reco::GenJetCollection * ak4genjets, std::vector<fastjet::PseudoJet> & ak4genjetsp);

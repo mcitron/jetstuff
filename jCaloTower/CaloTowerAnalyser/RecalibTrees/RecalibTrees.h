@@ -73,11 +73,11 @@ RecalibTrees::RecalibTrees(bool doingNGun, double useEtaCut) //: fChain(0)
   //TTree* fullTree;
 
   if(doNGun){
-    s1="ngun_jetTree.root";
-    s2="/afs/cern.ch/work/m/mcitron/public/NEUTRINO/140716/neutrino_output.root";
+    s1="ngun_jetTree_newAreas.root";
+    s2="/afs/cern.ch/work/a/aelwood/public/NGUN/140728/ngun_14-07-28.root";
   }else{
-    s1="ttbar_jetTree.root";
-    s2="/home/adam/ttbar_14-07-10.root";
+    s1="ttbar_jetTree_newAreas.root";
+    s2="/afs/cern.ch/work/a/aelwood/public/TTBAR/140728/ttbar_14-07-28.root";
   }
 
 
@@ -88,8 +88,9 @@ RecalibTrees::RecalibTrees(bool doingNGun, double useEtaCut) //: fChain(0)
   }
 
   TTree * tree = (TTree *)f1->Get("jetTree");
-  tree->AddFriend("demo/L1Tree",s2);
-
+  if(!doNGun){
+    tree->AddFriend("demo/L1Tree",s2);
+  }
   //Define the jet types
   jetTypes.push_back("s0_nopus");
   jetTypes.push_back("s0_donut");
@@ -111,7 +112,11 @@ RecalibTrees::RecalibTrees(bool doingNGun, double useEtaCut) //: fChain(0)
 
   Init(tree);
 
-  outFile = new TFile("calibJets.root","RECREATE");
+  if(doNGun){
+    outFile = new TFile("calibJetsNGun.root","RECREATE");
+  }else{
+    outFile = new TFile("calibJetsTtbar.root","RECREATE");
+  }
 
   friendTree = new TTree("jetTree","jetTree");
 

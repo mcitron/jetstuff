@@ -445,9 +445,9 @@ CaloTowerAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     this->MakeMatchTree(gct_jJet_calib,ak4genjetsp_jJet,"gct_calib_gen",true);
     this->MakeSumTree(gct_jJet_calib,"gct_calib_gen",true,true);
 
-    this->MakeJetTree(uct_jJet_calib,ak4genjetsp_jJet, "uct_calib_gen",true);
-    this->MakeMatchTree(uct_jJet_calib,ak4genjetsp_jJet,"uct_calib_gen",true);
-    this->MakeSumTree(uct_jJet_calib,"uct_calib_gen",true,true);
+    this->MakeJetTree(uct_jJet_calib,ak4genjetsp_jJet, "uct_calib_gen",false, true);
+    this->MakeMatchTree(uct_jJet_calib,ak4genjetsp_jJet,"uct_calib_gen",false);
+    this->MakeSumTree(uct_jJet_calib,"uct_calib_gen",false,false,true);
 
     this->MakeJetTree(gct_jJet_uncalib,ak4genjetsp_jJet,  "gct_uncalib_gen",true);
     this->MakeMatchTree(gct_jJet_uncalib,ak4genjetsp_jJet,"gct_uncalib_gen",true);

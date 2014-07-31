@@ -19,8 +19,10 @@ namespace{
     TLorentzVector mhtVec;
 
     for(unsigned i=0; i<jets.size(); i++){
-      ht+=jets[i].Pt();
-      mhtVec+=jets[i];
+      if(jets[i].Pt()>20.){
+        ht+=jets[i].Pt();
+        mhtVec+=jets[i];
+      }
     }
     mhtX=-1.0*mhtVec.Px();
     mhtY=-1.0*mhtVec.Py();
@@ -82,10 +84,10 @@ void RecalibTrees::Loop()
     if(!doNGun){
       for(unsigned i=0; i<jetPts["Gen"]->size(); i++){
         TLorentzVector jet;
-          jet.SetPtEtaPhiM(jetPts["Gen"]->at(i),jetEtas["Gen"]->at(i),
-              jetPhis["Gen"]->at(i),0.);
-      if(jet.Eta()>100 || jet.Eta()<-100) std::cout << "Gen\n";
-          genJetObjects.push_back(jet);
+        jet.SetPtEtaPhiM(jetPts["Gen"]->at(i),jetEtas["Gen"]->at(i),
+            jetPhis["Gen"]->at(i),0.);
+        if(jet.Eta()>100 || jet.Eta()<-100) std::cout << "Gen\n";
+        genJetObjects.push_back(jet);
       }
     }
 

@@ -37,6 +37,32 @@ double calibFit( Double_t *v, Double_t *par ){
 //double calibrateGraph();
 
 
+std::vector<TString> getJetTypes(){
+  std::vector<TString> jetTypes;
+  jetTypes.push_back("s0_nopus");
+  jetTypes.push_back("s0_donut");
+  jetTypes.push_back("s0_global");
+  jetTypes.push_back("s0_chunky");
+  jetTypes.push_back("s0_tsup1");
+  jetTypes.push_back("s0_tsup2");
+  jetTypes.push_back("s0_tsup3");
+  jetTypes.push_back("s5_nopus");
+  jetTypes.push_back("s5_donut");
+  jetTypes.push_back("s5_global");
+  jetTypes.push_back("s5_chunky");
+  jetTypes.push_back("s5_tsup1");
+  jetTypes.push_back("s5_tsup2");
+  jetTypes.push_back("s5_tsup3");
+  jetTypes.push_back("c10_nopus");
+  jetTypes.push_back("c10_donut");
+  jetTypes.push_back("c10_global");
+  jetTypes.push_back("c10_chunky");
+  jetTypes.push_back("c10_tsup1");
+  jetTypes.push_back("c10_tsup2");
+  jetTypes.push_back("c10_tsup3");
+  return jetTypes;
+}
+
 
 
 // TFile *f = new TFile("/vols/cms04/mb1512/Batch/2014-02-03_SingleMu_12Dec_11x11/SingleMu_12Dec_11x11.root","OPEN")
@@ -44,82 +70,82 @@ double calibFit( Double_t *v, Double_t *par ){
 
 
 /*
-void recalibrateGraph(TFile *file, TString directory, TString &outputLowPt, TString &outputHighPt, TString &outputNVTXResponse,
-		      double calibFitMin    = 0, 
-		      double calibFitMiddle = 45,
-		      double calibFitMax    = 200, 
-		      TString jetCollection = "Calibration_CalibPrePUS_ak5PUS",
-		      TString etaRange      = "Eta_-0.174_to_0.000",
-		      bool NVTXCorrection   = false ){
+   void recalibrateGraph(TFile *file, TString directory, TString &outputLowPt, TString &outputHighPt, TString &outputNVTXResponse,
+   double calibFitMin    = 0, 
+   double calibFitMiddle = 45,
+   double calibFitMax    = 200, 
+   TString jetCollection = "Calibration_CalibPrePUS_ak5PUS",
+   TString etaRange      = "Eta_-0.174_to_0.000",
+   bool NVTXCorrection   = false ){
 
 
 
-  //JetHist/Calibration/Calibration_CalibPrePUS_ak5PUS/EtaBinned/Eta_-0.174_to_0.000/Recalib/Calibration_CalibPrePUS_ak5PUS_JetResponse_vs_L1PT_Eta_-0.174_to_0.000_prof
+//JetHist/Calibration/Calibration_CalibPrePUS_ak5PUS/EtaBinned/Eta_-0.174_to_0.000/Recalib/Calibration_CalibPrePUS_ak5PUS_JetResponse_vs_L1PT_Eta_-0.174_to_0.000_prof
 
 //   TString jetCollection = "Calibration_CalibPrePUS_ak5PUS";
 //   TString etaRange      = "Eta_-0.174_to_0.000";
-  TString graph         = "JetHist/Calibration/" + jetCollection + "/EtaBinned/" + etaRange + "/Recalib/" + jetCollection 
-                        + "_JetResponse_vs_L1PT_" + etaRange + "_prof";
+TString graph         = "JetHist/Calibration/" + jetCollection + "/EtaBinned/" + etaRange + "/Recalib/" + jetCollection 
++ "_JetResponse_vs_L1PT_" + etaRange + "_prof";
 
 
-  TProfile* gr1 = (TProfile*)file->Get( graph )->Clone();
+TProfile* gr1 = (TProfile*)file->Get( graph )->Clone();
 
 
-  // Low-pT fitting
-  // ------------------------------------------------------------
+// Low-pT fitting
+// ------------------------------------------------------------
 
-  // Fit the calibration curve over low pT
-  TF1 *calibrationFitLow = new TF1("recalibFitLowPt", "pol9", calibFitMin, calibFitMiddle);
-  calibrationFitLow->SetLineColor(kRed);
-  gr1->Fit( calibrationFitLow, "MR");
+// Fit the calibration curve over low pT
+TF1 *calibrationFitLow = new TF1("recalibFitLowPt", "pol9", calibFitMin, calibFitMiddle);
+calibrationFitLow->SetLineColor(kRed);
+gr1->Fit( calibrationFitLow, "MR");
 
-  // Extract calibration parameters
-  TString p0 = Form("%e", calibrationFitLow->GetParameter( 0 ));
-  TString p1 = Form("%e", calibrationFitLow->GetParameter( 1 ));
-  TString p2 = Form("%e", calibrationFitLow->GetParameter( 2 ));
-  TString p3 = Form("%e", calibrationFitLow->GetParameter( 3 ));
-  TString p4 = Form("%e", calibrationFitLow->GetParameter( 4 ));
-  TString p5 = Form("%e", calibrationFitLow->GetParameter( 5 ));
-  TString p6 = Form("%e", calibrationFitLow->GetParameter( 6 ));
-  TString p7 = Form("%e", calibrationFitLow->GetParameter( 7 ));
-  TString p8 = Form("%e", calibrationFitLow->GetParameter( 8 ));
-  TString p9 = Form("%e", calibrationFitLow->GetParameter( 9 ));
-
-
-  // Output fit parameters
-  outputLowPt += p0 + "\t" + p1 + "\t" + p2 + "\t" + p3 + "\t" + p4 + "\t" + p5 + 
-                 "\t" + p6 + "\t" + p7 + "\t" + p8 + "\t" + p9 + "\n";
-  //  std::cout << outputLowPt;
+// Extract calibration parameters
+TString p0 = Form("%e", calibrationFitLow->GetParameter( 0 ));
+TString p1 = Form("%e", calibrationFitLow->GetParameter( 1 ));
+TString p2 = Form("%e", calibrationFitLow->GetParameter( 2 ));
+TString p3 = Form("%e", calibrationFitLow->GetParameter( 3 ));
+TString p4 = Form("%e", calibrationFitLow->GetParameter( 4 ));
+TString p5 = Form("%e", calibrationFitLow->GetParameter( 5 ));
+TString p6 = Form("%e", calibrationFitLow->GetParameter( 6 ));
+TString p7 = Form("%e", calibrationFitLow->GetParameter( 7 ));
+TString p8 = Form("%e", calibrationFitLow->GetParameter( 8 ));
+TString p9 = Form("%e", calibrationFitLow->GetParameter( 9 ));
 
 
-
-  // High-pT fitting
-  // ------------------------------------------------------------
-
-  // Fit the calibration curve over high pT
-  TF1 *calibrationFitHigh = new TF1("recalibFitHighPt", "pol2", calibFitMiddle, calibFitMax);
-  calibrationFitHigh->SetLineColor(kBlue);
-  gr1->Fit( calibrationFitHigh, "MR");
-
-  // Extract calibration parameters
-  TString p0High = Form("%e", calibrationFitHigh->GetParameter( 0 ));
-  TString p1High = Form("%e", calibrationFitHigh->GetParameter( 1 ));
-  TString p2High = Form("%e", calibrationFitHigh->GetParameter( 2 ));
-
-  
-  // Output fit parameters 
-  outputHighPt += p0High + "\t" + p1High + "\t" + p2High + "\n";
-  //  std::cout << outputHighPt;
+// Output fit parameters
+outputLowPt += p0 + "\t" + p1 + "\t" + p2 + "\t" + p3 + "\t" + p4 + "\t" + p5 + 
+"\t" + p6 + "\t" + p7 + "\t" + p8 + "\t" + p9 + "\n";
+//  std::cout << outputLowPt;
 
 
 
-  // NVTX correction
-  // ------------------------------------------------------------
+// High-pT fitting
+// ------------------------------------------------------------
 
-  TProfile* jetResponseProf;
-  TF1 *NVTXFit;
+// Fit the calibration curve over high pT
+TF1 *calibrationFitHigh = new TF1("recalibFitHighPt", "pol2", calibFitMiddle, calibFitMax);
+calibrationFitHigh->SetLineColor(kBlue);
+gr1->Fit( calibrationFitHigh, "MR");
 
-  if ( NVTXCorrection ){
+// Extract calibration parameters
+TString p0High = Form("%e", calibrationFitHigh->GetParameter( 0 ));
+TString p1High = Form("%e", calibrationFitHigh->GetParameter( 1 ));
+TString p2High = Form("%e", calibrationFitHigh->GetParameter( 2 ));
+
+
+// Output fit parameters 
+outputHighPt += p0High + "\t" + p1High + "\t" + p2High + "\n";
+//  std::cout << outputHighPt;
+
+
+
+// NVTX correction
+// ------------------------------------------------------------
+
+TProfile* jetResponseProf;
+TF1 *NVTXFit;
+
+if ( NVTXCorrection ){
 
   int NVTXMin = 2;
   int NVTXMax = 35;
@@ -130,7 +156,7 @@ void recalibrateGraph(TFile *file, TString directory, TString &outputLowPt, TStr
 
 
   TString NVTXGraph = "JetHist/Calibration/" + recalibJetCollection + "/EtaBinned/" + etaRange + "/Recalib/" + recalibJetCollection 
-                        + "_JetResponse_vs_NVTX_L1Ptge12_" + etaRange + "_prof";
+    + "_JetResponse_vs_NVTX_L1Ptge12_" + etaRange + "_prof";
 
   jetResponseProf = (TProfile*)file->Get( NVTXGraph )->Clone();
 
@@ -146,30 +172,30 @@ void recalibrateGraph(TFile *file, TString directory, TString &outputLowPt, TStr
   // Output fit parameters
   outputNVTXResponse += p0Re + "\t" + p1Re + "\n";
 
-  }
+}
 
 
 
 
-  // ********************************************************************************
-  // Output stuff
-  // ********************************************************************************
-  TCanvas *canvOut = new TCanvas();
+// ********************************************************************************
+// Output stuff
+// ********************************************************************************
+TCanvas *canvOut = new TCanvas();
 
-  // Fit plot
-  gr1->Draw("AP");
+// Fit plot
+gr1->Draw("AP");
 
-  calibrationFitLow->Draw("SAME");
-  canvOut->SaveAs( directory + "JetResponse_vs_L1PT_" + etaRange + "_fit.png" );
-  //canvOut->SaveAs( directory + "JetResponse_vs_L1PT_" + etaRange + "_fit.pdf" );
+calibrationFitLow->Draw("SAME");
+canvOut->SaveAs( directory + "JetResponse_vs_L1PT_" + etaRange + "_fit.png" );
+//canvOut->SaveAs( directory + "JetResponse_vs_L1PT_" + etaRange + "_fit.pdf" );
 
-  if ( NVTXCorrection ){
-    // NVTX plot
-    jetResponseProf->Draw("AP");
-    NVTXFit->Draw("SAME");
-    canvOut->SaveAs( directory + "JetResponse_vs_NVTX_" + etaRange + "_fit.png" );
-    //canvOut->SaveAs( directory + "JetResponse_vs_NVTX_" + etaRange + "_fit.pdf" );
-  }
+if ( NVTXCorrection ){
+  // NVTX plot
+  jetResponseProf->Draw("AP");
+  NVTXFit->Draw("SAME");
+  canvOut->SaveAs( directory + "JetResponse_vs_NVTX_" + etaRange + "_fit.png" );
+  //canvOut->SaveAs( directory + "JetResponse_vs_NVTX_" + etaRange + "_fit.pdf" );
+}
 
 }
 */
@@ -197,8 +223,8 @@ double calibrateGraph(TFile *file, TString directory, TString &outputCMSSW, doub
   // FROM: jet_l3_correction_x.cc      
 
 
-//   TF1 *calibrationFit = new TF1("calibrationFit","[0]-[1]/(pow(log10(x),2)+[2])-[3]*exp((-[4]*(log10(x)-[5])*(log10(x)-[5]))+([6]*(log10(x)-[5])))",
-// 				calibFitMin, calibFitMax );
+  //   TF1 *calibrationFit = new TF1("calibrationFit","[0]-[1]/(pow(log10(x),2)+[2])-[3]*exp((-[4]*(log10(x)-[5])*(log10(x)-[5]))+([6]*(log10(x)-[5])))",
+  // 				calibFitMin, calibFitMax );
 
   calibrationFit->SetLineColor(kRed); 
   calibrationFit->SetLineWidth(1);
@@ -212,7 +238,7 @@ double calibrateGraph(TFile *file, TString directory, TString &outputCMSSW, doub
   calibrationFit->SetParameter(6,0.016);
 
 
-//   // Restrict to only positive correlation with RECO.
+  //   // Restrict to only positive correlation with RECO.
   calibrationFit->SetParLimits(0, 0, 10);
   calibrationFit->SetParLimits(1, 0, 10);
   calibrationFit->SetParLimits(2, -1, 10);
@@ -221,23 +247,23 @@ double calibrateGraph(TFile *file, TString directory, TString &outputCMSSW, doub
   calibrationFit->SetParLimits(4, 0, 10);
   calibrationFit->SetParLimits(5, 0, 10);
 
-//   // Set initial parameter values 
-//   calibrationFit->SetParameter(0, 0.78);
-//   calibrationFit->SetParameter(1, 4.33);
-//   calibrationFit->SetParameter(2, 2.67);
-//   calibrationFit->SetParameter(3, 0.57);
-//   calibrationFit->SetParameter(4, 0.88);
-//   calibrationFit->SetParameter(5, 0.41);
+  //   // Set initial parameter values 
+  //   calibrationFit->SetParameter(0, 0.78);
+  //   calibrationFit->SetParameter(1, 4.33);
+  //   calibrationFit->SetParameter(2, 2.67);
+  //   calibrationFit->SetParameter(3, 0.57);
+  //   calibrationFit->SetParameter(4, 0.88);
+  //   calibrationFit->SetParameter(5, 0.41);
 
   //gr1->Fit(calibrationFit,"MQR");
   gr1->Fit(calibrationFit,"MQR");
 
-//   //int fitStatus = gr1->Fit( calibrationFit, "MR");
-//   gr1->Fit( calibrationFit, "MR");
+  //   //int fitStatus = gr1->Fit( calibrationFit, "MR");
+  //   gr1->Fit( calibrationFit, "MR");
 
-//UNCOMMENTED
-// Check fit was good
-// ************************************************************
+  //UNCOMMENTED
+  // Check fit was good
+  // ************************************************************
   bool checkFit = false;
   if (checkFit){
     // x and y points of TGraph

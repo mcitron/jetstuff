@@ -168,7 +168,7 @@ double ptStep = 5;
 
 
 //TString filename = "/afs/cern.ch/work/m/mcitron/public/QCD/140622/qcd_output.root";
-TString filename = "qcd_jetTree.root";
+TString filename = "qcd_jetTree_newAreas.root";
 
 
 // Directory inside ROOT file
@@ -306,17 +306,17 @@ int getCalibration(){
     //subDirs.push_back( "s5_donut" );
     //subDirs.push_back( "s5_global" );
     //subDirs.push_back( "s5_nopus" );
-    //subDirs.push_back( "s5_chunky" );
+    subDirs.push_back( "s5_chunky" );
     subDirs.push_back( "s5_tsup1" );
-    //subDirs.push_back( "s5_tsup2" );
-    //subDirs.push_back( "s5_tsup3" );
-    //subDirs.push_back( "c10_donut" );
-    //subDirs.push_back( "c10_global" );
-    //subDirs.push_back( "c10_nopus" );
-    //subDirs.push_back( "c10_chunky" );
-    //subDirs.push_back( "c10_tsup1" );
-    //subDirs.push_back( "c10_tsup2" );
-    //subDirs.push_back( "c10_tsup3" );
+    subDirs.push_back( "s5_tsup2" );
+    subDirs.push_back( "s5_tsup3" );
+    subDirs.push_back( "c10_donut" );
+    subDirs.push_back( "c10_global" );
+    subDirs.push_back( "c10_nopus" );
+    subDirs.push_back( "c10_chunky" );
+    subDirs.push_back( "c10_tsup1" );
+    subDirs.push_back( "c10_tsup2" );
+    subDirs.push_back( "c10_tsup3" );
 
 
     std::map <TString, TString> typeLabel;
@@ -330,17 +330,17 @@ int getCalibration(){
     //typeLabel[ "s5_donut" ] = "s5_donut_4Jets";
     //typeLabel[ "s5_global" ] = "s5_global_4Jets";
     //typeLabel[ "s5_nopus" ] = "s5_nopus_4Jets";
-    //typeLabel[ "s5_chunky" ] = "s5_chunky_4Jets";
+    typeLabel[ "s5_chunky" ] = "s5_chunky_4Jets";
     typeLabel[ "s5_tsup1" ] = "s5_tsup1_4Jets";
-    //typeLabel[ "s5_tsup2" ] = "s5_tsup2_4Jets";
-    //typeLabel[ "s5_tsup3" ] = "s5_tsup3_4Jets";
-    //typeLabel[ "c10_donut" ] = "c10_donut_4Jets";
-    //typeLabel[ "c10_global" ] = "c10_global_4Jets";
-    //typeLabel[ "c10_nopus" ] = "c10_nopus_4Jets";
-    //typeLabel[ "c10_chunky" ] = "c10_chunky_4Jets";
-    //typeLabel[ "c10_tsup1" ] = "c10_tsup1_4Jets";
-    //typeLabel[ "c10_tsup2" ] = "c10_tsup2_4Jets";
-    //typeLabel[ "c10_tsup3" ] = "c10_tsup3_4Jets";
+    typeLabel[ "s5_tsup2" ] = "s5_tsup2_4Jets";
+    typeLabel[ "s5_tsup3" ] = "s5_tsup3_4Jets";
+    typeLabel[ "c10_donut" ] = "c10_donut_4Jets";
+    typeLabel[ "c10_global" ] = "c10_global_4Jets";
+    typeLabel[ "c10_nopus" ] = "c10_nopus_4Jets";
+    typeLabel[ "c10_chunky" ] = "c10_chunky_4Jets";
+    typeLabel[ "c10_tsup1" ] = "c10_tsup1_4Jets";
+    typeLabel[ "c10_tsup2" ] = "c10_tsup2_4Jets";
+    typeLabel[ "c10_tsup3" ] = "c10_tsup3_4Jets";
 
 
      //Check labels are defined for each sample analysed

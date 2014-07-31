@@ -37,7 +37,7 @@ void plotRateEff(){
   yName.push_back("Rate");
   xLimitsLow.push_back(0.7); xLimitsHigh.push_back(1.0);
   yLimitsLow.push_back(0.); yLimitsHigh.push_back(30000.);
-
+/*
   histDir.push_back("rate/nvtx_ptCut_0");
   xName.push_back("NInts");
   yName.push_back("Rate");
@@ -49,6 +49,19 @@ void plotRateEff(){
   yName.push_back("Rate");
   xLimitsLow.push_back(0.); xLimitsHigh.push_back(70.0);
   yLimitsLow.push_back(0.); yLimitsHigh.push_back(100000.);
+
+  histDir.push_back("rate/Rate_0");
+  xName.push_back("Cut");
+  yName.push_back("Rate");
+  xLimitsLow.push_back(0.); xLimitsHigh.push_back(1000.0);
+  yLimitsLow.push_back(0.); yLimitsHigh.push_back(1000000.);
+  
+  histDir.push_back("rate/Rate_3");
+  xName.push_back("Cut");
+  yName.push_back("Rate");
+  xLimitsLow.push_back(0.); xLimitsHigh.push_back(600.);
+  yLimitsLow.push_back(0.); yLimitsHigh.push_back(1000000.);
+*/
 
   histDir.push_back("efficiency/nvtx_ptCut_0");
   xName.push_back("NInts");
@@ -110,7 +123,8 @@ void plotRateEff(){
   xLimitsLow.push_back(0.); xLimitsHigh.push_back(400.0);
   yLimitsLow.push_back(0.); yLimitsHigh.push_back(1.);
 
-  TFile* f = TFile::Open("../jetPlots_Eta2p2.root");
+  TFile* f = TFile::Open("../jetPlots_newAreas.root");
+  //TFile* f = TFile::Open("../test.root");
 
   std::cout << "Got here" << std::endl;
 
@@ -130,6 +144,8 @@ void plotRateEff(){
     TGraphAsymmErrors* tsup2seed = f->Get("calib_s5_tsup2/"+*iHist);
     TGraphAsymmErrors* global = f->Get("calib_s0_global/"+*iHist);
     TGraphAsymmErrors* globalseed = f->Get("calib_s5_global/"+*iHist);
+    TGraphAsymmErrors* uct = f->Get("uct_calib_gen/"+*iHist);
+    TGraphAsymmErrors* gct = f->Get("gct_calib_gen/"+*iHist);
 
     TMultiGraph * hs = new TMultiGraph();
 
@@ -177,6 +193,13 @@ void plotRateEff(){
     tsup2seed->SetLineColor(46);
     tsup2seed->SetMarkerColor(46);
 
+    uct->SetLineColor(8);
+    uct->SetMarkerColor(8);
+    
+    gct->SetLineColor(8);
+    gct->SetMarkerColor(8);
+    gct->SetLineStyle(2);
+
     hs->Add(nopus,"lp");
     hs->Add(nopusseed,"lp");
     hs->Add(donutseed,"lp");
@@ -186,7 +209,8 @@ void plotRateEff(){
     hs->Add(chunkyseed,"lp");
     hs->Add(tsup1seed,"lp");
     hs->Add(tsup2seed,"lp");
-
+    hs->Add(uct,"lp");
+    hs->Add(gct,"lp");
 
     hs->Draw("a");
     hs->GetXaxis()->SetTitle(xName[i]);
@@ -204,7 +228,8 @@ void plotRateEff(){
     leg->AddEntry(chunkyseed,"Chunky Donut (Seed 5)","l");
     leg->AddEntry(tsup1seed,"TSup 1 (Seed 5)","l");
     leg->AddEntry(tsup2seed,"TSup 2 (Seed 5)","l");
-    //leg->AddEntry(gct,"GCT","l");
+    leg->AddEntry(gct,"GCT","l");
+    leg->AddEntry(uct,"UCT","l");
 
     leg->Draw("L");
 

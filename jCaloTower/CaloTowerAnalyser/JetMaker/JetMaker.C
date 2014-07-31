@@ -15,8 +15,10 @@ namespace{
     TLorentzVector mht;
 
     for(unsigned i=0; i<jets.size(); i++){
-      ht+=jets[i].Pt();
-      mht+=jets[i];
+      if(jets[i].Pt()>20.){
+        ht+=jets[i].Pt();
+        mht+=jets[i];
+      }
     }
     mhtX=-1.0*mht.Px();
     mhtY=-1.0*mht.Py();
@@ -32,7 +34,7 @@ void JetMaker::Loop()
 
   Long64_t nentries = fChain->GetEntries();
 
-  nentries=3978328;
+  //nentries=2900000;
 
   outFile->cd();
 
