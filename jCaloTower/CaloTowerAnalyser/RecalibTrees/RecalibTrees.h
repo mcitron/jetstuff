@@ -74,10 +74,10 @@ RecalibTrees::RecalibTrees(bool doingNGun, double useEtaCut) //: fChain(0)
 
   if(doNGun){
     s1="ngun_jetTree_newAreas.root";
-    s2="/afs/cern.ch/work/a/aelwood/public/NGUN/140728/ngun_14-07-28.root";
+    s2="/afs/cern.ch/work/a/aelwood/public/NGUN/140729/ngun_14-07-29.root";
   }else{
     s1="ttbar_jetTree_newAreas.root";
-    s2="/afs/cern.ch/work/a/aelwood/public/TTBAR/140728/ttbar_14-07-28.root";
+    s2="/afs/cern.ch/work/a/aelwood/public/TTBAR/140729/ttbar_14-07-29.root";
   }
 
 
@@ -95,19 +95,23 @@ RecalibTrees::RecalibTrees(bool doingNGun, double useEtaCut) //: fChain(0)
   jetTypes.push_back("s0_nopus");
   jetTypes.push_back("s0_donut");
   jetTypes.push_back("s0_global");
-  // jetTypes.push_back("s0_chunky");
-  // jetTypes.push_back("s0_tsup1");
-  // jetTypes.push_back("s0_tsup2");
-  // jetTypes.push_back("s0_tsup3");
+  jetTypes.push_back("s0_chunky");
+  jetTypes.push_back("s0_tsup1");
+  jetTypes.push_back("s0_tsup2");
+  //jetTypes.push_back("s0_tsup3");
   jetTypes.push_back("s5_nopus");
   jetTypes.push_back("s5_donut");
   jetTypes.push_back("s5_global");
   jetTypes.push_back("s5_chunky");
   jetTypes.push_back("s5_tsup1");
   jetTypes.push_back("s5_tsup2");
-  //  jetTypes.push_back("s5_tsup3");
+  //jetTypes.push_back("s5_tsup3");
   jetTypes.push_back("c10_nopus");
   jetTypes.push_back("c10_donut");
+  jetTypes.push_back("c10_global");
+  jetTypes.push_back("c10_chunky");
+  jetTypes.push_back("c10_tsup1");
+  jetTypes.push_back("c10_tsup2");
 
 
   Init(tree);

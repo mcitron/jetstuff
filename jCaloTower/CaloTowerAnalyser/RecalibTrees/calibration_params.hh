@@ -23,6 +23,9 @@ namespace{
   TString l1s0donut="s0_donut";
   TString l1s0global="s0_global";
   TString l1s0nopus="s0_nopus";
+  TString l1s0chunky="s0_chunky";
+  TString l1s0tsup1="s0_tsup1";
+  TString l1s0tsup2="s0_tsup2";
   TString l1s5donut="s5_donut";
   TString l1s5nopus="s5_nopus";
   TString l1s5global="s5_global";
@@ -31,6 +34,10 @@ namespace{
   TString l1s5tsup2="s5_tsup2";
   TString l1c10donut="c10_donut";
   TString l1c10nopus="c10_nopus";
+  TString l1c10global="c10_global";
+  TString l1c10chunky="c10_chunky";
+  TString l1c10tsup1="c10_tsup1";
+  TString l1c10tsup2="c10_tsup2";
 }
 
 std::vector<TLorentzVector> calibrateL1Jets(const std::vector<TLorentzVector>& inJets, TString type, double ptMin, double ptMax){
@@ -46,6 +53,9 @@ std::vector<TLorentzVector> calibrateL1Jets(const std::vector<TLorentzVector>& i
     if(type==l1s0global) lut.push_back(lutss0GeV::globalLut[i]);
     else if(type==l1s0donut) lut.push_back(lutss0GeV::donutLut[i]);
     else if(type==l1s0nopus) lut.push_back(lutss0GeV::nopusLut[i]);
+    else if(type==l1s0chunky) lut.push_back(lutss0GeV::chunkyLut[i]);
+    else if(type==l1s0tsup1) lut.push_back(lutss0GeV::tsup1Lut[i]);
+    else if(type==l1s0tsup2) lut.push_back(lutss0GeV::tsup2Lut[i]);
     else if(type==l1s5donut) lut.push_back(lutss5GeV::donutLut[i]);
     else if(type==l1s5global) lut.push_back(lutss5GeV::globalLut[i]);
     else if(type==l1s5nopus) lut.push_back(lutss5GeV::nopusLut[i]);
@@ -54,6 +64,10 @@ std::vector<TLorentzVector> calibrateL1Jets(const std::vector<TLorentzVector>& i
     else if(type==l1s5tsup2) lut.push_back(lutss5GeV::tsup2Lut[i]);
     else if(type==l1c10donut) lut.push_back(lutsc10GeV::donutLut[i]);
     else if(type==l1c10nopus) lut.push_back(lutsc10GeV::nopusLut[i]);
+    else if(type==l1c10chunky) lut.push_back(lutsc10GeV::chunkyLut[i]);
+    else if(type==l1c10tsup1) lut.push_back(lutsc10GeV::tsup1Lut[i]);
+    else if(type==l1c10tsup2) lut.push_back(lutsc10GeV::tsup2Lut[i]);
+    else if(type==l1c10global) lut.push_back(lutsc10GeV::globalLut[i]);
 
     else std::cout << "Invalid type to get lut" << std::endl;
 
